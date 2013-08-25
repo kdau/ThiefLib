@@ -33,6 +33,9 @@ TARGET = i686-w64-mingw32
 # CUSTOMIZE to the location of the ThiefLib headers and archives.
 THIEFLIBDIR = ../
 
+# CUSTOMIZE to include only the game(s) you want to build for.
+default: thief1 thief2
+
 # CUSTOMIZE to list your scripts' headers.
 SCRIPT_HEADERS = \
 	SampleScript.hh

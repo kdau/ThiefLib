@@ -1,15 +1,15 @@
 ThiefLib is a modern wrapper library for creating custom script modules for the
-Dark Engine games Thief II: The Metal Age and Thief: The Dark Project/Thief Gold.
-It builds on the previous work of GayleSaver and Telliamed in documenting the
-engine's often-perplexing script API while offering a simplified, modern-C++
+Dark Engine games Thief II: The Metal Age and Thief: The Dark Project/Thief
+Gold. It builds on the previous work of GayleSaver and Telliamed in documenting
+the engine's often-perplexing script API while offering a simplified, modern-C++
 interface in which the first-class objects and methods are coherently organized
 and clearly mapped to in-game results.
 
 ThiefLib is still in development and should be used with caution. It is the base
 library for KDScript as of version 0.7.0 of that module, but many elements not
-used there have not seen extensive testing. See the TODO file and comments marked
-TODO throughout the codebase for other work remaining to be done. Particularly,
-the library is still almost entirely undocumented.
+used there have not seen extensive testing. See the TODO file and comments
+marked TODO throughout the codebase for other work remaining to be done.
+Particularly, the library is still almost entirely undocumented.
 
 The library currently requires NewDark, but that dependency can be made
 conditional if desired.

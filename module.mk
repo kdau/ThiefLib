@@ -24,10 +24,9 @@
 bindir1 = ./bin-t1
 bindir2 = ./bin-t2
 
-.PHONY: default all clean
+.PHONY: default thief1 thief2 clean
 .PRECIOUS: %.o
 .INTERMEDIATE: $(bindir1)/exports.o $(bindir2)/exports.o module.hh
-default: all
 
 ifdef TARGET
 CXX = $(TARGET)-g++
@@ -124,7 +123,8 @@ $(bindir2)/$(MODULE_NAME).osm: $(SCRIPT_OBJS2) $(MODULE_OBJS2)
 
 
 
-all: $(bindir1) $(bindir2) $(bindir1)/$(MODULE_NAME).osm $(bindir2)/$(MODULE_NAME).osm
+thief1: $(bindir1) $(bindir1)/$(MODULE_NAME).osm
+thief2: $(bindir2) $(bindir2)/$(MODULE_NAME).osm
 
 clean:
 	$(RM) $(bindir1)/*.o $(bindir2)/*.o $(bindir1)/*.osm $(bindir2)/*.osm
