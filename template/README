@@ -1,0 +1,18 @@
+This directory contains a basic template for a Dark Engine custom script module
+using the ThiefLib wrapper library. (See the library's README file in the parent
+directory for more information on it.)
+
+A single "Hello World" demonstration script, SampleScript, has been included. To
+use this template:
+* replace the SampleScript with your own scripts
+* edit the lines marked CUSTOMIZE in Makefile, module.cc, and version.rc
+* edit the first line of exports.def
+
+
+
+Copyright (C) 2012-2013 Kevin Daughtridge <kevin@kdau.com>
+
+Unlike the rest of ThiefLib, this template is unrestricted. Redistribution and
+use of the template in source and binary forms, with or without modification,
+are permitted unconditionally.
+

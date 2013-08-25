@@ -1,0 +1,95 @@
+/******************************************************************************
+ *  version.rc
+ *
+ *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
+ *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Adapted in part from Public Scripts and the Object Script Library
+ *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ *****************************************************************************/
+
+#ifndef __cplusplus // allow no-op inclusion in modules.cc
+
+#ifndef MODULE_NAME
+#error "The MODULE_NAME macro must be defined to provide a name for this module."
+#endif
+
+#ifndef PACKAGE_NAME
+#define PACKAGE_NAME MODULE_NAME
+#endif
+
+#ifndef AUTHOR_NAME
+#define AUTHOR_NAME "Anonymous"
+#endif
+
+#ifdef COPYRIGHT_YEAR
+#define COPYRIGHT COPYRIGHT_YEAR " " AUTHOR_NAME
+#else
+#define COPYRIGHT AUTHOR_NAME
+#endif
+
+#ifndef VERSION_NUMBER
+#define VERSION_NUMBER 1,0,0,0
+#endif
+
+#ifndef VERSION_STRING
+#define VERSION_STRING "1.0"
+#endif
+
+#ifndef WORKSHOP_INVOKED
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION		VERSION_NUMBER
+PRODUCTVERSION		VERSION_NUMBER
+#if DEBUG
+FILEFLAGS		VS_FF_DEBUG
+#else
+FILEFLAGS		0
+#endif
+FILEOS			VOS_NT_WINDOWS32
+FILETYPE		VFT_DLL
+BEGIN
+	BLOCK "StringFileInfo"
+	BEGIN
+		BLOCK "040904e4"
+		BEGIN
+			VALUE	"FileDescription", PACKAGE_NAME "\0"
+			VALUE	"FileVersion", VERSION_STRING "\0"
+			VALUE	"InternalName", MODULE_NAME "\0"
+			VALUE	"LegalCopyright", "Copyright (C) " COPYRIGHT "\0"
+			VALUE	"OriginalFilename", MODULE_NAME ".osm" "\0"
+			VALUE	"ProductName", PACKAGE_NAME "\0"
+			VALUE	"ProductVersion", VERSION_STRING "\0"
+#if (_DARKGAME == 1)
+			VALUE	"DarkGameVersion", "Thief1" "\0"
+#elif (_DARKGAME == 2)
+			VALUE	"DarkGameVersion", "Thief2" "\0"
+#else
+			VALUE	"DarkGameVersion", "All" "\0"
+#endif
+		END
+	END
+	BLOCK "VarFileInfo"
+	BEGIN
+		VALUE	"Translation", 1033, 1252
+	END
+END
+
+#endif // __cplusplus
+

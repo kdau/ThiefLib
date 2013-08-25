@@ -1,0 +1,10 @@
+lg
+DH2
+bin-t1/*.o
+bin-t1-d/*.o
+bin-t2/*.o
+bin-t2-d/*.o
+libthief1.a
+libthief1-d.a
+libthief2.a
+libthief2-d.a
