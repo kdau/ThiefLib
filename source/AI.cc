@@ -25,94 +25,98 @@
 
 namespace Thief {
 
-static bool _not (const bool& value) { return !value; }
-
 
 
 // AI
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE AI
-
-PF_CONFIG (mode, "AI_mode", nullptr, AI::Mode, AI::Mode::NORMAL);
-PF_CONFIG (frozen_start, "AI_Frozen", "StartTime", Time, 0ul);
-PF_CONFIG (frozen_duration, "AI_Frozen", "Duration", Time, 0ul);
-PF_CONFIG (behavior_set, "AI", "Behavior set", String, "");
-PF_CONFIG (aggression, "AI_Aggression", nullptr, AI::Rating, AI::Rating::NONE);
-PF_CONFIG (aptitude, "AI_Aptitude", nullptr, AI::Rating, AI::Rating::NONE);
-PF_CONFIG (defensiveness, "AI_Defensive", nullptr, AI::Rating, AI::Rating::NONE);
-PF_CONFIG (dodginess, "AI_Dodginess", nullptr, AI::Rating, AI::Rating::NONE);
-PF_CONFIG (hearing, "AI_Hearing", nullptr, AI::Rating, AI::Rating::NONE);
-PF_CONFIG (sloth, "AI_Sloth", nullptr, AI::Rating, AI::Rating::NONE);
-PF_CONFIG (verbosity, "AI_Verbosity", nullptr, AI::Rating, AI::Rating::NONE);
-PF_CONFIG (vision, "AI_Vision", nullptr, AI::Rating, AI::Rating::NONE);
-PF_CONFIG (time_warp, "TimeWarp", nullptr, float, 1.0f);
-PF_CONFIG (uses_doors, "AI_UsesDoors", nullptr, bool, true);
-PF_CONFIG (needs_big_doors, "AI_IsBig", nullptr, bool, false);
-PF_CONFIG_ (flash_vulnerable, "NoFlash", nullptr, bool, false, 0u, _not, _not);
-PF_CONFIG_ (head_tracks_player, "CretHTrack", nullptr, bool, false, 0u, _not, _not);
-PF_CONFIG_ (investigates, "AI_InvKnd", nullptr, bool, false, 0u, _not, _not);
-PF_CONFIG (patrols, "AI_Patrol", nullptr, bool, false);
-PF_CONFIG (patrols_randomly, "AI_PtrlRnd", nullptr, bool, false);
-PF_CONFIG (traverses_water, "AI_UseWater", nullptr, bool, false);
-PF_CONFIG (notices_bodies, "AI_NtcBody", nullptr, bool, true);
-PF_CONFIG_ (notices_cameras, "AI_IgCam", nullptr, bool, false, 0u, _not, _not);
-PF_CONFIG (notices_damage, "AI_NoticeDmg", nullptr, bool, true);
-PF_CONFIG_ (notices_other_ai, "AI_OnlyPlayer", nullptr, bool, false, 0u, _not, _not);
-PF_CONFIG (notices_projectiles, "AI_SeesPrj", nullptr, bool, true);
-PF_CONFIG (creature_type, "Creature", nullptr, AI::CreatureType,
-	AI::CreatureType::NONE);
-PF_CONFIG (creature_scale, "CretScale", nullptr, float, 1.0f);
-PF_CONFIG (is_small_creature, "AI_IsSmall", nullptr, bool, false);
-PF_CONFIG (motion_tags, "MotActorTagList", nullptr, String, "");
-PF_CONFIG (motion_tags_standing, "AI_StandTags", nullptr, String, "");
-PF_CONFIG (voice, "SpchVoice", nullptr, String, "");
-PFB_CONFIG (is_speaking, "Speech", "flags", 1u, false);
-PF_CONFIG (last_speech_time, "Speech", "time", Time, 0ul);
-PF_CONFIG (last_speech_schema, "Speech", "schemaID", Object, Object::NONE);
-PF_CONFIG (last_speech_concept, "Speech", "concept", int, 0);
-PFB_CONFIG (is_innocent, "DarkStat", nullptr, 1u, false);
-PFB_CONFIG (is_robot, "DarkStat", nullptr, 16u, false);
+PROXY_CONFIG (AI, mode, "AI_mode", nullptr, AI::Mode, AI::Mode::NORMAL);
+PROXY_CONFIG (AI, frozen_start, "AI_Frozen", "StartTime", Time, 0ul);
+PROXY_CONFIG (AI, frozen_duration, "AI_Frozen", "Duration", Time, 0ul);
+PROXY_CONFIG (AI, behavior_set, "AI", "Behavior set", String, "");
+PROXY_CONFIG (AI, aggression, "AI_Aggression", nullptr,
+	AI::Rating, AI::Rating::NONE);
+PROXY_CONFIG (AI, aptitude, "AI_Aptitude", nullptr,
+	AI::Rating, AI::Rating::NONE);
+PROXY_CONFIG (AI, defensiveness, "AI_Defensive", nullptr,
+	AI::Rating, AI::Rating::NONE);
+PROXY_CONFIG (AI, dodginess, "AI_Dodginess", nullptr,
+	AI::Rating, AI::Rating::NONE);
+PROXY_CONFIG (AI, hearing, "AI_Hearing", nullptr,
+	AI::Rating, AI::Rating::NONE);
+PROXY_CONFIG (AI, sloth, "AI_Sloth", nullptr,
+	AI::Rating, AI::Rating::NONE);
+PROXY_CONFIG (AI, verbosity, "AI_Verbosity", nullptr,
+	AI::Rating, AI::Rating::NONE);
+PROXY_CONFIG (AI, vision, "AI_Vision", nullptr,
+	AI::Rating, AI::Rating::NONE);
+PROXY_CONFIG (AI, time_warp, "TimeWarp", nullptr, float, 1.0f);
+PROXY_CONFIG (AI, uses_doors, "AI_UsesDoors", nullptr, bool, true);
+PROXY_CONFIG (AI, needs_big_doors, "AI_IsBig", nullptr, bool, false);
+PROXY_NEG_CONFIG (AI, flash_vulnerable, "NoFlash", nullptr, bool, false);
+PROXY_NEG_CONFIG (AI, head_tracks_player, "CretHTrack", nullptr, bool, false);
+PROXY_NEG_CONFIG (AI, investigates, "AI_InvKnd", nullptr, bool, false);
+PROXY_CONFIG (AI, patrols, "AI_Patrol", nullptr, bool, false);
+PROXY_CONFIG (AI, patrols_randomly, "AI_PtrlRnd", nullptr, bool, false);
+PROXY_CONFIG (AI, traverses_water, "AI_UseWater", nullptr, bool, false);
+PROXY_CONFIG (AI, notices_bodies, "AI_NtcBody", nullptr, bool, true);
+PROXY_NEG_CONFIG (AI, notices_cameras, "AI_IgCam", nullptr, bool, false);
+PROXY_CONFIG (AI, notices_damage, "AI_NoticeDmg", nullptr, bool, true);
+PROXY_NEG_CONFIG (AI, notices_other_ai, "AI_OnlyPlayer", nullptr, bool, false);
+PROXY_CONFIG (AI, notices_projectiles, "AI_SeesPrj", nullptr, bool, true);
+PROXY_CONFIG (AI, creature_type, "Creature", nullptr,
+	AI::CreatureType, AI::CreatureType::NONE);
+PROXY_CONFIG (AI, creature_scale, "CretScale", nullptr, float, 1.0f);
+PROXY_CONFIG (AI, is_small_creature, "AI_IsSmall", nullptr, bool, false);
+PROXY_CONFIG (AI, motion_tags, "MotActorTagList", nullptr, String, "");
+PROXY_CONFIG (AI, motion_tags_standing, "AI_StandTags", nullptr, String, "");
+PROXY_CONFIG (AI, voice, "SpchVoice", nullptr, String, "");
+PROXY_BIT_CONFIG (AI, is_speaking, "Speech", "flags", 1u, false);
+PROXY_CONFIG (AI, last_speech_time, "Speech", "time", Time, 0ul);
+PROXY_CONFIG (AI, last_speech_schema, "Speech", "schemaID",
+	Object, Object::NONE);
+PROXY_CONFIG (AI, last_speech_concept, "Speech", "concept", int, 0);
+PROXY_BIT_CONFIG (AI, is_innocent, "DarkStat", nullptr, 1u, false);
+PROXY_BIT_CONFIG (AI, is_robot, "DarkStat", nullptr, 16u, false);
 
 OBJECT_TYPE_IMPL_ (AI,
-	PF_INIT (mode),
-	PF_INIT (frozen_start),
-	PF_INIT (frozen_duration),
-	PF_INIT (behavior_set),
-	PF_INIT (aggression),
-	PF_INIT (aptitude),
-	PF_INIT (defensiveness),
-	PF_INIT (dodginess),
-	PF_INIT (hearing),
-	PF_INIT (sloth),
-	PF_INIT (verbosity),
-	PF_INIT (vision),
-	PF_INIT (time_warp),
-	PF_INIT (uses_doors),
-	PF_INIT (needs_big_doors),
-	PF_INIT (flash_vulnerable),
-	PF_INIT (head_tracks_player),
-	PF_INIT (investigates),
-	PF_INIT (patrols),
-	PF_INIT (patrols_randomly),
-	PF_INIT (traverses_water),
-	PF_INIT (notices_bodies),
-	PF_INIT (notices_cameras),
-	PF_INIT (notices_damage),
-	PF_INIT (notices_other_ai),
-	PF_INIT (notices_projectiles),
-	PF_INIT (creature_type),
-	PF_INIT (creature_scale),
-	PF_INIT (is_small_creature),
-	PF_INIT (motion_tags),
-	PF_INIT (motion_tags_standing),
-	PF_INIT (voice),
-	PF_INIT (is_speaking),
-	PF_INIT (last_speech_time),
-	PF_INIT (last_speech_schema),
-	PF_INIT (last_speech_concept),
-	PF_INIT (is_innocent),
-	PF_INIT (is_robot)
+	PROXY_INIT (mode),
+	PROXY_INIT (frozen_start),
+	PROXY_INIT (frozen_duration),
+	PROXY_INIT (behavior_set),
+	PROXY_INIT (aggression),
+	PROXY_INIT (aptitude),
+	PROXY_INIT (defensiveness),
+	PROXY_INIT (dodginess),
+	PROXY_INIT (hearing),
+	PROXY_INIT (sloth),
+	PROXY_INIT (verbosity),
+	PROXY_INIT (vision),
+	PROXY_INIT (time_warp),
+	PROXY_INIT (uses_doors),
+	PROXY_INIT (needs_big_doors),
+	PROXY_INIT (flash_vulnerable),
+	PROXY_INIT (head_tracks_player),
+	PROXY_INIT (investigates),
+	PROXY_INIT (patrols),
+	PROXY_INIT (patrols_randomly),
+	PROXY_INIT (traverses_water),
+	PROXY_INIT (notices_bodies),
+	PROXY_INIT (notices_cameras),
+	PROXY_INIT (notices_damage),
+	PROXY_INIT (notices_other_ai),
+	PROXY_INIT (notices_projectiles),
+	PROXY_INIT (creature_type),
+	PROXY_INIT (creature_scale),
+	PROXY_INIT (is_small_creature),
+	PROXY_INIT (motion_tags),
+	PROXY_INIT (motion_tags_standing),
+	PROXY_INIT (voice),
+	PROXY_INIT (is_speaking),
+	PROXY_INIT (last_speech_time),
+	PROXY_INIT (last_speech_schema),
+	PROXY_INIT (last_speech_concept),
+	PROXY_INIT (is_innocent),
+	PROXY_INIT (is_robot)
 )
 
 bool
@@ -320,13 +324,11 @@ AI::send_signal (const String& signal)
 // Conversation
 //TODO wrap property: AI: Conversations\Conversation = AI_Converation [sic]
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Conversation
-
-PF_CONFIG (save_conversation, "AI_SaveConverse", nullptr, bool, false);
+PROXY_CONFIG (Conversation, save_conversation, "AI_SaveConverse", nullptr,
+	bool, false);
 
 OBJECT_TYPE_IMPL_ (Conversation,
-	PF_INIT (save_conversation)
+	PROXY_INIT (save_conversation)
 )
 
 bool

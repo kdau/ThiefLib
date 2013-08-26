@@ -81,36 +81,17 @@ private:
 
 // PropField: interpreted access to property fields for Object subclasses
 
-template <typename T>
-struct PropFieldConfig
-{
-	const char* property;
-	const char* field;
-
-	typedef typename std::conditional<std::is_same<T, String>::value,
-		const char*, T>::type DefaultValue;
-	DefaultValue default_value;
-
-	unsigned bitmask; // for T==bool only
-
-	typedef T (*GetFilter) (const T&);
-	GetFilter get_filter;
-
-	typedef T (*SetFilter) (const T&);
-	SetFilter set_filter;
-};
-
 class PropFieldBase
 {
 protected:
 	void get (const Object&, const char*, const char*, LGMultiBase&) const;
 	void set (const Object&, const char*, const char*, const LGMultiBase&);
 
-	bool get_bit (const PropFieldConfig<bool>&, const Object&) const;
-	void set_bit (const PropFieldConfig<bool>&, const Object&, bool);
+	bool get_bit (const FieldProxyConfig<bool>&, const Object&) const;
+	void set_bit (const FieldProxyConfig<bool>&, const Object&, bool);
 };
 
-template <typename T, const PropFieldConfig<T>& config>
+template <typename T, const FieldProxyConfig<T>& config>
 class PropField : public PropFieldBase
 {
 public:
@@ -124,7 +105,7 @@ private:
 	const Object& object;
 };
 
-template <const PropFieldConfig<bool>& config>
+template <const FieldProxyConfig<bool>& config>
 class PropField<bool, config> : public PropFieldBase
 {
 public:
@@ -138,7 +119,7 @@ private:
 	const Object& object;
 };
 
-template <typename T, const PropFieldConfig<T>& config>
+template <typename T, const FieldProxyConfig<T>& config>
 std::ostream& operator << (std::ostream&, const PropField<T, config>&);
 
 

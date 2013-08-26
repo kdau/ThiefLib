@@ -29,15 +29,12 @@ namespace Thief {
 
 // Lockable
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Lockable
-
-PF_CONFIG (region_mask, "KeyDst", "RegionMask", unsigned, 0u);
-PF_CONFIG (lock_number, "KeyDst", "LockID", unsigned, 0u);
+PROXY_CONFIG (Lockable, region_mask, "KeyDst", "RegionMask", unsigned, 0u);
+PROXY_CONFIG (Lockable, lock_number, "KeyDst", "LockID", unsigned, 0u);
 
 OBJECT_TYPE_IMPL_ (Lockable,
-	PF_INIT (region_mask),
-	PF_INIT (lock_number)
+	PROXY_INIT (region_mask),
+	PROXY_INIT (lock_number)
 )
 
 bool
@@ -93,17 +90,14 @@ LockLink::set_interaction (Require interaction)
 
 // Key
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Key
-
-PF_CONFIG (master_key, "KeySrc", "MasterBit", bool, false);
-PF_CONFIG (region_mask, "KeySrc", "RegionMask", unsigned, 0u);
-PF_CONFIG (lock_number, "KeySrc", "LockID", unsigned, 0u);
+PROXY_CONFIG (Key, master_key, "KeySrc", "MasterBit", bool, false);
+PROXY_CONFIG (Key, region_mask, "KeySrc", "RegionMask", unsigned, 0u);
+PROXY_CONFIG (Key, lock_number, "KeySrc", "LockID", unsigned, 0u);
 
 OBJECT_TYPE_IMPL_ (Key,
-	PF_INIT (master_key),
-	PF_INIT (region_mask),
-	PF_INIT (lock_number)
+	PROXY_INIT (master_key),
+	PROXY_INIT (region_mask),
+	PROXY_INIT (lock_number)
 )
 
 bool
@@ -263,14 +257,11 @@ BasicPickable::is_basic_pickable () const
 //TODO wrap property: Dark Gamesys\AdvPickStateCfg = AdvPickStateCfg (propdefs.h: sAdvPickStateCfg)
 //TODO wrap property: Dark Gamesys\AdvPickTransCfg = AdvPickTransCfg (propdefs.h: sAdvPickTransCfg)
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE AdvPickable
-
-PF_CONFIG (is_advanced_pickable, "AdvPickStateCfg", "Enable Advanced System",
-	bool, false);
+PROXY_CONFIG (AdvPickable, is_advanced_pickable, "AdvPickStateCfg",
+	"Enable Advanced System", bool, false);
 
 OBJECT_TYPE_IMPL_ (AdvPickable,
-	PF_INIT (is_advanced_pickable)
+	PROXY_INIT (is_advanced_pickable)
 )
 
 
@@ -300,13 +291,10 @@ MESSAGE_ACCESSOR (AdvPickable::Stage, PickMessage, get_old_stage,
 // Lockpick
 //TODO wrap link: NowPicking - int (meaningful data??)
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Lockpick
-
-PF_CONFIG (pick_bits, "PickSrc", "PickBits", unsigned, 0u);
+PROXY_CONFIG (Lockpick, pick_bits, "PickSrc", "PickBits", unsigned, 0u);
 
 OBJECT_TYPE_IMPL_ (Lockpick,
-	PF_INIT (pick_bits)
+	PROXY_INIT (pick_bits)
 )
 
 bool

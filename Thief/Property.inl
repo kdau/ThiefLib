@@ -66,41 +66,41 @@ Property::get_field (const String& field, const T& default_value) const
 
 // PropField
 
-template <typename T, const PropFieldConfig<T>& config>
+template <typename T, const FieldProxyConfig<T>& config>
 inline
 PropField<T, config>::PropField (const Object& _object)
 	: object (_object)
 {
-	if (!config.property)
+	if (!config.major)
 		throw std::runtime_error ("no property specified");
 }
 
-template <typename T, const PropFieldConfig<T>& config>
+template <typename T, const FieldProxyConfig<T>& config>
 inline bool
 PropField<T, config>::exists () const
 {
-	return Property (object, config.property).exists ();
+	return Property (object, config.major).exists ();
 }
 
-template <typename T, const PropFieldConfig<T>& config>
+template <typename T, const FieldProxyConfig<T>& config>
 inline
 PropField<T, config>::operator T () const
 {
 	LGMulti<T> raw (config.default_value);
-	if (exists ()) get (object, config.property, config.field, raw);
+	if (exists ()) get (object, config.major, config.minor, raw);
 	return config.get_filter ? config.get_filter (raw) : T (raw);
 }
 
-template <typename T, const PropFieldConfig<T>& config>
+template <typename T, const FieldProxyConfig<T>& config>
 inline PropField<T, config>&
 PropField<T, config>::operator = (const T& value)
 {
-	set (object, config.property, config.field, LGMulti<T>
+	set (object, config.major, config.minor, LGMulti<T>
 		(config.set_filter ? config.set_filter (value) : T (value)));
 	return *this;
 }
 
-template <typename T, const PropFieldConfig<T>& config>
+template <typename T, const FieldProxyConfig<T>& config>
 inline std::ostream&
 operator << (std::ostream& out, const PropField<T, config>& field)
 {
@@ -112,23 +112,23 @@ operator << (std::ostream& out, const PropField<T, config>& field)
 
 // PropField<bool>
 
-template <const PropFieldConfig<bool>& config>
+template <const FieldProxyConfig<bool>& config>
 inline
 PropField<bool, config>::PropField (const Object& _object)
 	: object (_object)
 {
-	if (!config.property)
+	if (!config.major)
 		throw std::runtime_error ("no property specified");
 }
 
-template <const PropFieldConfig<bool>& config>
+template <const FieldProxyConfig<bool>& config>
 inline bool
 PropField<bool, config>::exists () const
 {
-	return Property (object, config.property).exists ();
+	return Property (object, config.major).exists ();
 }
 
-template <const PropFieldConfig<bool>& config>
+template <const FieldProxyConfig<bool>& config>
 inline
 PropField<bool, config>::operator bool () const
 {
@@ -136,11 +136,11 @@ PropField<bool, config>::operator bool () const
 	if (config.bitmask)
 		raw = get_bit (config, object);
 	else if (exists ())
-		get (object, config.property, config.field, raw);
+		get (object, config.major, config.minor, raw);
 	return config.get_filter ? config.get_filter (raw) : bool (raw);
 }
 
-template <const PropFieldConfig<bool>& config>
+template <const FieldProxyConfig<bool>& config>
 inline PropField<bool, config>&
 PropField<bool, config>::operator = (bool value)
 {
@@ -149,7 +149,7 @@ PropField<bool, config>::operator = (bool value)
 	if (config.bitmask)
 		set_bit (config, object, raw);
 	else
-		set (object, config.property, config.field, LGMulti<bool> (raw));
+		set (object, config.major, config.minor, LGMulti<bool> (raw));
 
 	return *this;
 }
@@ -158,13 +158,10 @@ PropField<bool, config>::operator = (bool value)
 
 // Convenience macro for PropField members of Object subclasses
 
-#define THIEF_PROP_FIELD_(Type, Name, Specifiers) \
-static const PropFieldConfig<Type> _PF_##Name; \
-Specifiers PropField<Type, _PF_##Name> Name;
+#define THIEF_PROP_FIELD(Type, Name) THIEF_FIELD_PROXY (PropField, Type, Name, )
 
-#define THIEF_PROP_FIELD(Type, Name) THIEF_PROP_FIELD_ (Type, Name,)
-
-#define THIEF_PROP_FIELD_CONST(Type, Name) THIEF_PROP_FIELD_ (Type, Name, const)
+#define THIEF_PROP_FIELD_CONST(Type, Name) \
+THIEF_FIELD_PROXY (PropField, Type, Name, const)
 
 
 

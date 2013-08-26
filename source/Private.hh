@@ -133,6 +133,30 @@ public:
 
 
 
+// Field proxy convenience macros
+
+#define PROXY_CONFIG_(Class, Member, Major, Minor, Type, ...) \
+const FieldProxyConfig<Type> \
+Class::F_##Member = { Major, Minor, __VA_ARGS__ }
+
+#define PROXY_CONFIG(Class, Member, Major, Minor, Type, Default) \
+PROXY_CONFIG_ (Class, Member, Major, Minor, Type, Default, 0u, nullptr, nullptr)
+
+#define PROXY_BIT_CONFIG(Class, Member, Major, Minor, Mask, Default) \
+PROXY_CONFIG_ (Class, Member, Major, Minor, bool, Default, Mask, nullptr, nullptr)
+
+bool negate (const bool&);
+
+#define PROXY_NEG_CONFIG(Class, Member, Major, Minor, Type, Default) \
+PROXY_CONFIG_ (Class, Member, Major, Minor, Type, Default, 0u, negate, negate)
+
+#define PROXY_NEG_BIT_CONFIG(Class, Member, Major, Minor, Mask, Default) \
+PROXY_CONFIG_ (Class, Member, Major, Minor, bool, Default, Mask, negate, negate)
+
+#define PROXY_INIT(Member) Member (*this)
+
+
+
 // Object subclass convenience macros
 
 #define OBJECT_TYPE_IMPL_(ClassName, ...) \
@@ -148,18 +172,6 @@ ClassName::ClassName (const Object& object) : Object (object) {} \
 ClassName::ClassName (const String& name) : Object (name) {} \
 ClassName& ClassName::operator = (const ClassName& copy) \
 	{ number = copy.number; return *this; }
-
-#define PF_CONFIG_(Member, Property, Field, Type, ...) \
-const PropFieldConfig<Type> \
-OBJECT_TYPE::_PF_##Member = { Property, Field, __VA_ARGS__ }
-
-#define PF_CONFIG(Member, Property, Field, Type, Default) \
-PF_CONFIG_ (Member, Property, Field, Type, Default, 0u, nullptr, nullptr)
-
-#define PFB_CONFIG(Member, Property, Field, Mask, Default) \
-PF_CONFIG_ (Member, Property, Field, bool, Default, Mask, nullptr, nullptr)
-
-#define PF_INIT(Member) Member (*this)
 
 
 

@@ -42,26 +42,23 @@ Object::SELF = INT_MAX;
 
 // Constructors and destructors
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Object
+PROXY_CONFIG (Object, has_refs, "HasRefs", nullptr, bool, true);
+PROXY_CONFIG (Object, stack_count, "StackCount", nullptr, int, 1);
 
-PF_CONFIG (has_refs, "HasRefs", nullptr, bool, true);
-PF_CONFIG (stack_count, "StackCount", nullptr, int, 1);
-
-#define PF_INIT_OBJECT \
-	PF_INIT (has_refs), \
-	PF_INIT (stack_count)
+#define OBJECT_COMMON_INIT \
+	PROXY_INIT (has_refs), \
+	PROXY_INIT (stack_count)
 
 Object::Object (Number _number)
-	: number (_number), PF_INIT_OBJECT
+	: number (_number), OBJECT_COMMON_INIT
 {}
 
 Object::Object (const Object& copy)
-	: number (copy.number), PF_INIT_OBJECT
+	: number (copy.number), OBJECT_COMMON_INIT
 {}
 
 Object::Object (const String& name)
-	: number (find (name)), PF_INIT_OBJECT
+	: number (find (name)), OBJECT_COMMON_INIT
 {}
 
 Object&

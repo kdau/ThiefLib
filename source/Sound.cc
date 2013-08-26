@@ -25,14 +25,9 @@
 
 namespace Thief {
 
-static bool _not (const bool& value) { return !value; }
-
 
 
 // SoundSchema
-
-#undef OBJECT_TYPE
-#define OBJECT_TYPE SoundSchema
 
 #ifdef IS_THIEF2
 #define _SOUND_NET , kSoundNetNormal
@@ -40,65 +35,80 @@ static bool _not (const bool& value) { return !value; }
 #define _SOUND_NET
 #endif
 
-PF_CONFIG (last_sample, "SchLastSample", nullptr, int, -1);
-PFB_CONFIG (retrigger, "SchPlayParams", "Flags", 1u, false);
-PFB_CONFIG (pan_position, "SchPlayParams", "Flags", 2u, false);
-PFB_CONFIG (pan_range, "SchPlayParams", "Flags", 4u, false);
-PF_CONFIG_ (repeat, "SchPlayParams", "Flags", bool, false, 8u, _not, _not);
-PF_CONFIG_ (cache, "SchPlayParams", "Flags", bool, false, 16u, _not, _not);
-PFB_CONFIG (stream, "SchPlayParams", "Flags", 32u, false);
-PFB_CONFIG (play_once, "SchPlayParams", "Flags", 64u, false);
-PF_CONFIG_ (combat, "SchPlayParams", "Flags", bool, false, 128u, _not, _not);
-PFB_CONFIG (net_ambient, "SchPlayParams", "Flags", 256u, false);
-PFB_CONFIG (local_spatial, "SchPlayParams", "Flags", 512u, false);
-PFB_CONFIG (is_noise, "SchPlayParams", "Flags", 65536u, false);
-PFB_CONFIG (is_speech, "SchPlayParams", "Flags", 131072u, false);
-PFB_CONFIG (is_ambient, "SchPlayParams", "Flags", 262144u, false);
-PFB_CONFIG (is_music, "SchPlayParams", "Flags", 524288u, false);
-PFB_CONFIG (is_meta_ui, "SchPlayParams", "Flags", 1048576u, false);
-PF_CONFIG (volume, "SchPlayParams", "Volume", int, 0);
-PF_CONFIG (pan, "SchPlayParams", "Pan", int, 0);
-PF_CONFIG (fade, "SchPlayParams", "Fade", int, 0);
-PF_CONFIG (initial_delay, "SchPlayParams", "Initial Delay", Time, 0ul);
-PF_CONFIG (attenuation_factor, "SchAttFac", nullptr, float, 1.0f);
-PF_CONFIG (priority, "SchPriority", nullptr, int, 0);
-PFB_CONFIG (loop_is_poly, "SchLoopParams", "Flags", 1u, false);
-PF_CONFIG (loop_max_samples, "SchLoopParams", "Max Samples", unsigned, 0u);
-PF_CONFIG (loop_min_interval, "SchLoopParams", "Interval Min", Time, 0ul);
-PF_CONFIG (loop_max_interval, "SchLoopParams", "Interval Max", Time, 0ul);
-PF_CONFIG (ai_value, "AI_SndType", "Type", SoundSchema::AIValue,
-	SoundSchema::AIValue::NONE);
-PF_CONFIG (ai_signal, "AI_SndType", "Signal", String, "");
+PROXY_CONFIG (SoundSchema, last_sample, "SchLastSample", nullptr, int, -1);
+PROXY_BIT_CONFIG (SoundSchema, retrigger, "SchPlayParams", "Flags", 1u, false);
+PROXY_BIT_CONFIG (SoundSchema, pan_position, "SchPlayParams", "Flags",
+	2u, false);
+PROXY_BIT_CONFIG (SoundSchema, pan_range, "SchPlayParams", "Flags", 4u, false);
+PROXY_NEG_BIT_CONFIG (SoundSchema, repeat, "SchPlayParams", "Flags", 8u, false);
+PROXY_NEG_BIT_CONFIG (SoundSchema, cache, "SchPlayParams", "Flags", 16u, false);
+PROXY_BIT_CONFIG (SoundSchema, stream, "SchPlayParams", "Flags", 32u, false);
+PROXY_BIT_CONFIG (SoundSchema, play_once, "SchPlayParams", "Flags", 64u, false);
+PROXY_NEG_BIT_CONFIG (SoundSchema, combat, "SchPlayParams", "Flags",
+	128u, false);
+PROXY_BIT_CONFIG (SoundSchema, net_ambient, "SchPlayParams", "Flags",
+	256u, false);
+PROXY_BIT_CONFIG (SoundSchema, local_spatial, "SchPlayParams", "Flags",
+	512u, false);
+PROXY_BIT_CONFIG (SoundSchema, is_noise, "SchPlayParams", "Flags",
+	65536u, false);
+PROXY_BIT_CONFIG (SoundSchema, is_speech, "SchPlayParams", "Flags",
+	131072u, false);
+PROXY_BIT_CONFIG (SoundSchema, is_ambient, "SchPlayParams", "Flags",
+	262144u, false);
+PROXY_BIT_CONFIG (SoundSchema, is_music, "SchPlayParams", "Flags",
+	524288u, false);
+PROXY_BIT_CONFIG (SoundSchema, is_meta_ui, "SchPlayParams", "Flags",
+	1048576u, false);
+PROXY_CONFIG (SoundSchema, volume, "SchPlayParams", "Volume", int, 0);
+PROXY_CONFIG (SoundSchema, pan, "SchPlayParams", "Pan", int, 0);
+PROXY_CONFIG (SoundSchema, fade, "SchPlayParams", "Fade", int, 0);
+PROXY_CONFIG (SoundSchema, initial_delay, "SchPlayParams", "Initial Delay",
+	Time, 0ul);
+PROXY_CONFIG (SoundSchema, attenuation_factor, "SchAttFac", nullptr,
+	float, 1.0f);
+PROXY_CONFIG (SoundSchema, priority, "SchPriority", nullptr, int, 0);
+PROXY_BIT_CONFIG (SoundSchema, loop_is_poly, "SchLoopParams", "Flags",
+	1u, false);
+PROXY_CONFIG (SoundSchema, loop_max_samples, "SchLoopParams", "Max Samples",
+	unsigned, 0u);
+PROXY_CONFIG (SoundSchema, loop_min_interval, "SchLoopParams", "Interval Min",
+	Time, 0ul);
+PROXY_CONFIG (SoundSchema, loop_max_interval, "SchLoopParams", "Interval Max",
+	Time, 0ul);
+PROXY_CONFIG (SoundSchema, ai_value, "AI_SndType", "Type",
+	SoundSchema::AIValue, SoundSchema::AIValue::NONE);
+PROXY_CONFIG (SoundSchema, ai_signal, "AI_SndType", "Signal", String, "");
 
 OBJECT_TYPE_IMPL_ (SoundSchema,
-	PF_INIT (last_sample),
-	PF_INIT (retrigger),
-	PF_INIT (pan_position),
-	PF_INIT (pan_range),
-	PF_INIT (repeat),
-	PF_INIT (cache),
-	PF_INIT (stream),
-	PF_INIT (play_once),
-	PF_INIT (combat),
-	PF_INIT (net_ambient),
-	PF_INIT (local_spatial),
-	PF_INIT (is_noise),
-	PF_INIT (is_speech),
-	PF_INIT (is_ambient),
-	PF_INIT (is_music),
-	PF_INIT (is_meta_ui),
-	PF_INIT (volume),
-	PF_INIT (pan),
-	PF_INIT (fade),
-	PF_INIT (initial_delay),
-	PF_INIT (attenuation_factor),
-	PF_INIT (priority),
-	PF_INIT (loop_is_poly),
-	PF_INIT (loop_max_samples),
-	PF_INIT (loop_min_interval),
-	PF_INIT (loop_max_interval),
-	PF_INIT (ai_value),
-	PF_INIT (ai_signal)
+	PROXY_INIT (last_sample),
+	PROXY_INIT (retrigger),
+	PROXY_INIT (pan_position),
+	PROXY_INIT (pan_range),
+	PROXY_INIT (repeat),
+	PROXY_INIT (cache),
+	PROXY_INIT (stream),
+	PROXY_INIT (play_once),
+	PROXY_INIT (combat),
+	PROXY_INIT (net_ambient),
+	PROXY_INIT (local_spatial),
+	PROXY_INIT (is_noise),
+	PROXY_INIT (is_speech),
+	PROXY_INIT (is_ambient),
+	PROXY_INIT (is_music),
+	PROXY_INIT (is_meta_ui),
+	PROXY_INIT (volume),
+	PROXY_INIT (pan),
+	PROXY_INIT (fade),
+	PROXY_INIT (initial_delay),
+	PROXY_INIT (attenuation_factor),
+	PROXY_INIT (priority),
+	PROXY_INIT (loop_is_poly),
+	PROXY_INIT (loop_max_samples),
+	PROXY_INIT (loop_min_interval),
+	PROXY_INIT (loop_max_interval),
+	PROXY_INIT (ai_value),
+	PROXY_INIT (ai_signal)
 )
 
 bool
@@ -188,33 +198,40 @@ SoundSchema::play_by_tags (const String& tags, Tagged location,
 
 // AmbientHacked
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE AmbientHacked
-
-PF_CONFIG_ (active, "AmbientHacked", "Flags", bool, false, 4u, _not, _not);
-PF_CONFIG (ambient_schema_1, "AmbientHacked", "Schema Name", String, "");
-PF_CONFIG (ambient_schema_2, "AmbientHacked", "Aux Schema 1", String, "");
-PF_CONFIG (ambient_schema_3, "AmbientHacked", "Aux Schema 2", String, "");
-PF_CONFIG (ambient_radius, "AmbientHacked", "Radius", int, 0);
-PF_CONFIG (ambient_volume, "AmbientHacked", "Override Volume", int, 0);
-PFB_CONFIG (environmental, "AmbientHacked", "Flags", 1u, false);
-PFB_CONFIG (fade_gradually, "AmbientHacked", "Flags", 2u, false);
-PFB_CONFIG (turn_off_after, "AmbientHacked", "Flags", 256u, false);
-PFB_CONFIG (remove_prop_after, "AmbientHacked", "Flags", 8u, false);
-PFB_CONFIG (destroy_after, "AmbientHacked", "Flags", 128u, false);
+PROXY_NEG_BIT_CONFIG (AmbientHacked, active, "AmbientHacked", "Flags",
+	4u, false);
+PROXY_CONFIG (AmbientHacked, ambient_schema_1, "AmbientHacked", "Schema Name",
+	String, "");
+PROXY_CONFIG (AmbientHacked, ambient_schema_2, "AmbientHacked", "Aux Schema 1",
+	String, "");
+PROXY_CONFIG (AmbientHacked, ambient_schema_3, "AmbientHacked", "Aux Schema 2",
+	String, "");
+PROXY_CONFIG (AmbientHacked, ambient_radius, "AmbientHacked", "Radius", int, 0);
+PROXY_CONFIG (AmbientHacked, ambient_volume, "AmbientHacked", "Override Volume",
+	int, 0);
+PROXY_BIT_CONFIG (AmbientHacked, environmental, "AmbientHacked", "Flags",
+	1u, false);
+PROXY_BIT_CONFIG (AmbientHacked, fade_gradually, "AmbientHacked", "Flags",
+	2u, false);
+PROXY_BIT_CONFIG (AmbientHacked, turn_off_after, "AmbientHacked", "Flags",
+	256u, false);
+PROXY_BIT_CONFIG (AmbientHacked, remove_prop_after, "AmbientHacked", "Flags",
+	8u, false);
+PROXY_BIT_CONFIG (AmbientHacked, destroy_after, "AmbientHacked", "Flags",
+	128u, false);
 
 OBJECT_TYPE_IMPL_ (AmbientHacked,
-	PF_INIT (active),
-	PF_INIT (ambient_schema_1),
-	PF_INIT (ambient_schema_2),
-	PF_INIT (ambient_schema_3),
-	PF_INIT (ambient_radius),
-	PF_INIT (ambient_volume),
-	PF_INIT (environmental),
-	PF_INIT (fade_gradually),
-	PF_INIT (turn_off_after),
-	PF_INIT (remove_prop_after),
-	PF_INIT (destroy_after)
+	PROXY_INIT (active),
+	PROXY_INIT (ambient_schema_1),
+	PROXY_INIT (ambient_schema_2),
+	PROXY_INIT (ambient_schema_3),
+	PROXY_INIT (ambient_radius),
+	PROXY_INIT (ambient_volume),
+	PROXY_INIT (environmental),
+	PROXY_INIT (fade_gradually),
+	PROXY_INIT (turn_off_after),
+	PROXY_INIT (remove_prop_after),
+	PROXY_INIT (destroy_after)
 )
 
 bool

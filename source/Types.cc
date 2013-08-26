@@ -25,26 +25,21 @@
 
 namespace Thief {
 
-static bool _not (const bool& value) { return !value; }
-
 
 
 // Damageable
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Damageable
-
-PF_CONFIG (hit_points, "HitPoints", nullptr, int, 0);
-PF_CONFIG (max_hit_points, "MAX_HP", nullptr, int, 0);
-PF_CONFIG (slay_result, "SlayResult", nullptr, Damageable::SlayResult,
-	Damageable::SlayResult::NORMAL);
-PF_CONFIG (death_stage, "DeathStage", nullptr, int, 0);
+PROXY_CONFIG (Damageable, hit_points, "HitPoints", nullptr, int, 0);
+PROXY_CONFIG (Damageable, max_hit_points, "MAX_HP", nullptr, int, 0);
+PROXY_CONFIG (Damageable, slay_result, "SlayResult", nullptr,
+	Damageable::SlayResult, Damageable::SlayResult::NORMAL);
+PROXY_CONFIG (Damageable, death_stage, "DeathStage", nullptr, int, 0);
 
 OBJECT_TYPE_IMPL_ (Damageable,
-	PF_INIT (hit_points),
-	PF_INIT (max_hit_points),
-	PF_INIT (slay_result),
-	PF_INIT (death_stage)
+	PROXY_INIT (hit_points),
+	PROXY_INIT (max_hit_points),
+	PROXY_INIT (slay_result),
+	PROXY_INIT (death_stage)
 )
 
 void
@@ -75,38 +70,35 @@ Damageable::resurrect (const Object& culprit)
 //TODO wrap property: Inventory\Type = InvType
 //TODO wrap link: FrobProxy - FrobProxyInfo
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Interactive
-
-PF_CONFIG (frob_world_action, "FrobInfo", "World Action",
+PROXY_CONFIG (Interactive, frob_world_action, "FrobInfo", "World Action",
 	Interactive::FrobAction, Interactive::FrobAction::INERT);
-PF_CONFIG (frob_inventory_action, "FrobInfo", "Inventory Action",
+PROXY_CONFIG (Interactive, frob_inventory_action, "FrobInfo", "Inventory Action",
 	Interactive::FrobAction, Interactive::FrobAction::INERT);
-PF_CONFIG (frob_tool_action, "FrobInfo", "Tool Action",
+PROXY_CONFIG (Interactive, frob_tool_action, "FrobInfo", "Tool Action",
 	Interactive::FrobAction, Interactive::FrobAction::INERT);
-PF_CONFIG (pick_distance, "PickDist", nullptr, float, 0.0f);
-PF_CONFIG (pick_bias, "PickBias", nullptr, float, 0.0f);
-PF_CONFIG (tool_reach, "ToolReach", nullptr, float, 0.0f);
-PF_CONFIG_ (droppable, "NoDrop", nullptr, bool, false, 0u, _not, _not);
-PF_CONFIG (loot_value_gold, "Loot", "Gold", int, 0);
-PF_CONFIG (loot_value_gems, "Loot", "Gems", int, 0);
-PF_CONFIG (loot_value_goods, "Loot", "Art", int, 0);
-PF_CONFIG (loot_value_special, "Loot", "Specials", unsigned, 0u);
-PF_CONFIG (store_price, "SalePrice", nullptr, int, 0);
+PROXY_CONFIG (Interactive, pick_distance, "PickDist", nullptr, float, 0.0f);
+PROXY_CONFIG (Interactive, pick_bias, "PickBias", nullptr, float, 0.0f);
+PROXY_CONFIG (Interactive, tool_reach, "ToolReach", nullptr, float, 0.0f);
+PROXY_NEG_CONFIG (Interactive, droppable, "NoDrop", nullptr, bool, false);
+PROXY_CONFIG (Interactive, loot_value_gold, "Loot", "Gold", int, 0);
+PROXY_CONFIG (Interactive, loot_value_gems, "Loot", "Gems", int, 0);
+PROXY_CONFIG (Interactive, loot_value_goods, "Loot", "Art", int, 0);
+PROXY_CONFIG (Interactive, loot_value_special, "Loot", "Specials", unsigned, 0u);
+PROXY_CONFIG (Interactive, store_price, "SalePrice", nullptr, int, 0);
 
 OBJECT_TYPE_IMPL_ (Interactive,
-	PF_INIT (frob_world_action),
-	PF_INIT (frob_inventory_action),
-	PF_INIT (frob_tool_action),
-	PF_INIT (pick_distance),
-	PF_INIT (pick_bias),
-	PF_INIT (tool_reach),
-	PF_INIT (droppable),
-	PF_INIT (loot_value_gold),
-	PF_INIT (loot_value_gems),
-	PF_INIT (loot_value_goods),
-	PF_INIT (loot_value_special),
-	PF_INIT (store_price)
+	PROXY_INIT (frob_world_action),
+	PROXY_INIT (frob_inventory_action),
+	PROXY_INIT (frob_tool_action),
+	PROXY_INIT (pick_distance),
+	PROXY_INIT (pick_bias),
+	PROXY_INIT (tool_reach),
+	PROXY_INIT (droppable),
+	PROXY_INIT (loot_value_gold),
+	PROXY_INIT (loot_value_gems),
+	PROXY_INIT (loot_value_goods),
+	PROXY_INIT (loot_value_special),
+	PROXY_INIT (store_price)
 )
 
 Interactive::InventoryType
@@ -119,13 +111,10 @@ Interactive::get_inventory_type () const
 
 // Blood
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Blood
-
-PF_CONFIG (is_blood, "Blood", nullptr, bool, false);
+PROXY_CONFIG (Blood, is_blood, "Blood", nullptr, bool, false);
 
 OBJECT_TYPE_IMPL_ (Blood,
-	PF_INIT (is_blood)
+	PROXY_INIT (is_blood)
 )
 
 void
@@ -140,9 +129,6 @@ Blood::cleanse (const Vector& _center, float radius)
 
 // Container
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Container
-
 THIEF_ENUM_CODING (Container::Type, CODE, CODE,
 	THIEF_ENUM_VALUE (ALTERNATE, "alternate", "alt"),
 	THIEF_ENUM_VALUE (HAND, "hand"),
@@ -150,12 +136,13 @@ THIEF_ENUM_CODING (Container::Type, CODE, CODE,
 	THIEF_ENUM_VALUE (GENERIC, "generic"),
 )
 
-PF_CONFIG (inherit_contains, "ContainInherit", nullptr, bool, false);
-PF_CONFIG (is_loadout_store, "ItemStore", nullptr, bool, false);
+PROXY_CONFIG (Container, inherit_contains, "ContainInherit", nullptr,
+	bool, false);
+PROXY_CONFIG (Container, is_loadout_store, "ItemStore", nullptr, bool, false);
 
 OBJECT_TYPE_IMPL_ (Container,
-	PF_INIT (inherit_contains),
-	PF_INIT (is_loadout_store)
+	PROXY_INIT (inherit_contains),
+	PROXY_INIT (is_loadout_store)
 )
 
 bool
@@ -316,15 +303,12 @@ ContainmentMessage::get_contents () const
 
 // Readable
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Readable
-
-PF_CONFIG (book_name, "Book", nullptr, String, "");
-PF_CONFIG (book_art, "BookArt", nullptr, String, "");
+PROXY_CONFIG (Readable, book_name, "Book", nullptr, String, "");
+PROXY_CONFIG (Readable, book_art, "BookArt", nullptr, String, "");
 
 OBJECT_TYPE_IMPL_ (Readable,
-	PF_INIT (book_name),
-	PF_INIT (book_art)
+	PROXY_INIT (book_name),
+	PROXY_INIT (book_art)
 )
 
 String
@@ -358,31 +342,28 @@ Readable::show_book (bool use_art, Time duration)
 //TODO wrap property (if useful): Room\Ambient = Ambient
 //TODO wrap property (if useful): Room\Loud Room = LoudRoom
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Room
-
-PF_CONFIG (ambient_light_zone, "Weather", "ambient lighting", AmbientLightZone,
-	AmbientLightZone::GLOBAL);
-PF_CONFIG (automap_page, "Automap", "Page", int, 0);
-PF_CONFIG (automap_location, "Automap", "Location", int, 0);
-PF_CONFIG (environment_map_zone, "RoomRend", "Env Zone", EnvironmentMapZone,
-	EnvironmentMapZone::GLOBAL);
-PF_CONFIG_ (fog_zone, "Weather", "fog", Fog::Zone, Fog::Zone (0), 0u,
+PROXY_CONFIG (Room, ambient_light_zone, "Weather", "ambient lighting",
+	AmbientLightZone, AmbientLightZone::GLOBAL);
+PROXY_CONFIG (Room, automap_page, "Automap", "Page", int, 0);
+PROXY_CONFIG (Room, automap_location, "Automap", "Location", int, 0);
+PROXY_CONFIG (Room, environment_map_zone, "RoomRend", "Env Zone",
+	EnvironmentMapZone, EnvironmentMapZone::GLOBAL);
+PROXY_CONFIG_ (Room, fog_zone, "Weather", "fog", Fog::Zone, Fog::Zone (0), 0u,
 	[] (const Fog::Zone& zone) { return Fog::Zone (zone - 1); },
 	[] (const Fog::Zone& zone) { return Fog::Zone (zone + 1); });
-PF_CONFIG (gravity, "RoomGrav", nullptr, int, 100);
-PF_CONFIG (precipitation, "Weather", "precipitation", bool, false);
-PFB_CONFIG (see_through, "RoomRend", "Flags", 1u, false);
+PROXY_CONFIG (Room, gravity, "RoomGrav", nullptr, int, 100);
+PROXY_CONFIG (Room, precipitation, "Weather", "precipitation", bool, false);
+PROXY_BIT_CONFIG (Room, see_through, "RoomRend", "Flags", 1u, false);
 
 OBJECT_TYPE_IMPL_ (Room,
-	PF_INIT (ambient_light_zone),
-	PF_INIT (automap_page),
-	PF_INIT (automap_location),
-	PF_INIT (environment_map_zone),
-	PF_INIT (fog_zone),
-	PF_INIT (gravity),
-	PF_INIT (precipitation),
-	PF_INIT (see_through)
+	PROXY_INIT (ambient_light_zone),
+	PROXY_INIT (automap_page),
+	PROXY_INIT (automap_location),
+	PROXY_INIT (environment_map_zone),
+	PROXY_INIT (fog_zone),
+	PROXY_INIT (gravity),
+	PROXY_INIT (precipitation),
+	PROXY_INIT (see_through)
 )
 
 bool
@@ -452,13 +433,10 @@ MESSAGE_ACCESSOR (Room, RoomMessage, get_to_room, sRoomMsg, ToObjId);
 
 #ifdef IS_THIEF2
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Secret
-
-PFB_CONFIG (is_secret, "DarkStat", nullptr, 4u, false); //TODO Adjust secret count when this is changed.
+PROXY_BIT_CONFIG (Secret, is_secret, "DarkStat", nullptr, 4u, false); //TODO Adjust secret count when this is changed.
 
 OBJECT_TYPE_IMPL_ (Secret,
-	PF_INIT (is_secret)
+	PROXY_INIT (is_secret)
 )
 
 void
@@ -483,17 +461,15 @@ Secret::find_secret ()
 
 // Weapon
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Weapon
-
-PF_CONFIG (exposure_drawn, "WpnExposure", nullptr, int, 0);
-PF_CONFIG (exposure_swung, "SwingExpose", nullptr, int, 0);
-PF_CONFIG (collides_with_terrain, "WpnTerrColl", nullptr, bool, false);
+PROXY_CONFIG (Weapon, exposure_drawn, "WpnExposure", nullptr, int, 0);
+PROXY_CONFIG (Weapon, exposure_swung, "SwingExpose", nullptr, int, 0);
+PROXY_CONFIG (Weapon, collides_with_terrain, "WpnTerrColl", nullptr,
+	bool, false);
 
 OBJECT_TYPE_IMPL_ (Weapon,
-	PF_INIT (exposure_drawn),
-	PF_INIT (exposure_swung),
-	PF_INIT (collides_with_terrain)
+	PROXY_INIT (exposure_drawn),
+	PROXY_INIT (exposure_swung),
+	PROXY_INIT (collides_with_terrain)
 )
 
 bool
@@ -508,9 +484,6 @@ Weapon::is_weapon () const
 //TODO wrap property: AI: Utility\Visibility control = AI_VisCtrl
 //TODO wrap property (const): AI: State\Current visibility = AI_Visibility
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Being
-
 THIEF_ENUM_CODING (Being::Team, CODE, CODE,
 	THIEF_ENUM_VALUE (GOOD, "good"),
 	THIEF_ENUM_VALUE (NEUTRAL, "neutral"),
@@ -521,24 +494,26 @@ THIEF_ENUM_CODING (Being::Team, CODE, CODE,
 	THIEF_ENUM_VALUE (BAD_5, "bad5", "bad_5", "bad 5", "bad-5", "undead"),
 )
 
-PF_CONFIG (team, "AI_Team", nullptr, Being::Team, Being::Team::GOOD);
-PF_CONFIG (culpable, "Culpable", nullptr, bool, false);
-PF_CONFIG (blood_type, "BloodType", nullptr, String, "");
-PF_CONFIG (current_breath, "AirSupply", nullptr, Time, 0ul);
-PF_CONFIG (maximum_breath, "BreathConfig", "Max Air (ms)", Time, 0ul);
-PF_CONFIG (breath_recovery_rate, "BreathConfig", "Recover rate", float, 0.0f);
-PF_CONFIG (drowning_damage, "BreathConfig", "Drown Damage", int, 0);
-PF_CONFIG (drowning_frequency, "BreathConfig", "Drown Freq (ms)", Time, 0ul);
+PROXY_CONFIG (Being, team, "AI_Team", nullptr, Being::Team, Being::Team::GOOD);
+PROXY_CONFIG (Being, culpable, "Culpable", nullptr, bool, false);
+PROXY_CONFIG (Being, blood_type, "BloodType", nullptr, String, "");
+PROXY_CONFIG (Being, current_breath, "AirSupply", nullptr, Time, 0ul);
+PROXY_CONFIG (Being, maximum_breath, "BreathConfig", "Max Air (ms)", Time, 0ul);
+PROXY_CONFIG (Being, breath_recovery_rate, "BreathConfig", "Recover rate",
+	float, 0.0f);
+PROXY_CONFIG (Being, drowning_damage, "BreathConfig", "Drown Damage", int, 0);
+PROXY_CONFIG (Being, drowning_frequency, "BreathConfig", "Drown Freq (ms)",
+	Time, 0ul);
 
 OBJECT_TYPE_IMPL_ (Being,
-	PF_INIT (team),
-	PF_INIT (culpable),
-	PF_INIT (blood_type),
-	PF_INIT (current_breath),
-	PF_INIT (maximum_breath),
-	PF_INIT (breath_recovery_rate),
-	PF_INIT (drowning_damage),
-	PF_INIT (drowning_frequency)
+	PROXY_INIT (team),
+	PROXY_INIT (culpable),
+	PROXY_INIT (blood_type),
+	PROXY_INIT (current_breath),
+	PROXY_INIT (maximum_breath),
+	PROXY_INIT (breath_recovery_rate),
+	PROXY_INIT (drowning_damage),
+	PROXY_INIT (drowning_frequency)
 )
 
 bool

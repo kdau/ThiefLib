@@ -537,6 +537,33 @@ Method (const T& value) \
 
 
 
+// FieldProxyConfig: common base for PropField and LinkField proxy objects
+
+template <typename T>
+struct FieldProxyConfig
+{
+	const char* major;
+	const char* minor;
+
+	typedef typename std::conditional<std::is_same<T, String>::value,
+		const char*, T>::type DefaultValue;
+	DefaultValue default_value;
+
+	unsigned bitmask; // for T==bool only
+
+	typedef T (*GetFilter) (const T&);
+	GetFilter get_filter;
+
+	typedef T (*SetFilter) (const T&);
+	SetFilter set_filter;
+};
+
+#define THIEF_FIELD_PROXY(ProxyType, Type, Name, Specifiers) \
+static const FieldProxyConfig<Type> F_##Name; \
+Specifiers ProxyType<Type, F_##Name> Name;
+
+
+
 } // namespace Thief
 
 #endif // THIEF_BASE_INL

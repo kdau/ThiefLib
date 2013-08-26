@@ -30,56 +30,63 @@ namespace Thief {
 // Physical
 //TODO wrap property: AI: Utility\Path avoid = AI_ObjAvoid
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Physical
-
-PF_CONFIG (physics_type, "PhysType", "Type", Physical::PhysicsType,
-	Physical::PhysicsType::NONE);
-PF_CONFIG (submodel_count, "PhysType", "# Submodels", unsigned, 0u);
-PF_CONFIG (gravity, "PhysAttr", "Gravity %", float, 100.0f);
-PF_CONFIG (mass, "PhysAttr", "Mass", float, 30.0f);
-PF_CONFIG (density, "PhysAttr", "Density", float, 1.0f);
-PF_CONFIG (elasticity, "PhysAttr", "Elasticity", float, 1.0f);
-PF_CONFIG (friction, "PhysAttr", "Base Friction", float, 0.0f);
-PF_CONFIG (center_of_gravity, "PhysAttr", "COG Offset", Vector, Vector ());
-PF_CONFIG (mantleable, "PhysCanMant", nullptr, bool, true);
-PF_CONFIG (remove_on_sleep, "PhysType", "Remove on Sleep", bool, false);
-PFB_CONFIG (collision_bounce, "CollisionType", nullptr, 1u, false);
-PFB_CONFIG (collision_destroy, "CollisionType", nullptr, 2u, false);
-PFB_CONFIG (collision_slay, "CollisionType", nullptr, 4u, false);
-PFB_CONFIG (collision_no_sound, "CollisionType", nullptr, 8u, false);
-PFB_CONFIG (collision_no_result, "CollisionType", nullptr, 16u, false);
-PFB_CONFIG (collision_full_sound, "CollisionType", nullptr, 32u, false);
-PF_CONFIG (collides_with_ai, "PhysAIColl", nullptr, bool, false);
-PF_CONFIG (bash_factor, "BashFactor", nullptr, float, 0.0f);
-PF_CONFIG (bash_threshold, "BashParams", "Threshold", float, 0.0f);
-PF_CONFIG (bash_coefficient, "BashParams", "Coefficient", float, 0.0f);
-PF_CONFIG (velocity, "PhysState", "Velocity", Vector, Vector ());
-PF_CONFIG (rotational_velocity, "PhysState", "Rot Velocity", Vector, Vector ());
+PROXY_CONFIG (Physical, physics_type, "PhysType", "Type",
+	Physical::PhysicsType, Physical::PhysicsType::NONE);
+PROXY_CONFIG (Physical, submodel_count, "PhysType", "# Submodels", unsigned, 0u);
+PROXY_CONFIG (Physical, gravity, "PhysAttr", "Gravity %", float, 100.0f);
+PROXY_CONFIG (Physical, mass, "PhysAttr", "Mass", float, 30.0f);
+PROXY_CONFIG (Physical, density, "PhysAttr", "Density", float, 1.0f);
+PROXY_CONFIG (Physical, elasticity, "PhysAttr", "Elasticity", float, 1.0f);
+PROXY_CONFIG (Physical, friction, "PhysAttr", "Base Friction", float, 0.0f);
+PROXY_CONFIG (Physical, center_of_gravity, "PhysAttr", "COG Offset", Vector,
+	Vector ());
+PROXY_CONFIG (Physical, mantleable, "PhysCanMant", nullptr, bool, true);
+PROXY_CONFIG (Physical, remove_on_sleep, "PhysType", "Remove on Sleep",
+	bool, false);
+PROXY_BIT_CONFIG (Physical, collision_bounce, "CollisionType", nullptr, 1u,
+	false);
+PROXY_BIT_CONFIG (Physical, collision_destroy, "CollisionType", nullptr, 2u,
+	false);
+PROXY_BIT_CONFIG (Physical, collision_slay, "CollisionType", nullptr, 4u,
+	false);
+PROXY_BIT_CONFIG (Physical, collision_no_sound, "CollisionType", nullptr, 8u,
+	false);
+PROXY_BIT_CONFIG (Physical, collision_no_result, "CollisionType", nullptr, 16u,
+	false);
+PROXY_BIT_CONFIG (Physical, collision_full_sound, "CollisionType", nullptr, 32u,
+	false);
+PROXY_CONFIG (Physical, collides_with_ai, "PhysAIColl", nullptr, bool, false);
+PROXY_CONFIG (Physical, bash_factor, "BashFactor", nullptr, float, 0.0f);
+PROXY_CONFIG (Physical, bash_threshold, "BashParams", "Threshold", float, 0.0f);
+PROXY_CONFIG (Physical, bash_coefficient, "BashParams", "Coefficient",
+	float, 0.0f);
+PROXY_CONFIG (Physical, velocity, "PhysState", "Velocity", Vector, Vector ());
+PROXY_CONFIG (Physical, rotational_velocity, "PhysState", "Rot Velocity",
+	Vector, Vector ());
 
 OBJECT_TYPE_IMPL_ (Physical,
-	PF_INIT (physics_type),
-	PF_INIT (submodel_count),
-	PF_INIT (gravity),
-	PF_INIT (mass),
-	PF_INIT (density),
-	PF_INIT (elasticity),
-	PF_INIT (friction),
-	PF_INIT (center_of_gravity),
-	PF_INIT (mantleable),
-	PF_INIT (remove_on_sleep),
-	PF_INIT (collision_bounce),
-	PF_INIT (collision_destroy),
-	PF_INIT (collision_slay),
-	PF_INIT (collision_no_sound),
-	PF_INIT (collision_no_result),
-	PF_INIT (collision_full_sound),
-	PF_INIT (collides_with_ai),
-	PF_INIT (bash_factor),
-	PF_INIT (bash_threshold),
-	PF_INIT (bash_coefficient),
-	PF_INIT (velocity),
-	PF_INIT (rotational_velocity)
+	PROXY_INIT (physics_type),
+	PROXY_INIT (submodel_count),
+	PROXY_INIT (gravity),
+	PROXY_INIT (mass),
+	PROXY_INIT (density),
+	PROXY_INIT (elasticity),
+	PROXY_INIT (friction),
+	PROXY_INIT (center_of_gravity),
+	PROXY_INIT (mantleable),
+	PROXY_INIT (remove_on_sleep),
+	PROXY_INIT (collision_bounce),
+	PROXY_INIT (collision_destroy),
+	PROXY_INIT (collision_slay),
+	PROXY_INIT (collision_no_sound),
+	PROXY_INIT (collision_no_result),
+	PROXY_INIT (collision_full_sound),
+	PROXY_INIT (collides_with_ai),
+	PROXY_INIT (bash_factor),
+	PROXY_INIT (bash_threshold),
+	PROXY_INIT (bash_coefficient),
+	PROXY_INIT (velocity),
+	PROXY_INIT (rotational_velocity)
 )
 
 bool
@@ -252,50 +259,52 @@ Physical::unsubscribe_physics (Messages messages)
 //TODO wrap property: AI: Utility\Path Exact OBB = AI_NGOBB
 //TODO wrap property: AI: Utility\Pathable object = AI_ObjPathable
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE OBBPhysical
-
-PF_CONFIG (physics_size, "PhysDims", "Size", Vector, Vector ());
-PF_CONFIG (physics_offset, "PhysDims", "Offset", Vector, Vector ());
-PF_CONFIG (climbable_sides, "PhysAttr", "Climbable Sides", unsigned,
-	Physical::ALL_AXES);
-PFB_CONFIG (edge_trigger, "PhysAttr", "Flags", 1u, false);
-PFB_CONFIG (platform_friction, "PhysAttr", "Flags", 2u, false);
-PF_CONFIG (pore_size, "PhysAttr", "Pore Size", float, 0.0f);
-PF_CONFIG (ai_fires_through, "AIFiresThrough", nullptr, bool, false);
+PROXY_CONFIG (OBBPhysical, physics_size, "PhysDims", "Size", Vector, Vector ());
+PROXY_CONFIG (OBBPhysical, physics_offset, "PhysDims", "Offset",
+	Vector, Vector ());
+PROXY_CONFIG (OBBPhysical, climbable_sides, "PhysAttr", "Climbable Sides",
+	unsigned, Physical::ALL_AXES);
+PROXY_BIT_CONFIG (OBBPhysical, edge_trigger, "PhysAttr", "Flags", 1u, false);
+PROXY_BIT_CONFIG (OBBPhysical, platform_friction, "PhysAttr", "Flags", 2u,
+	false);
+PROXY_CONFIG (OBBPhysical, pore_size, "PhysAttr", "Pore Size", float, 0.0f);
+PROXY_CONFIG (OBBPhysical, ai_fires_through, "AIFiresThrough", nullptr,
+	bool, false);
 
 OBJECT_TYPE_IMPL_ (OBBPhysical,
-	PF_INIT (physics_size),
-	PF_INIT (physics_offset),
-	PF_INIT (climbable_sides),
-	PF_INIT (edge_trigger),
-	PF_INIT (platform_friction),
-	PF_INIT (pore_size),
-	PF_INIT (ai_fires_through)
+	PROXY_INIT (physics_size),
+	PROXY_INIT (physics_offset),
+	PROXY_INIT (climbable_sides),
+	PROXY_INIT (edge_trigger),
+	PROXY_INIT (platform_friction),
+	PROXY_INIT (pore_size),
+	PROXY_INIT (ai_fires_through)
 )
 
 
 
 // SpherePhysical
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE SpherePhysical
-
-PF_CONFIG (physics_radius_1, "PhysDims", "Radius 1", float, 0.0f);
-PF_CONFIG (physics_radius_2, "PhysDims", "Radius 2", float, 0.0f);
-PF_CONFIG (physics_offset_1, "PhysDims", "Offset 1", Vector, Vector ());
-PF_CONFIG (physics_offset_2, "PhysDims", "Offset 2", Vector, Vector ());
-PF_CONFIG (rotation_axes, "PhysAttr", "Rotation Axes", unsigned,
-	Physical::ALL_POS_AXES);
-PF_CONFIG (rest_axes, "PhysAttr", "Rest Axes", unsigned, Physical::ALL_AXES);
+PROXY_CONFIG (SpherePhysical, physics_radius_1, "PhysDims", "Radius 1",
+	float, 0.0f);
+PROXY_CONFIG (SpherePhysical, physics_radius_2, "PhysDims", "Radius 2",
+	float, 0.0f);
+PROXY_CONFIG (SpherePhysical, physics_offset_1, "PhysDims", "Offset 1",
+	Vector, Vector ());
+PROXY_CONFIG (SpherePhysical, physics_offset_2, "PhysDims", "Offset 2",
+	Vector, Vector ());
+PROXY_CONFIG (SpherePhysical, rotation_axes, "PhysAttr", "Rotation Axes",
+	unsigned, Physical::ALL_POS_AXES);
+PROXY_CONFIG (SpherePhysical, rest_axes, "PhysAttr", "Rest Axes",
+	unsigned, Physical::ALL_AXES);
 
 OBJECT_TYPE_IMPL_ (SpherePhysical,
-	PF_INIT (physics_radius_1),
-	PF_INIT (physics_radius_2),
-	PF_INIT (physics_offset_1),
-	PF_INIT (physics_offset_2),
-	PF_INIT (rotation_axes),
-	PF_INIT (rest_axes)
+	PROXY_INIT (physics_radius_1),
+	PROXY_INIT (physics_radius_2),
+	PROXY_INIT (physics_offset_1),
+	PROXY_INIT (physics_offset_2),
+	PROXY_INIT (rotation_axes),
+	PROXY_INIT (rest_axes)
 )
 
 
@@ -307,15 +316,12 @@ OBJECT_TYPE_IMPL_ (SpherePhysical,
 // MovingTerrain
 //TODO wrap link: TPath - sTerrainPath
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE MovingTerrain
-
-PF_CONFIG (is_moving_terrain, "MovingTerrain", nullptr, bool, false);
-PFB_CONFIG (push_vator_attachments, "PhysAttr", "Flags", 4u, false);
+PROXY_CONFIG (MovingTerrain, is_moving_terrain, "MovingTerrain", nullptr, bool, false);
+PROXY_BIT_CONFIG (MovingTerrain, push_vator_attachments, "PhysAttr", "Flags", 4u, false);
 
 OBJECT_TYPE_IMPL_ (MovingTerrain,
-	PF_INIT (is_moving_terrain),
-	PF_INIT (push_vator_attachments)
+	PROXY_INIT (is_moving_terrain),
+	PROXY_INIT (push_vator_attachments)
 )
 
 
@@ -356,17 +362,14 @@ MESSAGE_ACCESSOR (MovingTerrain, WaypointMessage, get_moving_terrain,
 //TODO wrap property: Firer
 //TODO wrap property: Gun\Projectile Description = Projectile
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Projectile
-
-PF_CONFIG (initial_velocity, "PhysInitVel", nullptr, Vector, Vector ());
-PF_CONFIG (faces_velocity, "PhysFaceVel", nullptr, bool, false);
-PF_CONFIG (whizzing_sound, "PrjSound", nullptr, String, "");
+PROXY_CONFIG (Projectile, initial_velocity, "PhysInitVel", nullptr, Vector, Vector ());
+PROXY_CONFIG (Projectile, faces_velocity, "PhysFaceVel", nullptr, bool, false);
+PROXY_CONFIG (Projectile, whizzing_sound, "PrjSound", nullptr, String, "");
 
 OBJECT_TYPE_IMPL_ (Projectile,
-	PF_INIT (initial_velocity),
-	PF_INIT (faces_velocity),
-	PF_INIT (whizzing_sound)
+	PROXY_INIT (initial_velocity),
+	PROXY_INIT (faces_velocity),
+	PROXY_INIT (whizzing_sound)
 )
 
 bool

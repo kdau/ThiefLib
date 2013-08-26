@@ -191,21 +191,21 @@ PropFieldBase::set (const Object& object, const char* _property,
 }
 
 bool
-PropFieldBase::get_bit (const PropFieldConfig<bool>& config,
+PropFieldBase::get_bit (const FieldProxyConfig<bool>& config,
 	const Object& object) const
 {
 	LGMulti<unsigned> field;
-	get (object, config.property, config.field, field);
+	get (object, config.major, config.minor, field);
 	return field & config.bitmask;	
 }
 
 void
-PropFieldBase::set_bit (const PropFieldConfig<bool>& config,
+PropFieldBase::set_bit (const FieldProxyConfig<bool>& config,
 	const Object& object, bool value)
 {
-	Property property (object, config.property);
-	unsigned field = config.field
-		? property.get_field (config.field, 0u) : property.get (0u);
+	Property property (object, config.major);
+	unsigned field = config.minor
+		? property.get_field (config.minor, 0u) : property.get (0u);
 
 	if (value)
 		field |= config.bitmask;
@@ -213,7 +213,7 @@ PropFieldBase::set_bit (const PropFieldConfig<bool>& config,
 		field &= ~config.bitmask;
 
 	LGMulti<unsigned> multi (field);
-	if (config.field ? !property._set_field (config.field, multi, true)
+	if (config.minor ? !property._set_field (config.minor, multi, true)
 			: !property._set (multi))
 		throw std::runtime_error ("could not set property field");
 }

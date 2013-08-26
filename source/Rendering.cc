@@ -33,56 +33,56 @@ namespace Thief {
 //TODO wrap property: Renderer\Distance Alpha = DistAlpha
 //TODO wrap property: Renderer\Render Order = RenderOrder
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Rendered
-
-PF_CONFIG (render_type, "RenderType", nullptr, Rendered::RenderType,
-	Rendered::RenderType::NORMAL);
-PF_CONFIG (z_bias, "Z-Bias", nullptr, int, 0);
-PF_CONFIG (opacity, "RenderAlpha", nullptr, float, 1.0f);
-PF_CONFIG (model, "ModelName", "", String, "");
-PF_CONFIG (model_scale, "Scale", "", Vector, Vector (1.0f, 1.0f, 1.0f));
-PF_CONFIG (replacement_texture_0, "OTxtRepr0", nullptr, String, "");
-PF_CONFIG (replacement_texture_1, "OTxtRepr1", nullptr, String, "");
-PF_CONFIG (replacement_texture_2, "OTxtRepr2", nullptr, String, "");
-PF_CONFIG (replacement_texture_3, "OTxtRepr3", nullptr, String, "");
-PF_CONFIG (joint_position_1, "JointPos", "Joint 1", float, 0.0f);
-PF_CONFIG (joint_position_2, "JointPos", "Joint 2", float, 0.0f);
-PF_CONFIG (joint_position_3, "JointPos", "Joint 3", float, 0.0f);
-PF_CONFIG (joint_position_4, "JointPos", "Joint 4", float, 0.0f);
-PF_CONFIG (joint_position_5, "JointPos", "Joint 5", float, 0.0f);
-PF_CONFIG (joint_position_6, "JointPos", "Joint 6", float, 0.0f);
-PF_CONFIG (extra_light, "ExtraLight", "Amount (-1..1)", float, 0.0f);
-PF_CONFIG (extra_light_additive, "ExtraLight", "Additive?", bool, false);
-PF_CONFIG (self_illumination, "SelfIllum", nullptr, float, 0.0f);
-PF_CONFIG (static_shadow, "Immobile", nullptr, bool, false);
-PF_CONFIG (force_static_shadow, "StatShad", nullptr, bool, false);
-PF_CONFIG (dynamic_shadow, "Shadow", nullptr, int, 0);
-PF_CONFIG (visibility_shadow, "ObjShad", nullptr, bool, false);
+PROXY_CONFIG (Rendered, render_type, "RenderType", nullptr,
+	Rendered::RenderType, Rendered::RenderType::NORMAL);
+PROXY_CONFIG (Rendered, z_bias, "Z-Bias", nullptr, int, 0);
+PROXY_CONFIG (Rendered, opacity, "RenderAlpha", nullptr, float, 1.0f);
+PROXY_CONFIG (Rendered, model, "ModelName", "", String, "");
+PROXY_CONFIG (Rendered, model_scale, "Scale", "",
+	Vector, Vector (1.0f, 1.0f, 1.0f));
+PROXY_CONFIG (Rendered, replacement_texture_0, "OTxtRepr0", nullptr, String, "");
+PROXY_CONFIG (Rendered, replacement_texture_1, "OTxtRepr1", nullptr, String, "");
+PROXY_CONFIG (Rendered, replacement_texture_2, "OTxtRepr2", nullptr, String, "");
+PROXY_CONFIG (Rendered, replacement_texture_3, "OTxtRepr3", nullptr, String, "");
+PROXY_CONFIG (Rendered, joint_position_1, "JointPos", "Joint 1", float, 0.0f);
+PROXY_CONFIG (Rendered, joint_position_2, "JointPos", "Joint 2", float, 0.0f);
+PROXY_CONFIG (Rendered, joint_position_3, "JointPos", "Joint 3", float, 0.0f);
+PROXY_CONFIG (Rendered, joint_position_4, "JointPos", "Joint 4", float, 0.0f);
+PROXY_CONFIG (Rendered, joint_position_5, "JointPos", "Joint 5", float, 0.0f);
+PROXY_CONFIG (Rendered, joint_position_6, "JointPos", "Joint 6", float, 0.0f);
+PROXY_CONFIG (Rendered, extra_light, "ExtraLight", "Amount (-1..1)",
+	float, 0.0f);
+PROXY_CONFIG (Rendered, extra_light_additive, "ExtraLight", "Additive?",
+	bool, false);
+PROXY_CONFIG (Rendered, self_illumination, "SelfIllum", nullptr, float, 0.0f);
+PROXY_CONFIG (Rendered, static_shadow, "Immobile", nullptr, bool, false);
+PROXY_CONFIG (Rendered, force_static_shadow, "StatShad", nullptr, bool, false);
+PROXY_CONFIG (Rendered, dynamic_shadow, "Shadow", nullptr, int, 0);
+PROXY_CONFIG (Rendered, visibility_shadow, "ObjShad", nullptr, bool, false);
 
 OBJECT_TYPE_IMPL_ (Rendered,
-	PF_INIT (render_type),
-	PF_INIT (z_bias),
-	PF_INIT (opacity),
-	PF_INIT (model),
-	PF_INIT (model_scale),
-	PF_INIT (replacement_texture_0),
-	PF_INIT (replacement_texture_1),
-	PF_INIT (replacement_texture_2),
-	PF_INIT (replacement_texture_3),
-	PF_INIT (joint_position_1),
-	PF_INIT (joint_position_2),
-	PF_INIT (joint_position_3),
-	PF_INIT (joint_position_4),
-	PF_INIT (joint_position_5),
-	PF_INIT (joint_position_6),
-	PF_INIT (extra_light),
-	PF_INIT (extra_light_additive),
-	PF_INIT (self_illumination),
-	PF_INIT (static_shadow),
-	PF_INIT (force_static_shadow),
-	PF_INIT (dynamic_shadow),
-	PF_INIT (visibility_shadow)
+	PROXY_INIT (render_type),
+	PROXY_INIT (z_bias),
+	PROXY_INIT (opacity),
+	PROXY_INIT (model),
+	PROXY_INIT (model_scale),
+	PROXY_INIT (replacement_texture_0),
+	PROXY_INIT (replacement_texture_1),
+	PROXY_INIT (replacement_texture_2),
+	PROXY_INIT (replacement_texture_3),
+	PROXY_INIT (joint_position_1),
+	PROXY_INIT (joint_position_2),
+	PROXY_INIT (joint_position_3),
+	PROXY_INIT (joint_position_4),
+	PROXY_INIT (joint_position_5),
+	PROXY_INIT (joint_position_6),
+	PROXY_INIT (extra_light),
+	PROXY_INIT (extra_light_additive),
+	PROXY_INIT (self_illumination),
+	PROXY_INIT (static_shadow),
+	PROXY_INIT (force_static_shadow),
+	PROXY_INIT (dynamic_shadow),
+	PROXY_INIT (visibility_shadow)
 )
 
 
@@ -91,15 +91,12 @@ OBJECT_TYPE_IMPL_ (Rendered,
 //TODO wrap property: Renderer\Spotlight = Spotlight
 //TODO wrap property: Renderer\SpotlightAndAmbient = SpotAmb
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE Light
-
-PF_CONFIG (hue, "LightColor", "hue", float, 0.0f);
-PF_CONFIG (saturation, "LightColor", "saturation", float, 0.0f);
+PROXY_CONFIG (Light, hue, "LightColor", "hue", float, 0.0f);
+PROXY_CONFIG (Light, saturation, "LightColor", "saturation", float, 0.0f);
 
 OBJECT_TYPE_IMPL_ (Light,
-	PF_INIT (hue),
-	PF_INIT (saturation)
+	PROXY_INIT (hue),
+	PROXY_INIT (saturation)
 )
 
 
@@ -165,13 +162,10 @@ AnimLight::unsubscribe_light ()
 
 // DynamicLight
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE DynamicLight
-
-PF_CONFIG (brightness, "SelfLit", nullptr, int, 0);
+PROXY_CONFIG (DynamicLight, brightness, "SelfLit", nullptr, int, 0);
 
 OBJECT_TYPE_IMPL_ (DynamicLight,
-	PF_INIT (brightness)
+	PROXY_INIT (brightness)
 )
 
 bool
@@ -234,17 +228,15 @@ ParticleGroup::set_particles_active (bool active)
 
 // TextureSwapper
 
-#undef OBJECT_TYPE
-#define OBJECT_TYPE TextureSwapper
-
-PF_CONFIG (old_texture, "TerrRepOff", nullptr, String, "");
-PF_CONFIG (new_texture, "TerrRepOn", nullptr, String, "");
-PF_CONFIG (swap_radius, "TextureRadius", nullptr, float, 0.0f);
+PROXY_CONFIG (TextureSwapper, old_texture, "TerrRepOff", nullptr, String, "");
+PROXY_CONFIG (TextureSwapper, new_texture, "TerrRepOn", nullptr, String, "");
+PROXY_CONFIG (TextureSwapper, swap_radius, "TextureRadius", nullptr,
+	float, 0.0f);
 
 OBJECT_TYPE_IMPL_ (TextureSwapper,
-	PF_INIT (old_texture),
-	PF_INIT (new_texture),
-	PF_INIT (swap_radius)
+	PROXY_INIT (old_texture),
+	PROXY_INIT (new_texture),
+	PROXY_INIT (swap_radius)
 )
 
 bool
