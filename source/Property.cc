@@ -315,7 +315,6 @@ MESSAGE_ACCESSOR (Object, PropertyChangeMessage, get_object,
  * Engine Features\From Briefcase? = FromBriefcase
  * Engine Features\KeyDst = KeyDst: "MasterBit"
  * Engine Features\Preload = Preload
- * Game: Damage Model\Death Stage = DeathStage
  * Game: Damage Model\Weapon Damage = WeaponDamage
  * Game: Damage Model\Weapon Type = WeaponType
  * Inventory\Being Taken = InvBeingTaken

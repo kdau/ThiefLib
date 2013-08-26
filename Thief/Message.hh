@@ -66,8 +66,9 @@ public:
 	Timer schedule (const Object& from, const Object& to,
 		Time delay, bool repeating);
 
-	void broadcast (const Links& links);
-	void broadcast (const Object& from, const Flavor& link_flavor);
+	void broadcast (const Links& links, Time delay = 0ul);
+	void broadcast (const Object& from, const Flavor& link_flavor,
+		Time delay = 0ul);
 
 	Object get_from () const;
 	Object get_to () const;

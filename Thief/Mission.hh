@@ -107,8 +107,8 @@ struct Precipitation
 
 	float visible_distance;
 
-	float rendering_radius;
-	float alpha;
+	float radius;
+	float opacity;
 	float brightness;
 
 	float snow_jitter;

@@ -3,6 +3,7 @@ Current work
 	* PropField: add array option for sequences of equivalent fields?
 	* LinkField, MessageField: create to parallel PropField?
 	* Script: use DarkHook hierarchy messages to reinitialize replaced instances?
+	* TrapTrigger: split into Object type and Script type?
 	* AI: split into two or more units.
 	* Create full documentation. (!!!)
 

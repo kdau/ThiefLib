@@ -119,7 +119,7 @@ Fog::interpolate_distance (bool global, float from, float to, float weight,
 
 Precipitation::Precipitation ()
 	: type (Type::SNOW), frequency (0.0f), speed (0.0f),
-	  visible_distance (0.0f), rendering_radius (0.0f), alpha (0.0f),
+	  visible_distance (0.0f), radius (0.0f), opacity (0.0f),
 	  brightness (0.0f), snow_jitter (0.0f), rain_length (0.0f),
 	  splash_frequency (0.0f), splash_radius (0.0f), splash_height (0.0f),
 	  splash_duration (0.0f), texture (), wind (0.0f, 0.0f, 0.0f)
@@ -307,8 +307,8 @@ Mission::get_precipitation ()
 	LGString texture;
 	LGVector wind;
 	SService<IEngineSrv> (LG)->GetWeather (type, precip.frequency,
-		precip.speed, precip.visible_distance, precip.rendering_radius,
-		precip.alpha, precip.brightness, precip.snow_jitter,
+		precip.speed, precip.visible_distance, precip.radius,
+		precip.opacity, precip.brightness, precip.snow_jitter,
 		precip.rain_length, precip.splash_frequency,
 		precip.splash_radius, precip.splash_height,
 		precip.splash_duration, texture, wind);
@@ -323,7 +323,7 @@ Mission::set_precipitation (const Precipitation& precip)
 {
 	SService<IEngineSrv> (LG)->SetWeather (int (precip.type),
 		precip.frequency, precip.speed, precip.visible_distance,
-		precip.rendering_radius, precip.alpha, precip.brightness,
+		precip.radius, precip.opacity, precip.brightness,
 		precip.snow_jitter, precip.rain_length, precip.splash_frequency,
 		precip.splash_radius, precip.splash_height,
 		precip.splash_duration, precip.texture.data (),

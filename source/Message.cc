@@ -98,16 +98,20 @@ Message::schedule (const Object& from, const Object& to,
 }
 
 void
-Message::broadcast (const Links& links)
+Message::broadcast (const Links& links, Time delay)
 {
 	for (auto& link : links)
-		send (link.get_source (), link.get_dest ());
+		if (delay > 0ul)
+			schedule (link.get_source (), link.get_dest (),
+				delay, false);
+		else
+			send (link.get_source (), link.get_dest ());
 }
 
 void
-Message::broadcast (const Object& from, const Flavor& link_flavor)
+Message::broadcast (const Object& from, const Flavor& link_flavor, Time delay)
 {
-	broadcast (Link::get_all (link_flavor, from));
+	broadcast (Link::get_all (link_flavor, from), delay);
 }
 
 Object

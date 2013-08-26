@@ -38,11 +38,13 @@ PF_CONFIG (hit_points, "HitPoints", nullptr, int, 0);
 PF_CONFIG (max_hit_points, "MAX_HP", nullptr, int, 0);
 PF_CONFIG (slay_result, "SlayResult", nullptr, Damageable::SlayResult,
 	Damageable::SlayResult::NORMAL);
+PF_CONFIG (death_stage, "DeathStage", nullptr, int, 0);
 
 OBJECT_TYPE_IMPL_ (Damageable,
 	PF_INIT (hit_points),
 	PF_INIT (max_hit_points),
-	PF_INIT (slay_result)
+	PF_INIT (slay_result),
+	PF_INIT (death_stage)
 )
 
 void

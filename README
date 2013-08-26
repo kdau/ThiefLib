@@ -11,8 +11,8 @@ used there have not seen extensive testing. See the TODO file and comments
 marked TODO throughout the codebase for other work remaining to be done.
 Particularly, the library is still almost entirely undocumented.
 
-The library currently requires NewDark, but that dependency can be made
-conditional if desired.
+The library currently requires NewDark, but I can eventually make that
+dependency optional if anyone would prefer that.
 
 
 

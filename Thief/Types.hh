@@ -49,6 +49,8 @@ public:
 	enum class SlayResult { NORMAL, NONE, TERMINATE, DESTROY };
 	THIEF_PROP_FIELD (SlayResult, slay_result);
 
+	THIEF_PROP_FIELD_CONST (int, death_stage);
+
 	void damage (const Object& type, int intensity, const Object& culprit);
 	void slay (const Object& culprit);
 	void resurrect (const Object& culprit);
