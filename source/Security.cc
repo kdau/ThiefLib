@@ -64,26 +64,19 @@ Lockable::set_locked (bool locked)
 
 // LockLink
 
-FLAVORED_LINK_IMPL (Lock)
+PROXY_CONFIG (LockLink, interaction, nullptr, nullptr,
+	LockLink::Require, Require::ALL);
+
+FLAVORED_LINK_IMPL_ (Lock,
+	PROXY_INIT (interaction)
+)
 
 LockLink
 LockLink::create (const Object& source, const Object& dest, Require interaction)
 {
 	LockLink link = Link::create (flavor (), source, dest);
-	link.set_interaction (interaction);
+	link.interaction = interaction;
 	return link;
-}
-
-LockLink::Require
-LockLink::get_interaction () const
-{
-	return *static_cast<const Require*> (get_data_raw ());
-}
-
-void
-LockLink::set_interaction (Require interaction)
-{
-	set_data_raw (&interaction);
 }
 
 
@@ -94,7 +87,8 @@ PROXY_CONFIG (Key, master_key, "KeySrc", "MasterBit", bool, false);
 PROXY_CONFIG (Key, region_mask, "KeySrc", "RegionMask", unsigned, 0u);
 PROXY_CONFIG (Key, lock_number, "KeySrc", "LockID", unsigned, 0u);
 
-OBJECT_TYPE_IMPL_ (Key,
+OBJECT_TYPE_IMPL_ (Key, Physical (), SpherePhysical (), Rendered (),
+		Interactive (), Damageable (),
 	PROXY_INIT (master_key),
 	PROXY_INIT (region_mask),
 	PROXY_INIT (lock_number)
@@ -128,7 +122,8 @@ THIEF_ENUM_CODING (Door::State, CODE, CODE,
 	THIEF_ENUM_VALUE (HALTED, "halted"),
 )
 
-OBJECT_TYPE_IMPL (Door)
+OBJECT_TYPE_IMPL_ (Door, Physical (), OBBPhysical (), Rendered (),
+	Interactive (), Damageable (), Lockable ())
 
 bool
 Door::is_door () const
@@ -187,13 +182,13 @@ translate_door_state (Door::State state)
 	case Door::State::OPEN: return sDoorMsg::kDoorOpen;
 	case Door::State::CLOSING: return sDoorMsg::kDoorClosing;
 	case Door::State::OPENING: return sDoorMsg::kDoorOpening;
-	case Door::State::HALTED: return sDoorMsg::kDoorHalt;
-	default: throw std::invalid_argument ("bad door state");
+	case Door::State::HALTED: default: return sDoorMsg::kDoorHalt;
 	}
 }
 
 inline Door::State
-translate_door_action (sDoorMsg::eDoorAction action)
+translate_door_action (const DoorMessage& message, const sScrMsg* lgmessage,
+	sDoorMsg::eDoorAction action)
 {
 	switch (action)
 	{
@@ -202,7 +197,8 @@ translate_door_action (sDoorMsg::eDoorAction action)
 	case sDoorMsg::kDoorClosing: return Door::State::CLOSING;
 	case sDoorMsg::kDoorOpening: return Door::State::OPENING;
 	case sDoorMsg::kDoorHalt: return Door::State::HALTED;
-	default: throw std::invalid_argument ("bad door action");
+	default: throw MessageWrapError (lgmessage, typeid (message),
+		"invalid action");
 	}
 }
 
@@ -215,8 +211,7 @@ DoorMessage::DoorMessage (Door::State new_state, Door::State old_state)
 	case Door::State::OPEN: message->message = "DoorOpen"; break;
 	case Door::State::CLOSING: message->message = "DoorClosing"; break;
 	case Door::State::OPENING: message->message = "DoorOpening"; break;
-	case Door::State::HALTED: message->message = "DoorHalt"; break;
-	default: throw std::invalid_argument ("bad DoorMessage type");
+	case Door::State::HALTED: default: message->message = "DoorHalt"; break;
 	}
 
 	MESSAGE_AS (sDoorMsg)->ActionType = translate_door_state (new_state);
@@ -226,13 +221,15 @@ DoorMessage::DoorMessage (Door::State new_state, Door::State old_state)
 Door::State
 DoorMessage::get_new_state () const
 {
-	return translate_door_action (MESSAGE_AS (sDoorMsg)->ActionType);
+	return translate_door_action (*this, message,
+		MESSAGE_AS (sDoorMsg)->ActionType);
 }
 
 Door::State
 DoorMessage::get_old_state () const
 {
-	return translate_door_action (MESSAGE_AS (sDoorMsg)->PrevActionType);
+	return translate_door_action (*this, message,
+		MESSAGE_AS (sDoorMsg)->PrevActionType);
 }
 
 
@@ -241,7 +238,7 @@ DoorMessage::get_old_state () const
 //TODO wrap property: Dark GameSys\PickCfg = PickCfg
 //TODO wrap property: Dark GameSys\PickState = PickState (does it apply below too?)
 
-OBJECT_TYPE_IMPL (BasicPickable)
+OBJECT_TYPE_IMPL_ (BasicPickable, Rendered (), Interactive (), Lockable ())
 
 bool
 BasicPickable::is_basic_pickable () const
@@ -260,7 +257,7 @@ BasicPickable::is_basic_pickable () const
 PROXY_CONFIG (AdvPickable, is_advanced_pickable, "AdvPickStateCfg",
 	"Enable Advanced System", bool, false);
 
-OBJECT_TYPE_IMPL_ (AdvPickable,
+OBJECT_TYPE_IMPL_ (AdvPickable, Rendered (), Interactive (), Lockable (),
 	PROXY_INIT (is_advanced_pickable)
 )
 
@@ -293,7 +290,7 @@ MESSAGE_ACCESSOR (AdvPickable::Stage, PickMessage, get_old_stage,
 
 PROXY_CONFIG (Lockpick, pick_bits, "PickSrc", "PickBits", unsigned, 0u);
 
-OBJECT_TYPE_IMPL_ (Lockpick,
+OBJECT_TYPE_IMPL_ (Lockpick, Rendered (), Interactive (),
 	PROXY_INIT (pick_bits)
 )
 

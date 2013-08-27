@@ -165,11 +165,8 @@ THIEF_FLAVORED_LINK (VoiceOver) //TESTME
 	static VoiceOverLink create (const Object& source, const Object& dest,
 		bool play_when_focused, bool play_when_contained);
 
-	bool get_play_when_focused () const;
-	void set_play_when_focused (bool);
-
-	bool get_play_when_contained () const;
-	void set_play_when_contained (bool);
+	THIEF_LINK_FIELD (bool, play_when_focused);
+	THIEF_LINK_FIELD (bool, play_when_contained);
 };
 
 

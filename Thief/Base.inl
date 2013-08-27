@@ -438,6 +438,17 @@ public: \
 	operator Type () const; \
 };
 
+class LGMultiTypeError : public std::exception
+{
+public:
+	LGMultiTypeError (LGMultiBase::Type got, const char* expected) noexcept;
+	virtual ~LGMultiTypeError () noexcept {}
+	virtual const char* what () const noexcept
+		{ return explanation.data (); }
+private:
+	String explanation;
+};
+
 
 
 // Wrappers for fundamental types

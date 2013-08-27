@@ -144,25 +144,23 @@ Property::_set (const LGMultiBase& value)
 }
 
 void
-Property::_get_field (const String& field, LGMultiBase& value) const
+Property::_get_field (const char* field, LGMultiBase& value) const
 {
 	if (!Object (object).exists () || !property)
 		value.clear ();
 	else
 		SService<IPropertySrv> (LG)->Get (value, object,
-			property->Describe ()->szName,
-			field.empty () ? nullptr : field.data ());
+			property->Describe ()->szName, field);
 }
 
 bool
-Property::_set_field (const String& field, const LGMultiBase& value,
+Property::_set_field (const char* field, const LGMultiBase& value,
 	bool add_if_missing)
 {
 	if (!Object (object).exists () || !property) return false;
 	if (!exists (false) && (!add_if_missing || !add ())) return false;
 	return SService<IPropertySrv> (LG)->Set (object,
-		property->Describe ()->szName,
-		field.empty () ? nullptr : field.data (), value) == S_OK;
+		property->Describe ()->szName, field, value) == S_OK;
 }
 
 
@@ -174,19 +172,21 @@ PropFieldBase::get (const Object& object, const char* _property,
 	const char* field, LGMultiBase& value) const
 {
 	Property property (object, _property);
-	if (field)
+	if (!property.exists ())
+		{}
+	else if (field)
 		property._get_field (field, value);
 	else
 		property._get (value);
 }
 
 void
-PropFieldBase::set (const Object& object, const char* _property,
-	const char* field, const LGMultiBase& value)
+PropFieldBase::set (Object& object, const char* _property, const char* field,
+	const LGMultiBase& value)
 {
 	Property property (object, _property);
 	if (field ? !property._set_field (field, value, true)
-			: !property._set (value))
+	          : !property._set (value))
 		throw std::runtime_error ("could not set property field");
 }
 
@@ -194,27 +194,26 @@ bool
 PropFieldBase::get_bit (const FieldProxyConfig<bool>& config,
 	const Object& object) const
 {
-	LGMulti<unsigned> field;
+	LGMulti<unsigned> field (config.default_value ? config.bitmask : 0u);
 	get (object, config.major, config.minor, field);
 	return field & config.bitmask;	
 }
 
 void
-PropFieldBase::set_bit (const FieldProxyConfig<bool>& config,
-	const Object& object, bool value)
+PropFieldBase::set_bit (const FieldProxyConfig<bool>& config, Object& object,
+	bool value)
 {
 	Property property (object, config.major);
-	unsigned field = config.minor
-		? property.get_field (config.minor, 0u) : property.get (0u);
+	LGMulti<unsigned> field; field = 0u;
+	get (object, config.major, config.minor, field);
 
 	if (value)
-		field |= config.bitmask;
+		field = field | config.bitmask;
 	else
-		field &= ~config.bitmask;
+		field = field & ~config.bitmask;
 
-	LGMulti<unsigned> multi (field);
-	if (config.minor ? !property._set_field (config.minor, multi, true)
-			: !property._set (multi))
+	if (config.minor ? !property._set_field (config.minor, field, true)
+	                 : !property._set (field))
 		throw std::runtime_error ("could not set property field");
 }
 

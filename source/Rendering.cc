@@ -34,7 +34,7 @@ namespace Thief {
 //TODO wrap property: Renderer\Render Order = RenderOrder
 
 PROXY_CONFIG (Rendered, render_type, "RenderType", nullptr,
-	Rendered::RenderType, Rendered::RenderType::NORMAL);
+	Rendered::RenderType, RenderType::NORMAL);
 PROXY_CONFIG (Rendered, z_bias, "Z-Bias", nullptr, int, 0);
 PROXY_CONFIG (Rendered, opacity, "RenderAlpha", nullptr, float, 1.0f);
 PROXY_CONFIG (Rendered, model, "ModelName", "", String, "");
@@ -104,7 +104,7 @@ OBJECT_TYPE_IMPL_ (Light,
 // AnimLight
 //TODO wrap property: Renderer\Anim Light = AnimLight (propdefs.h: sAnimLight) (Can some of the service methods be replaced with PropFields?)
 
-OBJECT_TYPE_IMPL (AnimLight)
+OBJECT_TYPE_IMPL_ (AnimLight, Light ())
 
 bool
 AnimLight::is_anim_light () const
@@ -164,7 +164,7 @@ AnimLight::unsubscribe_light ()
 
 PROXY_CONFIG (DynamicLight, brightness, "SelfLit", nullptr, int, 0);
 
-OBJECT_TYPE_IMPL_ (DynamicLight,
+OBJECT_TYPE_IMPL_ (DynamicLight, Light (),
 	PROXY_INIT (brightness)
 )
 

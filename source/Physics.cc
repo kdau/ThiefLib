@@ -31,7 +31,7 @@ namespace Thief {
 //TODO wrap property: AI: Utility\Path avoid = AI_ObjAvoid
 
 PROXY_CONFIG (Physical, physics_type, "PhysType", "Type",
-	Physical::PhysicsType, Physical::PhysicsType::NONE);
+	Physical::PhysicsType, PhysicsType::NONE);
 PROXY_CONFIG (Physical, submodel_count, "PhysType", "# Submodels", unsigned, 0u);
 PROXY_CONFIG (Physical, gravity, "PhysAttr", "Gravity %", float, 100.0f);
 PROXY_CONFIG (Physical, mass, "PhysAttr", "Mass", float, 30.0f);
@@ -271,7 +271,7 @@ PROXY_CONFIG (OBBPhysical, pore_size, "PhysAttr", "Pore Size", float, 0.0f);
 PROXY_CONFIG (OBBPhysical, ai_fires_through, "AIFiresThrough", nullptr,
 	bool, false);
 
-OBJECT_TYPE_IMPL_ (OBBPhysical,
+OBJECT_TYPE_IMPL_ (OBBPhysical, Physical (),
 	PROXY_INIT (physics_size),
 	PROXY_INIT (physics_offset),
 	PROXY_INIT (climbable_sides),
@@ -298,7 +298,7 @@ PROXY_CONFIG (SpherePhysical, rotation_axes, "PhysAttr", "Rotation Axes",
 PROXY_CONFIG (SpherePhysical, rest_axes, "PhysAttr", "Rest Axes",
 	unsigned, Physical::ALL_AXES);
 
-OBJECT_TYPE_IMPL_ (SpherePhysical,
+OBJECT_TYPE_IMPL_ (SpherePhysical, Physical (),
 	PROXY_INIT (physics_radius_1),
 	PROXY_INIT (physics_radius_2),
 	PROXY_INIT (physics_offset_1),
@@ -319,7 +319,7 @@ OBJECT_TYPE_IMPL_ (SpherePhysical,
 PROXY_CONFIG (MovingTerrain, is_moving_terrain, "MovingTerrain", nullptr, bool, false);
 PROXY_BIT_CONFIG (MovingTerrain, push_vator_attachments, "PhysAttr", "Flags", 4u, false);
 
-OBJECT_TYPE_IMPL_ (MovingTerrain,
+OBJECT_TYPE_IMPL_ (MovingTerrain, Physical (), OBBPhysical (),
 	PROXY_INIT (is_moving_terrain),
 	PROXY_INIT (push_vator_attachments)
 )
@@ -366,7 +366,7 @@ PROXY_CONFIG (Projectile, initial_velocity, "PhysInitVel", nullptr, Vector, Vect
 PROXY_CONFIG (Projectile, faces_velocity, "PhysFaceVel", nullptr, bool, false);
 PROXY_CONFIG (Projectile, whizzing_sound, "PrjSound", nullptr, String, "");
 
-OBJECT_TYPE_IMPL_ (Projectile,
+OBJECT_TYPE_IMPL_ (Projectile, Physical (), SpherePhysical (),
 	PROXY_INIT (initial_velocity),
 	PROXY_INIT (faces_velocity),
 	PROXY_INIT (whizzing_sound)

@@ -77,7 +77,7 @@ PROXY_CONFIG (SoundSchema, loop_min_interval, "SchLoopParams", "Interval Min",
 PROXY_CONFIG (SoundSchema, loop_max_interval, "SchLoopParams", "Interval Max",
 	Time, 0ul);
 PROXY_CONFIG (SoundSchema, ai_value, "AI_SndType", "Type",
-	SoundSchema::AIValue, SoundSchema::AIValue::NONE);
+	SoundSchema::AIValue, AIValue::NONE);
 PROXY_CONFIG (SoundSchema, ai_signal, "AI_SndType", "Signal", String, "");
 
 OBJECT_TYPE_IMPL_ (SoundSchema,
@@ -286,50 +286,24 @@ SchemaDoneMessage::get_schema () const
 
 // VoiceOverLink
 
-FLAVORED_LINK_IMPL (VoiceOver)
+PROXY_BIT_CONFIG (VoiceOverLink, play_when_focused, "Events", nullptr,
+	1u, false);
+PROXY_BIT_CONFIG (VoiceOverLink, play_when_contained, "Events", nullptr,
+	2u, false);
+
+FLAVORED_LINK_IMPL_ (VoiceOver,
+	PROXY_INIT (play_when_focused),
+	PROXY_INIT (play_when_contained)
+)
 
 VoiceOverLink
 VoiceOverLink::create (const Object& source, const Object& dest,
 	bool play_when_focused, bool play_when_contained)
 {
 	VoiceOverLink link = Link::create (flavor (), source, dest);
-	link.set_play_when_focused (play_when_focused);
-	link.set_play_when_contained (play_when_contained);
+	link.play_when_focused = play_when_focused;
+	link.play_when_contained = play_when_contained;
 	return link;
-}
-
-bool
-VoiceOverLink::get_play_when_focused () const
-{
-	return get_data_field<unsigned> ("Events") & 1u;
-}
-
-void
-VoiceOverLink::set_play_when_focused (bool play_when_focused)
-{
-	unsigned events = get_data_field<unsigned> ("Events");
-	if (play_when_focused)
-		events |= 1u;
-	else
-		events &= ~1u;
-	set_data_field ("Events", events);
-}
-
-bool
-VoiceOverLink::get_play_when_contained () const
-{
-	return get_data_field<unsigned> ("Events") & 2u;
-}
-
-void
-VoiceOverLink::set_play_when_contained (bool play_when_contained)
-{
-	unsigned events = get_data_field<unsigned> ("Events");
-	if (play_when_contained)
-		events |= 2u;
-	else
-		events &= ~2u;
-	set_data_field ("Events", events);
 }
 
 

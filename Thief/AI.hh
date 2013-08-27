@@ -203,16 +203,16 @@ public:
 
 
 
-THIEF_FLAVORED_LINK (AIAwareness)
+THIEF_FLAVORED_LINK (AIAwareness) //TESTME
 {
 	THIEF_FLAVORED_LINK_COMMON (AIAwareness)
 
 	enum Flags
 	{
-		SEEN = 1, HEARD = 2,
-		CAN_RAYCAST = 4, HAVE_LOS = 8,
-		BLIND = 16, DEAF = 32,
-		HIGHEST = 64, FIRSTHAND = 128
+		SEEN = 1u, HEARD = 2u,
+		CAN_RAYCAST = 4u, HAVE_LOS = 8u,
+		BLIND = 16u, DEAF = 32u,
+		HIGHEST = 64u, FIRSTHAND = 128u
 	};
 
 	enum class Level { NONE, LOW, MODERATE, HIGH };
@@ -220,26 +220,30 @@ THIEF_FLAVORED_LINK (AIAwareness)
 	static AIAwarenessLink create (const Object& source, const Object& dest,
 		unsigned flags, Level, Time, const Vector&, int vision_cone);
 
-	unsigned get_flags () const;
-	void set_flags (unsigned);
-	void clear_flags (unsigned);
+	THIEF_LINK_FIELD (bool, seen);
+	THIEF_LINK_FIELD (bool, heard);
+	THIEF_LINK_FIELD (bool, can_raycast);
+	THIEF_LINK_FIELD (bool, have_los);
+	THIEF_LINK_FIELD (bool, blind);
+	THIEF_LINK_FIELD (bool, deaf);
+	THIEF_LINK_FIELD (bool, highest);
+	THIEF_LINK_FIELD (bool, firsthand);
 
-	Level get_current_level () const;
-	Level get_peak_level () const;
-	Level get_pulse_level () const;
-	Time get_level_time () const;
-	void set_level (Level, Time);
+	THIEF_LINK_FIELD_CONST (Level, current_level);
+	THIEF_LINK_FIELD_CONST (Level, peak_level);
+	THIEF_LINK_FIELD_CONST (Level, pulse_level);
+	THIEF_LINK_FIELD_CONST (Time, level_time);
+	void update_level (Level, Time);
 
-	Vector get_contact_location () const;
-	Time get_contact_time () const;
-	Time get_firsthand_time () const;
+	THIEF_LINK_FIELD_CONST (Vector, contact_location);
+	THIEF_LINK_FIELD_CONST (Time, contact_time);
+	THIEF_LINK_FIELD_CONST (Time, firsthand_time);
 	void update_contact (const Vector&, Time, bool firsthand);
 
-	int get_vision_cone () const;
-	void set_vision_cone (int);
+	THIEF_LINK_FIELD (int, vision_cone);
 
-	Time get_update_time () const;
-	Time get_los_update_time () const;
+	THIEF_LINK_FIELD_CONST (Time, update_time);
+	THIEF_LINK_FIELD_CONST (Time, los_update_time);
 	void update (Time, bool have_los);
 };
 
@@ -261,8 +265,7 @@ THIEF_FLAVORED_LINK (CreatureAttachment)
 	static CreatureAttachmentLink create (const Object& source,
 		const Object& dest, Joint = Joint::NONE);
 
-	Joint get_joint () const;
-	void set_joint (Joint);
+	THIEF_LINK_FIELD (Joint, joint);
 };
 
 

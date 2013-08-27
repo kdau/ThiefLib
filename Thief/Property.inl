@@ -55,11 +55,25 @@ Property::get_field (const String& field, const T& default_value) const
 	if (exists ())
 	{
 		LGMulti<T> value;
-		_get_field (field, value);
+		_get_field (field.empty () ? nullptr : field.data (), value);
 		return value;
 	}
 	else
 		return default_value;
+}
+
+inline void
+Property::_get_field (const String& field, LGMultiBase& value) const
+{
+	_get_field (field.empty () ? nullptr : field.data (), value);
+}
+
+inline bool
+Property::_set_field (const String& field, const LGMultiBase& value,
+	bool add_if_missing)
+{
+	return _set_field (field.empty () ? nullptr : field.data (), value,
+		add_if_missing);
 }
 
 
@@ -68,7 +82,7 @@ Property::get_field (const String& field, const T& default_value) const
 
 template <typename T, const FieldProxyConfig<T>& config>
 inline
-PropField<T, config>::PropField (const Object& _object)
+PropField<T, config>::PropField (Object& _object)
 	: object (_object)
 {
 	if (!config.major)
@@ -114,7 +128,7 @@ operator << (std::ostream& out, const PropField<T, config>& field)
 
 template <const FieldProxyConfig<bool>& config>
 inline
-PropField<bool, config>::PropField (const Object& _object)
+PropField<bool, config>::PropField (Object& _object)
 	: object (_object)
 {
 	if (!config.major)

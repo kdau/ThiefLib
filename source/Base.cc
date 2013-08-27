@@ -449,24 +449,40 @@ int
 LGMultiBase::as_enum_value () const
 {
 	if (type != INT)
-		throw std::runtime_error ("bad LGMulti type");
+		throw LGMultiTypeError (type, "[enumeration]");
 	return data.i;
 }
 
 ObjectNumber
 LGMultiBase::as_object () const \
 {
-	switch (get_type ())
+	switch (type)
 	{
 	case INT:
 		return data.i;
 	case STRING:
 		return Object (static_cast<const char*> (data.p)).number;
 	default:
-		throw std::runtime_error ("bad LGMulti type");
+		throw LGMultiTypeError (type, "[Object or subclass]");
 	}
 }
 
+LGMultiTypeError::LGMultiTypeError (LGMultiBase::Type got, const char* expected)
+	noexcept
+{
+	std::ostringstream explain;
+	explain << "Cannot translate an LGMulti of type ";
+	switch (got)
+	{
+	case LGMultiBase::Type::EMPTY: explain << "EMPTY"; break;
+	case LGMultiBase::Type::INT: explain << "INT"; break;
+	case LGMultiBase::Type::FLOAT: explain << "FLOAT"; break;
+	case LGMultiBase::Type::STRING: explain << "STRING"; break;
+	case LGMultiBase::Type::VECTOR: explain << "VECTOR"; break;
+	}
+	explain << " to a value of type " << expected << ".";
+	explanation = explain.str ();
+}
 
 
 
@@ -483,7 +499,7 @@ LGMulti<Type>::LGMulti (const Type& value) \
 LGMulti<Type>::operator Type () const \
 { \
 	if (type != MultiType) \
-		throw std::runtime_error ("bad LGMulti type"); \
+		throw LGMultiTypeError (type, typeid (Type).name ()); \
 	return data.Member; \
 }
 
@@ -512,7 +528,7 @@ LGMulti<Color>::operator Color () const \
 	{
 	case INT: return Color (data.i);
 	case STRING: return Color (static_cast<const char*> (data.p));
-	default: throw std::runtime_error ("bad LGMulti type");
+	default: throw LGMultiTypeError (type, "Color");
 	}
 }
 
@@ -528,7 +544,7 @@ LGMulti<String>::LGMulti (const String& value)
 LGMulti<String>::operator String () const \
 {
 	if (type != STRING)
-		throw std::runtime_error ("bad LGMulti type");
+		throw LGMultiTypeError (type, "String");
 	return static_cast<const char*> (data.p);
 }
 
@@ -543,7 +559,7 @@ LGMulti<Timer>::LGMulti (const Timer& value)
 LGMulti<Timer>::operator Timer () const \
 {
 	if (type != INT)
-		throw std::runtime_error ("bad LGMulti type");
+		throw LGMultiTypeError (type, "Timer");
 	return data.p;
 }
 
@@ -559,7 +575,7 @@ LGMulti<Vector>::LGMulti (const Vector& value)
 LGMulti<Vector>::operator Vector () const \
 {
 	if (type != VECTOR)
-		throw std::runtime_error ("bad LGMulti type");
+		throw LGMultiTypeError (type, "Vector");
 	return *static_cast<const Vector*> (data.p);
 }
 

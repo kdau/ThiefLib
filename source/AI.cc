@@ -29,26 +29,20 @@ namespace Thief {
 
 // AI
 
-PROXY_CONFIG (AI, mode, "AI_mode", nullptr, AI::Mode, AI::Mode::NORMAL);
+PROXY_CONFIG (AI, mode, "AI_mode", nullptr, AI::Mode, Mode::NORMAL);
 PROXY_CONFIG (AI, frozen_start, "AI_Frozen", "StartTime", Time, 0ul);
 PROXY_CONFIG (AI, frozen_duration, "AI_Frozen", "Duration", Time, 0ul);
 PROXY_CONFIG (AI, behavior_set, "AI", "Behavior set", String, "");
 PROXY_CONFIG (AI, aggression, "AI_Aggression", nullptr,
-	AI::Rating, AI::Rating::NONE);
-PROXY_CONFIG (AI, aptitude, "AI_Aptitude", nullptr,
-	AI::Rating, AI::Rating::NONE);
+	AI::Rating, Rating::NONE);
+PROXY_CONFIG (AI, aptitude, "AI_Aptitude", nullptr, AI::Rating, Rating::NONE);
 PROXY_CONFIG (AI, defensiveness, "AI_Defensive", nullptr,
-	AI::Rating, AI::Rating::NONE);
-PROXY_CONFIG (AI, dodginess, "AI_Dodginess", nullptr,
-	AI::Rating, AI::Rating::NONE);
-PROXY_CONFIG (AI, hearing, "AI_Hearing", nullptr,
-	AI::Rating, AI::Rating::NONE);
-PROXY_CONFIG (AI, sloth, "AI_Sloth", nullptr,
-	AI::Rating, AI::Rating::NONE);
-PROXY_CONFIG (AI, verbosity, "AI_Verbosity", nullptr,
-	AI::Rating, AI::Rating::NONE);
-PROXY_CONFIG (AI, vision, "AI_Vision", nullptr,
-	AI::Rating, AI::Rating::NONE);
+	AI::Rating, Rating::NONE);
+PROXY_CONFIG (AI, dodginess, "AI_Dodginess", nullptr, AI::Rating, Rating::NONE);
+PROXY_CONFIG (AI, hearing, "AI_Hearing", nullptr, AI::Rating, Rating::NONE);
+PROXY_CONFIG (AI, sloth, "AI_Sloth", nullptr, AI::Rating, Rating::NONE);
+PROXY_CONFIG (AI, verbosity, "AI_Verbosity", nullptr, AI::Rating, Rating::NONE);
+PROXY_CONFIG (AI, vision, "AI_Vision", nullptr, AI::Rating, Rating::NONE);
 PROXY_CONFIG (AI, time_warp, "TimeWarp", nullptr, float, 1.0f);
 PROXY_CONFIG (AI, uses_doors, "AI_UsesDoors", nullptr, bool, true);
 PROXY_CONFIG (AI, needs_big_doors, "AI_IsBig", nullptr, bool, false);
@@ -64,7 +58,7 @@ PROXY_CONFIG (AI, notices_damage, "AI_NoticeDmg", nullptr, bool, true);
 PROXY_NEG_CONFIG (AI, notices_other_ai, "AI_OnlyPlayer", nullptr, bool, false);
 PROXY_CONFIG (AI, notices_projectiles, "AI_SeesPrj", nullptr, bool, true);
 PROXY_CONFIG (AI, creature_type, "Creature", nullptr,
-	AI::CreatureType, AI::CreatureType::NONE);
+	AI::CreatureType, CreatureType::NONE);
 PROXY_CONFIG (AI, creature_scale, "CretScale", nullptr, float, 1.0f);
 PROXY_CONFIG (AI, is_small_creature, "AI_IsSmall", nullptr, bool, false);
 PROXY_CONFIG (AI, motion_tags, "MotActorTagList", nullptr, String, "");
@@ -78,7 +72,8 @@ PROXY_CONFIG (AI, last_speech_concept, "Speech", "concept", int, 0);
 PROXY_BIT_CONFIG (AI, is_innocent, "DarkStat", nullptr, 1u, false);
 PROXY_BIT_CONFIG (AI, is_robot, "DarkStat", nullptr, 16u, false);
 
-OBJECT_TYPE_IMPL_ (AI,
+OBJECT_TYPE_IMPL_ (AI, Rendered (), Interactive (), Physical (),
+		SpherePhysical (), Damageable (), Being (), Container (),
 	PROXY_INIT (mode),
 	PROXY_INIT (frozen_start),
 	PROXY_INIT (frozen_duration),
@@ -374,7 +369,56 @@ Conversation::remove_actor (size_t _number)
 
 // AIAwarenessLink
 
-FLAVORED_LINK_IMPL (AIAwareness)
+PROXY_BIT_CONFIG (AIAwarenessLink, seen, "Flags", nullptr, SEEN, false);
+PROXY_BIT_CONFIG (AIAwarenessLink, heard, "Flags", nullptr, HEARD, false);
+PROXY_BIT_CONFIG (AIAwarenessLink, can_raycast, "Flags", nullptr,
+	CAN_RAYCAST, false);
+PROXY_BIT_CONFIG (AIAwarenessLink, have_los, "Flags", nullptr, HAVE_LOS, false);
+PROXY_BIT_CONFIG (AIAwarenessLink, blind, "Flags", nullptr, BLIND, false);
+PROXY_BIT_CONFIG (AIAwarenessLink, deaf, "Flags", nullptr, DEAF, false);
+PROXY_BIT_CONFIG (AIAwarenessLink, highest, "Flags", nullptr, HIGHEST, false);
+PROXY_BIT_CONFIG (AIAwarenessLink, firsthand, "Flags", nullptr,
+	FIRSTHAND, false);
+PROXY_CONFIG (AIAwarenessLink, current_level, "Level", nullptr,
+	AIAwarenessLink::Level, Level::NONE);
+PROXY_CONFIG (AIAwarenessLink, peak_level, "Peak Level", nullptr,
+	AIAwarenessLink::Level, Level::NONE);
+PROXY_CONFIG (AIAwarenessLink, pulse_level, "Last pulse level", nullptr,
+	AIAwarenessLink::Level, Level::NONE);
+PROXY_CONFIG (AIAwarenessLink, level_time, "Level enter time", nullptr,
+	Time, 0ul);
+PROXY_CONFIG (AIAwarenessLink, contact_location, "Pos last contact", nullptr,
+	Vector, Vector ());
+PROXY_CONFIG (AIAwarenessLink, contact_time, "Time last contact", nullptr,
+	Time, 0ul);
+PROXY_CONFIG (AIAwarenessLink, firsthand_time, "Last true contact", nullptr,
+	Time, 0ul);
+PROXY_CONFIG (AIAwarenessLink, vision_cone, "Vision cone", nullptr, int, 0);
+PROXY_CONFIG (AIAwarenessLink, update_time, "Time last update", nullptr,
+	Time, 0ul);
+PROXY_CONFIG (AIAwarenessLink, los_update_time, "Time last update LOS", nullptr,
+	Time, 0ul);
+
+FLAVORED_LINK_IMPL_ (AIAwareness,
+	PROXY_INIT (seen),
+	PROXY_INIT (heard),
+	PROXY_INIT (can_raycast),
+	PROXY_INIT (have_los),
+	PROXY_INIT (blind),
+	PROXY_INIT (deaf),
+	PROXY_INIT (highest),
+	PROXY_INIT (firsthand),
+	PROXY_INIT (current_level),
+	PROXY_INIT (peak_level),
+	PROXY_INIT (pulse_level),
+	PROXY_INIT (level_time),
+	PROXY_INIT (contact_location),
+	PROXY_INIT (contact_time),
+	PROXY_INIT (firsthand_time),
+	PROXY_INIT (vision_cone),
+	PROXY_INIT (update_time),
+	PROXY_INIT (los_update_time)
+)
 
 AIAwarenessLink
 AIAwarenessLink::create (const Object& source, const Object& dest,
@@ -393,61 +437,18 @@ AIAwarenessLink::create (const Object& source, const Object& dest,
 	return link;
 }
 
-unsigned
-AIAwarenessLink::get_flags () const
+inline const sAIAwareness&
+get_ai_awareness_data (const AIAwarenessLink& link)
 {
-	auto& data = *static_cast<const sAIAwareness*> (get_data_raw ());
-	return data.uFlags;
+	const void* data = link.get_data_raw ();
+	if (!data) throw std::runtime_error ("invalid link");
+	return *static_cast<const sAIAwareness*> (data);
 }
 
 void
-AIAwarenessLink::set_flags (unsigned flags)
+AIAwarenessLink::update_level (Level level, Time time)
 {
-	auto data = *static_cast<const sAIAwareness*> (get_data_raw ());
-	data.uFlags |= flags;
-	set_data_raw (&data);
-}
-
-void
-AIAwarenessLink::clear_flags (unsigned flags)
-{
-	auto data = *static_cast<const sAIAwareness*> (get_data_raw ());
-	data.uFlags &= ~flags;
-	set_data_raw (&data);
-}
-
-AIAwarenessLink::Level
-AIAwarenessLink::get_current_level () const
-{
-	auto& data = *static_cast<const sAIAwareness*> (get_data_raw ());
-	return Level (data.Level);
-}
-
-AIAwarenessLink::Level
-AIAwarenessLink::get_peak_level () const
-{
-	auto& data = *static_cast<const sAIAwareness*> (get_data_raw ());
-	return Level (data.PeakLevel);
-}
-
-AIAwarenessLink::Level
-AIAwarenessLink::get_pulse_level () const
-{
-	auto& data = *static_cast<const sAIAwareness*> (get_data_raw ());
-	return Level (data.i2);
-}
-
-Time
-AIAwarenessLink::get_level_time () const
-{
-	auto& data = *static_cast<const sAIAwareness*> (get_data_raw ());
-	return data.LevelEnterTime;
-}
-
-void
-AIAwarenessLink::set_level (Level level, Time time)
-{
-	auto data = *static_cast<const sAIAwareness*> (get_data_raw ());
+	sAIAwareness data = get_ai_awareness_data (*this);
 	data.Level = eAIAwareLevel (level);
 	if (data.PeakLevel < eAIAwareLevel (level))
 		data.PeakLevel = eAIAwareLevel (level);
@@ -455,73 +456,25 @@ AIAwarenessLink::set_level (Level level, Time time)
 	set_data_raw (&data);
 }
 
-Vector
-AIAwarenessLink::get_contact_location () const
-{
-	auto& data = *static_cast<const sAIAwareness*> (get_data_raw ());
-	return LGVector (&data.PosLastContact);
-}
-
-Time
-AIAwarenessLink::get_contact_time () const
-{
-	auto& data = *static_cast<const sAIAwareness*> (get_data_raw ());
-	return data.TimeLastContact;
-}
-
-Time
-AIAwarenessLink::get_firsthand_time () const
-{
-	auto& data = *static_cast<const sAIAwareness*> (get_data_raw ());
-	return data.TimeLastFirstHand;
-}
-
 void
 AIAwarenessLink::update_contact (const Vector& location, Time time,
-	bool firsthand)
+	bool _firsthand)
 {
-	auto data = *static_cast<const sAIAwareness*> (get_data_raw ());
+	firsthand = _firsthand;
+	sAIAwareness data = get_ai_awareness_data (*this);
 	data.PosLastContact = LGVector (location);
 	data.TimeLastContact = time;
-	if (firsthand) data.TimeLastFirstHand = time;
+	if (_firsthand) data.TimeLastFirstHand = time;
 	set_data_raw (&data);
 }
 
-int
-AIAwarenessLink::get_vision_cone () const
-{
-	auto& data = *static_cast<const sAIAwareness*> (get_data_raw ());
-	return data.VisCone;
-}
-
 void
-AIAwarenessLink::set_vision_cone (int vision_cone)
+AIAwarenessLink::update (Time time, bool _have_los)
 {
-	auto data = *static_cast<const sAIAwareness*> (get_data_raw ());
-	data.VisCone = vision_cone;
-	set_data_raw (&data);
-}
-
-Time
-AIAwarenessLink::get_update_time () const
-{
-	auto& data = *static_cast<const sAIAwareness*> (get_data_raw ());
-	return data.TimeLastUpdate;
-}
-
-Time
-AIAwarenessLink::get_los_update_time () const
-{
-	auto& data = *static_cast<const sAIAwareness*> (get_data_raw ());
-	return data.TimeLastUpdateLOS;
-}
-
-void
-AIAwarenessLink::update (Time time, bool have_los)
-{
-	auto data = *static_cast<const sAIAwareness*> (get_data_raw ());
+	have_los = _have_los;
+	sAIAwareness data = get_ai_awareness_data (*this);
 	data.TimeLastUpdate = time;
-	if (have_los) data.TimeLastUpdateLOS = time;
+	if (_have_los) data.TimeLastUpdateLOS = time;
 	set_data_raw (&data);
 }
 
@@ -529,27 +482,20 @@ AIAwarenessLink::update (Time time, bool have_los)
 
 // CreatureAttachmentLink
 
-FLAVORED_LINK_IMPL (CreatureAttachment)
+PROXY_CONFIG (CreatureAttachmentLink, joint, "Joint", nullptr,
+	CreatureAttachmentLink::Joint, Joint::NONE);
+
+FLAVORED_LINK_IMPL_ (CreatureAttachment,
+	PROXY_INIT (joint)
+)
 
 CreatureAttachmentLink
 CreatureAttachmentLink::create (const Object& source, const Object& dest,
 	Joint joint)
 {
 	CreatureAttachmentLink link = Link::create (flavor (), source, dest);
-	link.set_joint (joint);
+	link.joint = joint;
 	return link;
-}
-
-CreatureAttachmentLink::Joint
-CreatureAttachmentLink::get_joint () const
-{
-	return get_data_field<Joint> ("Joint");
-}
-
-void
-CreatureAttachmentLink::set_joint (Joint joint)
-{
-	set_data_field ("Joint", joint);
 }
 
 
@@ -641,9 +587,8 @@ AIAttackMessage::AIAttackMessage (Event event, const Object& weapon)
 	{
 	case WINDUP: message->message = "StartWindup"; break;
 	case START:  message->message = "StartAttack"; break;
-	case END:    message->message = "EndAttack"; break;
-	default:
-		throw std::invalid_argument ("bad AIAttackMessage event");
+	case END:
+	default:     message->message = "EndAttack"; break;
 	}
 	MESSAGE_AS (sAttackMsg)->weapon = weapon.number;
 }
@@ -655,7 +600,7 @@ AIAttackMessage::get_event () const
 	if (name == "StartWindup") return WINDUP;
 	if (name == "StartAttack") return START;
 	if (name == "EndAttack") return END;
-	throw std::runtime_error ("invalid AIAttackMessage");
+	throw MessageWrapError (message, typeid (*this), "invalid event");
 }
 
 MESSAGE_ACCESSOR (Object, AIAttackMessage, get_weapon, sAttackMsg, weapon)
@@ -697,10 +642,9 @@ AIMotionMessage::AIMotionMessage (Event event, const char* motion_name,
 	switch (event)
 	{
 	case START:        message->message = "MotionStart"; break;
-	case END:          message->message = "MotionEnd"; break;
 	case FLAG_REACHED: message->message = "MotionFlagReached"; break;
-	default:
-		throw std::invalid_argument ("bad AIMotionMessage event");
+	case END:
+	default:           message->message = "MotionEnd"; break;
 	}
 	MESSAGE_AS (sBodyMsg)->ActionType = sBodyMsg::eBodyAction (event);
 	MESSAGE_AS (sBodyMsg)->MotionName = motion_name;

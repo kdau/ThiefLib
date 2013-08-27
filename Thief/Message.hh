@@ -101,7 +101,23 @@ private:
 	bool own_reply;
 };
 
+
+
+// Message wrapping
+
 #define THIEF_MESSAGE_WRAP(Type) Type (sScrMsg*, sMultiParm*);
+
+class MessageWrapError : public std::exception
+{
+public:
+	MessageWrapError (const sScrMsg* message,
+		const std::type_info& wrap_type, const char* problem) noexcept;
+	virtual ~MessageWrapError () noexcept {}
+	virtual const char* what () const noexcept
+		{ return explanation.data (); }
+private:
+	String explanation;
+};
 
 
 

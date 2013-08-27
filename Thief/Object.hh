@@ -34,8 +34,9 @@ namespace Thief {
 #define THIEF_OBJECT_TYPE(ClassName) \
 	ClassName (Number = NONE); \
 	ClassName (const Object&); \
-	explicit ClassName (const String& name); \
-	ClassName& operator = (const ClassName& copy);
+	ClassName (const ClassName&); \
+	ClassName& operator = (const ClassName& copy); \
+	explicit ClassName (const String& name);
 
 
 
@@ -47,7 +48,13 @@ public:
 	static const Number ANY;
 	static const Number SELF;
 
-	THIEF_OBJECT_TYPE (Object)
+	Object (Number = NONE);
+
+	Object (const Object&);
+	Object& operator = (const Object& copy);
+
+	explicit Object (const String& name);
+
 	virtual ~Object ();
 
 #ifdef IS_THIEF2

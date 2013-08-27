@@ -33,6 +33,7 @@ class Player : public Being
 {
 public:
 	Player ();
+	Player (const Player&) = delete;
 
 	// Inventory
 

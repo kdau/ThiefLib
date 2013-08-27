@@ -263,8 +263,8 @@ void
 Mission::set_envmap_texture (EnvironmentMapZone zone, const String& texture)
 {
 	if (Engine::get_version () < Version (1, 20))
-		throw std::runtime_error
-			("SetEnvMapTexture not implemented before version 1.20");
+		throw std::runtime_error ("Mission::set_envmap_texture is not "
+			"implemented before engine version 1.20.");
 
 	SService<IEngineSrv> (LG)->SetEnvMapZone
 		(int (zone), texture.empty () ? nullptr : texture.data ());

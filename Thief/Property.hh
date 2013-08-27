@@ -70,7 +70,10 @@ private:
 	void _get (LGMultiBase& value) const;
 	bool _set (const LGMultiBase& value);
 	void _get_field (const String& field, LGMultiBase& value) const;
+	void _get_field (const char* field, LGMultiBase& value) const;
 	bool _set_field (const String& field, const LGMultiBase& value,
+		bool add_if_missing = false);
+	bool _set_field (const char* field, const LGMultiBase& value,
 		bool add_if_missing = false);
 
 	ObjectNumber object;
@@ -85,38 +88,38 @@ class PropFieldBase
 {
 protected:
 	void get (const Object&, const char*, const char*, LGMultiBase&) const;
-	void set (const Object&, const char*, const char*, const LGMultiBase&);
+	void set (Object&, const char*, const char*, const LGMultiBase&);
 
 	bool get_bit (const FieldProxyConfig<bool>&, const Object&) const;
-	void set_bit (const FieldProxyConfig<bool>&, const Object&, bool);
+	void set_bit (const FieldProxyConfig<bool>&, Object&, bool);
 };
 
 template <typename T, const FieldProxyConfig<T>& config>
 class PropField : public PropFieldBase
 {
 public:
-	PropField (const Object&);
+	PropField (Object&);
 
 	bool exists () const;
 	operator T () const;
 	PropField& operator = (const T&);
 
 private:
-	const Object& object;
+	Object& object;
 };
 
 template <const FieldProxyConfig<bool>& config>
 class PropField<bool, config> : public PropFieldBase
 {
 public:
-	PropField (const Object&);
+	PropField (Object&);
 
 	bool exists () const;
 	operator bool () const;
 	PropField& operator = (bool);
 
 private:
-	const Object& object;
+	Object& object;
 };
 
 template <typename T, const FieldProxyConfig<T>& config>

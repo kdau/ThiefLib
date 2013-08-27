@@ -77,11 +77,11 @@ public:
 	Object get_source () const;
 	Object get_dest () const;
 
-	const void* get_data_raw () const;
-	void set_data_raw (const void* data);
-
 	MULTI_GET_ARG (get_data_field, String, field);
 	MULTI_SET_ARG (set_data_field, String, field);
+
+	const void* get_data_raw () const;
+	void set_data_raw (const void*);
 
 	static bool any_exist (Flavor,
 		const Object& source = Object::ANY,
@@ -114,11 +114,59 @@ public:
 		const Object& host = Object::SELF);
 
 private:
+	friend class LinkFieldBase;
+	template <typename T, const FieldProxyConfig<T>& config>
+	friend class LinkField;
+
 	void _get_data_field (const String& field, LGMultiBase& multi) const;
+	void _get_data_field (const char* field, LGMultiBase& multi) const;
 	void _set_data_field (const String& field, const LGMultiBase& multi);
+	void _set_data_field (const char* field, const LGMultiBase& multi);
 };
 
 
+
+// LinkField: interpreted access to fields of flavor-specific Link subclasses
+
+class LinkFieldBase
+{
+protected:
+	bool get_bit (const FieldProxyConfig<bool>&, const Link&) const;
+	void set_bit (const FieldProxyConfig<bool>&, Link&, bool);
+};
+
+template <typename T, const FieldProxyConfig<T>& config>
+class LinkField : public LinkFieldBase
+{
+public:
+	LinkField (Link&);
+
+	operator T () const;
+	LinkField& operator = (const T&);
+
+private:
+	Link& link;
+};
+
+template <const FieldProxyConfig<bool>& config>
+class LinkField<bool, config> : public LinkFieldBase
+{
+public:
+	LinkField (Link&);
+
+	operator bool () const;
+	LinkField& operator = (bool);
+
+private:
+	Link& link;
+};
+
+template <typename T, const FieldProxyConfig<T>& config>
+std::ostream& operator << (std::ostream&, const LinkField<T, config>&);
+
+
+
+// LinkChangeMessage
 
 class LinkChangeMessage : public Message
 {
@@ -138,28 +186,11 @@ public:
 
 
 
-// Common declarations for flavor-specific Link subclasses
+} // namespace Thief
 
-#define THIEF_FLAVORED_LINK(FlavorName) \
-class FlavorName##Link; \
-typedef std::vector<FlavorName##Link> FlavorName##Links; \
-class FlavorName##Link : public Link
+#include <Thief/Link.inl>
 
-#define THIEF_FLAVORED_LINK_COMMON(FlavorName) \
-private: \
-	void check_valid () const; \
-public: \
-	static Flavor flavor (bool reverse = false); \
-	FlavorName##Link (Number = NONE); \
-	FlavorName##Link (const Link&); \
-	static FlavorName##Links get_all \
-		(const Object& source = Object::ANY, \
-		const Object& dest = Object::ANY, \
-		Inheritance = Inheritance::NONE); \
-	static FlavorName##Links get_all_reverse \
-		(const Object& source = Object::ANY, \
-		const Object& dest = Object::ANY, \
-		Inheritance = Inheritance::NONE);
+namespace Thief {
 
 
 
@@ -172,8 +203,7 @@ THIEF_FLAVORED_LINK (Corpse)
 	static CorpseLink create (const Object& source,
 		const Object& dest, bool propagate_source_scale);
 
-	bool get_propagate_source_scale () const;
-	void set_propagate_source_scale (bool);
+	THIEF_LINK_FIELD (bool, propagate_source_scale);
 };
 
 
@@ -188,17 +218,10 @@ THIEF_FLAVORED_LINK (Flinderize)
 		int count, float impulse, bool scatter,
 		const Vector& offset = Vector ());
 
-	int get_count () const;
-	void set_count (int);
-
-	float get_impulse () const;
-	void set_impulse (float);
-
-	bool get_scatter () const;
-	void set_scatter (bool);
-
-	Vector get_offset () const;
-	void set_offset (const Vector&);
+	THIEF_LINK_FIELD (int, count);
+	THIEF_LINK_FIELD (float, impulse);
+	THIEF_LINK_FIELD (bool, scatter);
+	THIEF_LINK_FIELD (Vector, offset);
 };
 
 
@@ -212,15 +235,12 @@ THIEF_FLAVORED_LINK (ScriptParams)
 	static ScriptParamsLink create (const Object& source,
 		const Object& dest, const String& data = String ());
 
-	String get_data () const;
-	void set_data (const String&);
+	THIEF_LINK_FIELD (String, data);
 };
 
 
 
 } // namespace Thief
-
-#include <Thief/Link.inl>
 
 #endif // THIEF_LINK_HH
 

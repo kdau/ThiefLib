@@ -116,21 +116,21 @@ Link::set_data_raw (const void* data)
 }
 
 void
-Link::_get_data_field (const String& field, LGMultiBase& multi) const
+Link::_get_data_field (const char* field, LGMultiBase& multi) const
 {
 	if (exists ())
 		SService<ILinkToolsSrv> (LG)->LinkGetData
-			(multi, number, field.data ());
+			(multi, number, field);
 	else
 		multi.clear ();
 }
 
 void
-Link::_set_data_field (const String& field, const LGMultiBase& multi)
+Link::_set_data_field (const char* field, const LGMultiBase& multi)
 {
 	if (!exists ()) throw std::runtime_error ("link does not exist");
 	SService<ILinkToolsSrv> (LG)->LinkSetData
-		(number, field.data (), multi);
+		(number, field, multi);
 }
 
 
@@ -254,6 +254,33 @@ Link::unsubscribe (const Object& source, Flavor flavor, const Object& _host)
 
 
 
+// LinkFieldBase
+
+bool
+LinkFieldBase::get_bit (const FieldProxyConfig<bool>& config,
+	const Link& link) const
+{
+	LGMulti<unsigned> raw (config.default_value ? config.bitmask : 0u);
+	link._get_data_field (config.major, raw);
+	return raw & config.bitmask;
+}
+
+void
+LinkFieldBase::set_bit (const FieldProxyConfig<bool>& config, Link& link,
+	bool value)
+{
+	LGMulti<unsigned> field (0u);
+	link._get_data_field (config.major, field);
+
+	if (value)
+		field = field | config.bitmask;
+	else
+		field = field & ~config.bitmask;
+
+	link._set_data_field (config.major, field);
+}
+
+
 
 // LinkChangeMessage
 
@@ -305,121 +332,67 @@ MESSAGE_ACCESSOR (Object, LinkChangeMessage, get_dest,
 
 // CorpseLink
 
-FLAVORED_LINK_IMPL (Corpse)
+PROXY_CONFIG (CorpseLink, propagate_source_scale, "Propagate Source Scale?",
+	nullptr, bool, false);
+
+FLAVORED_LINK_IMPL_ (Corpse,
+	PROXY_INIT (propagate_source_scale)
+)
 
 CorpseLink
 CorpseLink::create (const Object& source, const Object& dest,
 	bool propagate_source_scale)
 {
 	CorpseLink link = Link::create (flavor (), source, dest);
-	link.set_propagate_source_scale (propagate_source_scale);
+	link.propagate_source_scale = propagate_source_scale;
 	return link;
-}
-
-bool
-CorpseLink::get_propagate_source_scale () const
-{
-	return get_data_field<bool> ("Propagate Source Scale?");
-}
-
-void
-CorpseLink::set_propagate_source_scale (bool propagate_source_scale)
-{
-	set_data_field ("Propagate Source Scale?", propagate_source_scale);
 }
 
 
 
 // FlinderizeLink
 
-FLAVORED_LINK_IMPL (Flinderize)
+PROXY_CONFIG (FlinderizeLink, count, "Count", nullptr, int, 0);
+PROXY_CONFIG (FlinderizeLink, impulse, "Impulse", nullptr, float, 0.0f);
+PROXY_CONFIG (FlinderizeLink, scatter, "Scatter?", nullptr, bool, false);
+PROXY_CONFIG (FlinderizeLink, offset, "Offset", nullptr, Vector, Vector ());
+
+FLAVORED_LINK_IMPL_ (Flinderize,
+	PROXY_INIT (count),
+	PROXY_INIT (impulse),
+	PROXY_INIT (scatter),
+	PROXY_INIT (offset)
+)
 
 FlinderizeLink
 FlinderizeLink::create (const Object& source, const Object& dest, int count,
 	float impulse, bool scatter, const Vector& offset)
 {
 	FlinderizeLink link = Link::create (flavor (), source, dest);
-	link.set_count (count);
-	link.set_impulse (impulse);
-	link.set_scatter (scatter);
-	link.set_offset (offset);
+	link.count = count;
+	link.impulse = impulse;
+	link.scatter = scatter;
+	link.offset = offset;
 	return link;
-}
-
-int
-FlinderizeLink::get_count () const
-{
-	return get_data_field<int> ("Count");
-}
-
-void
-FlinderizeLink::set_count (int count)
-{
-	set_data_field ("Count", count);
-}
-
-float
-FlinderizeLink::get_impulse () const
-{
-	return get_data_field<float> ("Impulse");
-}
-
-void
-FlinderizeLink::set_impulse (float impulse)
-{
-	set_data_field ("Impulse", impulse);
-}
-
-bool
-FlinderizeLink::get_scatter () const
-{
-	return get_data_field<bool> ("Scatter?");
-}
-
-void
-FlinderizeLink::set_scatter (bool scatter)
-{
-	set_data_field ("Scatter?", scatter);
-}
-
-Vector
-FlinderizeLink::get_offset () const
-{
-	return get_data_field<Vector> ("Offset");
-}
-
-void
-FlinderizeLink::set_offset (const Vector& offset)
-{
-	set_data_field ("Offset", offset);
 }
 
 
 
 // ScriptParamsLink
 
-FLAVORED_LINK_IMPL (ScriptParams)
+PROXY_CONFIG (ScriptParamsLink, data, nullptr, nullptr, String, "");
+
+FLAVORED_LINK_IMPL_ (ScriptParams,
+	PROXY_INIT (data)
+)
 
 ScriptParamsLink
 ScriptParamsLink::create (const Object& source, const Object& dest,
 	const String& data)
 {
 	ScriptParamsLink link = Link::create (flavor (), source, dest);
-	link.set_data (data);
+	link.data = data;
 	return link;
-}
-
-String
-ScriptParamsLink::get_data () const
-{
-	auto data = static_cast<const char*> (get_data_raw ());
-	return data ? data : String ();
-}
-
-void
-ScriptParamsLink::set_data (const String& data)
-{
-	set_data_raw (data.data ());
 }
 
 

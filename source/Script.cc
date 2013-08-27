@@ -73,7 +73,8 @@ Script::Impl::ReceiveMessage (sScrMsg* message, sMultiParm* reply,
 	try
 	{
 		if (!message)
-			throw std::invalid_argument ("null message received");
+			throw MessageWrapError (message, typeid (Message),
+				"message is null");
 		return script.dispatch (*message, reply, trace) ? S_OK : S_FALSE;
 	}
 	catch (std::exception& e)

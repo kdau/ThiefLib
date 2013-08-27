@@ -32,7 +32,7 @@ namespace Thief {
 PROXY_CONFIG (Damageable, hit_points, "HitPoints", nullptr, int, 0);
 PROXY_CONFIG (Damageable, max_hit_points, "MAX_HP", nullptr, int, 0);
 PROXY_CONFIG (Damageable, slay_result, "SlayResult", nullptr,
-	Damageable::SlayResult, Damageable::SlayResult::NORMAL);
+	Damageable::SlayResult, SlayResult::NORMAL);
 PROXY_CONFIG (Damageable, death_stage, "DeathStage", nullptr, int, 0);
 
 OBJECT_TYPE_IMPL_ (Damageable,
@@ -71,11 +71,11 @@ Damageable::resurrect (const Object& culprit)
 //TODO wrap link: FrobProxy - FrobProxyInfo
 
 PROXY_CONFIG (Interactive, frob_world_action, "FrobInfo", "World Action",
-	Interactive::FrobAction, Interactive::FrobAction::INERT);
+	Interactive::FrobAction, FrobAction::INERT);
 PROXY_CONFIG (Interactive, frob_inventory_action, "FrobInfo", "Inventory Action",
-	Interactive::FrobAction, Interactive::FrobAction::INERT);
+	Interactive::FrobAction, FrobAction::INERT);
 PROXY_CONFIG (Interactive, frob_tool_action, "FrobInfo", "Tool Action",
-	Interactive::FrobAction, Interactive::FrobAction::INERT);
+	Interactive::FrobAction, FrobAction::INERT);
 PROXY_CONFIG (Interactive, pick_distance, "PickDist", nullptr, float, 0.0f);
 PROXY_CONFIG (Interactive, pick_bias, "PickBias", nullptr, float, 0.0f);
 PROXY_CONFIG (Interactive, tool_reach, "ToolReach", nullptr, float, 0.0f);
@@ -86,7 +86,7 @@ PROXY_CONFIG (Interactive, loot_value_goods, "Loot", "Art", int, 0);
 PROXY_CONFIG (Interactive, loot_value_special, "Loot", "Specials", unsigned, 0u);
 PROXY_CONFIG (Interactive, store_price, "SalePrice", nullptr, int, 0);
 
-OBJECT_TYPE_IMPL_ (Interactive,
+OBJECT_TYPE_IMPL_ (Interactive, Rendered (),
 	PROXY_INIT (frob_world_action),
 	PROXY_INIT (frob_inventory_action),
 	PROXY_INIT (frob_tool_action),
@@ -113,7 +113,7 @@ Interactive::get_inventory_type () const
 
 PROXY_CONFIG (Blood, is_blood, "Blood", nullptr, bool, false);
 
-OBJECT_TYPE_IMPL_ (Blood,
+OBJECT_TYPE_IMPL_ (Blood, Rendered (), Damageable (),
 	PROXY_INIT (is_blood)
 )
 
@@ -205,27 +205,20 @@ Container::move_contents (const Object& new_container, bool combine)
 
 // ContainsLink
 
-FLAVORED_LINK_IMPL (Contains)
+PROXY_CONFIG (ContainsLink, type, nullptr, nullptr,
+	Container::Type, Container::Type::NONE);
+
+FLAVORED_LINK_IMPL_ (Contains,
+	PROXY_INIT (type)
+)
 
 ContainsLink
 ContainsLink::create (const Object& source, const Object& dest,
 	Container::Type type)
 {
 	ContainsLink link = Link::create (flavor (), source, dest);
-	link.set_type (type);
+	link.type = type;
 	return link;
-}
-
-Container::Type
-ContainsLink::get_type () const
-{
-	return *static_cast<const Container::Type*> (get_data_raw ());
-}
-
-void
-ContainsLink::set_type (Container::Type type)
-{
-	set_data_raw (&type);
 }
 
 
@@ -306,7 +299,7 @@ ContainmentMessage::get_contents () const
 PROXY_CONFIG (Readable, book_name, "Book", nullptr, String, "");
 PROXY_CONFIG (Readable, book_art, "BookArt", nullptr, String, "");
 
-OBJECT_TYPE_IMPL_ (Readable,
+OBJECT_TYPE_IMPL_ (Readable, Rendered (), Interactive (),
 	PROXY_INIT (book_name),
 	PROXY_INIT (book_art)
 )
@@ -390,9 +383,8 @@ RoomMessage::RoomMessage (Event event, ObjectType object_type,
 		{
 		case PLAYER: message->message = "PlayerRoomEnter"; break;
 		case CREATURE: message->message = "CreatureRoomEnter"; break;
-		case OBJECT: message->message = "ObjectRoomEnter"; break;
+		case OBJECT: default: message->message = "ObjectRoomEnter"; break;
 		// REMOTE_PLAYER is skipped since we don't support multiplayer.
-		default: throw std::invalid_argument ("bad RoomMessage type");
 		}
 		break;
 	case EXIT:
@@ -400,16 +392,14 @@ RoomMessage::RoomMessage (Event event, ObjectType object_type,
 		{
 		case PLAYER: message->message = "PlayerRoomExit"; break;
 		case CREATURE: message->message = "CreatureRoomExit"; break;
-		case OBJECT: message->message = "ObjectRoomExit"; break;
+		case OBJECT: default: message->message = "ObjectRoomExit"; break;
 		// REMOTE_PLAYER is skipped since we don't support multiplayer.
-		default: throw std::invalid_argument ("bad RoomMessage type");
 		}
 		break;
 	case TRANSIT:
+	default:
 		message->message = "ObjRoomTransit";
 		break;
-	default:
-		throw std::invalid_argument ("bad RoomMessage event");
 	}
 
 	MESSAGE_AS (sRoomMsg)->FromObjId = from_room.number;
@@ -466,7 +456,7 @@ PROXY_CONFIG (Weapon, exposure_swung, "SwingExpose", nullptr, int, 0);
 PROXY_CONFIG (Weapon, collides_with_terrain, "WpnTerrColl", nullptr,
 	bool, false);
 
-OBJECT_TYPE_IMPL_ (Weapon,
+OBJECT_TYPE_IMPL_ (Weapon, Rendered (), Interactive (),
 	PROXY_INIT (exposure_drawn),
 	PROXY_INIT (exposure_swung),
 	PROXY_INIT (collides_with_terrain)
@@ -494,7 +484,7 @@ THIEF_ENUM_CODING (Being::Team, CODE, CODE,
 	THIEF_ENUM_VALUE (BAD_5, "bad5", "bad_5", "bad 5", "bad-5", "undead"),
 )
 
-PROXY_CONFIG (Being, team, "AI_Team", nullptr, Being::Team, Being::Team::GOOD);
+PROXY_CONFIG (Being, team, "AI_Team", nullptr, Being::Team, Team::GOOD);
 PROXY_CONFIG (Being, culpable, "Culpable", nullptr, bool, false);
 PROXY_CONFIG (Being, blood_type, "BloodType", nullptr, String, "");
 PROXY_CONFIG (Being, current_breath, "AirSupply", nullptr, Time, 0ul);
@@ -505,7 +495,7 @@ PROXY_CONFIG (Being, drowning_damage, "BreathConfig", "Drown Damage", int, 0);
 PROXY_CONFIG (Being, drowning_frequency, "BreathConfig", "Drown Freq (ms)",
 	Time, 0ul);
 
-OBJECT_TYPE_IMPL_ (Being,
+OBJECT_TYPE_IMPL_ (Being, Physical (), SpherePhysical (), Damageable (),
 	PROXY_INIT (team),
 	PROXY_INIT (culpable),
 	PROXY_INIT (blood_type),

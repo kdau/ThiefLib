@@ -102,7 +102,7 @@ public:
 
 // Blood
 
-class Blood : public virtual Damageable
+class Blood : public virtual Rendered, public virtual Damageable
 {
 public:
 	THIEF_OBJECT_TYPE (Blood)
@@ -156,8 +156,7 @@ THIEF_FLAVORED_LINK (Contains)
 	static ContainsLink create (const Object& source,
 		const Object& dest, Container::Type = Container::Type::GENERIC);
 
-	Container::Type get_type () const;
-	void set_type (Container::Type);
+	THIEF_LINK_FIELD (Container::Type, type);
 };
 
 class ContainmentMessage : public Message

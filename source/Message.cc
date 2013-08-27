@@ -55,7 +55,8 @@ Message::Message (sScrMsg* _message, sMultiParm* _reply, bool)
 	else
 	{
 		if (own_reply) delete reply;
-		throw std::invalid_argument ("null message");
+		throw MessageWrapError (message, typeid (*this),
+			"message is null");
 	}
 }
 
@@ -140,7 +141,7 @@ Message::has_data (Datum datum) const
 	case DATA1: return message->data.type != kMT_Undef;
 	case DATA2: return message->data2.type != kMT_Undef;
 	case DATA3: return message->data3.type != kMT_Undef;
-	default: throw std::invalid_argument ("bad message datum");
+	default: return false;
 	}
 }
 
@@ -152,7 +153,7 @@ Message::_get_data (Datum datum, LGMultiBase& value) const
 	case DATA1: value = message->data; break;
 	case DATA2: value = message->data2; break;
 	case DATA3: value = message->data3; break;
-	default: throw std::invalid_argument ("bad message datum");
+	default: value.clear ();
 	}
 }
 
@@ -164,7 +165,7 @@ Message::_set_data (Datum datum, const LGMultiBase& value)
 	case DATA1: message->data = value; break;
 	case DATA2: message->data2 = value; break;
 	case DATA3: message->data3 = value; break;
-	default: throw std::invalid_argument ("bad message datum");
+	default: break;
 	}
 }
 
@@ -184,6 +185,21 @@ const char*
 Message::get_lg_typename () const
 {
 	return message->Persistent_GetName ();
+}
+
+
+
+// Message wrapping
+
+MessageWrapError::MessageWrapError (const sScrMsg* message,
+	const std::type_info& wrap_type, const char* problem) noexcept
+{
+	std::ostringstream explain;
+	explain << "Can't wrap a \"" << (message ? message->message : "")
+		<< "\" message of engine type "
+		<< (message ? message->Persistent_GetName () : "null")
+		<< " as a " << wrap_type.name () << ": " << problem << ".";
+	explanation = explain.str ();
 }
 
 
@@ -252,23 +268,20 @@ FrobMessage::FrobMessage (Event event, const Object& frobber, const Object& tool
 	case BEGIN:
 		switch (frob_loc)
 		{
-		case WORLD: message->message = "FrobWorldBegin"; break;
 		case INVENTORY: message->message = "FrobInvBegin"; break;
 		case TOOL: message->message = "FrobToolBegin"; break;
-		default: throw std::invalid_argument ("bad FrobMessage location");
+		case WORLD: default: message->message = "FrobWorldBegin"; break;
 		}
 		break;
 	case END:
+	default:
 		switch (frob_loc)
 		{
-		case WORLD: message->message = "FrobWorldEnd"; break;
 		case INVENTORY: message->message = "FrobInvEnd"; break;
 		case TOOL: message->message = "FrobToolEnd"; break;
-		default: throw std::invalid_argument ("bad FrobMessage location");
+		case WORLD: default: message->message = "FrobWorldEnd"; break;
 		}
 		break;
-	default:
-		throw std::invalid_argument ("bad FrobMessage event");
 	}
 
 	MESSAGE_AS (sFrobMsg)->Frobber = frobber.number;
@@ -300,7 +313,7 @@ FrobMessage::get_event () const
 	else if (length > 3 && name.compare (length - 3, 3, "End") == 0)
 		return END;
 	else
-		throw std::runtime_error ("invalid FrobMessage");
+		throw MessageWrapError (message, typeid (*this), "invalid event");
 }
 
 Time

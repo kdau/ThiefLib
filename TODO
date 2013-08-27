@@ -1,7 +1,7 @@
 Current work
 	* ParameterCache: actually detect hierarchy changes. May need new OSL.
-	* PropField: add array option for sequences of equivalent fields?
-	* LinkField, MessageField: create to parallel PropField?
+	* PropField, LinkField: add array option for sequences of equivalent fields?
+	* MessageField: create to parallel PropField and LinkField?
 	* Script: use DarkHook hierarchy messages to reinitialize replaced instances?
 	* TrapTrigger: split into Object type and Script type?
 	* AI: split into two or more units.

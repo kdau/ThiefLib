@@ -64,8 +64,7 @@ THIEF_FLAVORED_LINK (Lock) //TESTME
 	static LockLink create (const Object& source, const Object& dest,
 		Require interaction);
 
-	Require get_interaction () const;
-	void set_interaction (Require);
+	THIEF_LINK_FIELD (Require, interaction);
 };
 
 

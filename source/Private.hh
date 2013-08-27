@@ -162,22 +162,24 @@ PROXY_CONFIG_ (Class, Member, Major, Minor, bool, Default, Mask, negate, negate)
 #define OBJECT_TYPE_IMPL_(ClassName, ...) \
 ClassName::ClassName (Number _number) : Object (_number), __VA_ARGS__ {} \
 ClassName::ClassName (const Object& object) : Object (object), __VA_ARGS__ {} \
-ClassName::ClassName (const String& name) : Object (name), __VA_ARGS__ {} \
+ClassName::ClassName (const ClassName& copy) : Object (copy), __VA_ARGS__ {} \
 ClassName& ClassName::operator = (const ClassName& copy) \
-	{ number = copy.number; return *this; }
+	{ number = copy.number; return *this; } \
+ClassName::ClassName (const String& name) : Object (name), __VA_ARGS__ {}
 
 #define OBJECT_TYPE_IMPL(ClassName) \
 ClassName::ClassName (Number _number) : Object (_number) {} \
 ClassName::ClassName (const Object& object) : Object (object) {} \
-ClassName::ClassName (const String& name) : Object (name) {} \
+ClassName::ClassName (const ClassName& copy) : Object (copy) {} \
 ClassName& ClassName::operator = (const ClassName& copy) \
-	{ number = copy.number; return *this; }
+	{ number = copy.number; return *this; } \
+ClassName::ClassName (const String& name) : Object (name) {}
 
 
 
 // Link subclass convenience macros
 
-#define FLAVORED_LINK_IMPL(FlavorName) \
+#define FLAVORED_LINK_IMPL_COMMON(FlavorName) \
 Flavor \
 FlavorName##Link::flavor (bool reverse) \
 { \
@@ -185,11 +187,9 @@ FlavorName##Link::flavor (bool reverse) \
 	return reverse ? rev : fwd; \
 } \
 \
-FlavorName##Link::FlavorName##Link (Number _number) \
-	: Link (_number) { check_valid (); } \
-\
-FlavorName##Link::FlavorName##Link (const Link& link) \
-	: Link (link) { check_valid (); } \
+FlavorName##Link& \
+FlavorName##Link::operator = (const FlavorName##Link& copy) \
+	{ number = copy.number; return *this; } \
 \
 void \
 FlavorName##Link::check_valid () const \
@@ -227,6 +227,31 @@ FlavorName##Link::get_all_reverse (const Object& source, const Object& dest, \
 	return links; \
 }
 
+#define FLAVORED_LINK_IMPL_(FlavorName, ...) \
+FLAVORED_LINK_IMPL_COMMON (FlavorName) \
+\
+FlavorName##Link::FlavorName##Link (Number _number) \
+	: Link (_number), __VA_ARGS__ { check_valid (); } \
+\
+FlavorName##Link::FlavorName##Link (const Link& link) \
+	: Link (link), __VA_ARGS__ { check_valid (); } \
+\
+FlavorName##Link::FlavorName##Link (const FlavorName##Link& link) \
+	: Link (link), __VA_ARGS__ { check_valid (); }
+
+#define FLAVORED_LINK_IMPL(FlavorName) \
+FLAVORED_LINK_IMPL_COMMON (FlavorName) \
+\
+FlavorName##Link::FlavorName##Link (Number _number) \
+	: Link (_number) { check_valid (); } \
+\
+FlavorName##Link::FlavorName##Link (const Link& link) \
+	: Link (link) { check_valid (); } \
+\
+FlavorName##Link::FlavorName##Link (const FlavorName##Link& link) \
+	: Link (link) { check_valid (); }
+
+
 
 
 // Message subclass convenience macros
@@ -236,12 +261,8 @@ Type::Type (sScrMsg* _message, sMultiParm* _reply) \
 	: Message (_message, _reply, true) \
 { \
 	if (!(Tests)) \
-	{ \
-		mono << "*** The " #Type " wrapper constructor couldn't wrap a " \
-			<< message->message << " message of type " \
-			<< get_lg_typename () << "." << std::endl; \
-		throw std::runtime_error ("invalid LG message structure"); \
-	} \
+		throw MessageWrapError (message, typeid (Type), \
+			"structure type or message name mismatch"); \
 }
 
 #define MESSAGE_NAME_TEST(Name) (strcmp (message->message, Name) == 0)
