@@ -58,7 +58,7 @@ Script::name () const
 	return script_name;
 }
 
-inline Object
+inline ScriptHost
 Script::host () const
 {
 	return host_obj;

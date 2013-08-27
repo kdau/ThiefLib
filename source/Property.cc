@@ -270,9 +270,7 @@ MESSAGE_ACCESSOR (Object, PropertyChangeMessage, get_object,
  * Engine Features\Combine Type = CombineType
  * Engine Features\Suspicious = SuspObj
  * Inventory\Block Frob? = BlockFrob
- * Prox\Blood = Blood
  * Prox\Fungus = Fungus
- * Script\Timing = ScriptTiming
  * Trap\Quest Var = TrapQVar
  */
 
@@ -281,9 +279,9 @@ MESSAGE_ACCESSOR (Object, PropertyChangeMessage, get_object,
 /* The following properties and property fields: are not instantiated in the
  * stock T2 dark.gam, have no documented use, work only in SS2, were never
  * implemented at all, are better accessed through methods in script services,
- * and/or are just clearly unsuited for direct use by scripts. No specialized
- * wrapper methods have been created for them, but they may be accessed with
- * the generic Property wrapper.
+ * and/or are just clearly unsuited for direct use by scripts. No PropField
+ * proxies have been created for them, but they may be accessed with the generic
+ * Property wrapper.
  *
  * AI: AI Core\Free sense knowledge = AI_FreeKnow
  * AI: AI Core\Handed-off proxy = AI_IsProxy
@@ -306,13 +304,13 @@ MESSAGE_ACCESSOR (Object, PropertyChangeMessage, get_object,
  * CSArrow
  * CSProjectile
  * CSProperty
- * Dark GameSys\Stats = DarkStat: "Enemy"
+ * (Dark GameSys\Stats = DarkStat): "Enemy"
  * Editor\Auto-Multibrush = AutoVBR
  * Editor\Brush Name = Brush
  * Editor\Editor Comments = EdComment
  * Editor\Has Brush = HasBrush
  * Engine Features\From Briefcase? = FromBriefcase
- * Engine Features\KeyDst = KeyDst: "MasterBit"
+ * (Engine Features\KeyDst = KeyDst): "MasterBit"
  * Engine Features\Preload = Preload
  * Game: Damage Model\Weapon Damage = WeaponDamage
  * Game: Damage Model\Weapon Type = WeaponType

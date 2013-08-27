@@ -30,9 +30,10 @@ namespace Thief {
 // Difficulty
 
 THIEF_ENUM_CODING (Difficulty, BOTH, VALUE,
-	THIEF_ENUM_VALUE (NOT_EXPERT, "0,1", "0, 1", "0-1"),
-	THIEF_ENUM_VALUE (NOT_NORMAL, "1,2", "1, 2", "1-2"),
-	THIEF_ENUM_VALUE (ANY, "any", "0,1,2", "0, 1, 2", "0-2"),
+	THIEF_ENUM_VALUE (NOT_EXPERT, "0,1", "0, 1", "n,h", "n, h", "0-1"),
+	THIEF_ENUM_VALUE (NOT_NORMAL, "1,2", "1, 2", "h,e", "h, e", "1-2"),
+	THIEF_ENUM_VALUE (ANY, "any", "0,1,2", "0, 1, 2", "n,h,e", "n, h, e",
+		"0-2"),
 	THIEF_ENUM_VALUE (NONE, "none", "-"),
 	THIEF_ENUM_VALUE (NORMAL, "normal", "n"),
 	THIEF_ENUM_VALUE (HARD, "hard", "h"),

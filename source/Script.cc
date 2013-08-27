@@ -35,6 +35,16 @@ LG = nullptr;
 
 
 
+// ScriptHost
+
+PROXY_CONFIG (ScriptHost, script_timing, "ScriptTiming", nullptr, Time, 0ul);
+
+OBJECT_TYPE_IMPL_ (ScriptHost,
+	PROXY_INIT (script_timing)
+)
+
+
+
 // Script::Impl
 
 class Script::Impl : public cInterfaceImp<IScript>
@@ -103,7 +113,7 @@ Script::Impl::ReceiveMessage (sScrMsg* message, sMultiParm* reply,
 // Script
 
 Script::Script (const String& _name, const Object& _host)
-	: impl (new Impl (*this)), script_name (_name), host_obj (_host),
+	: impl (new Impl (*this)), script_name (_name), host_obj (_host.number),
 	  initialized (false), sim (Engine::is_sim ()), post_sim (false),
 	  sim_time (0ul)
 {}
@@ -129,21 +139,21 @@ Script::mono () const
 	char fill = Thief::mono.fill ('0');
 	Thief::mono << '.' << std::setw (3) << (sim_time % 1000) << "] ";
 	Thief::mono.fill (fill);
-	Thief::mono << script_name << " [" << host_obj.number << "]: ";
+	Thief::mono << script_name << " [" << host_obj << "]: ";
 	return Thief::mono;
 }
 
 bool
 Script::has_datum (const String& datum) const
 {
-	sScrDatumTag tag { host_obj.number, script_name.data (), datum.data () };
+	sScrDatumTag tag { host_obj, script_name.data (), datum.data () };
 	return LG->IsScriptDataSet (&tag);
 }
 
 void
 Script::_get_datum (const String& datum, LGMultiBase& value) const
 {
-	sScrDatumTag tag { host_obj.number, script_name.data (), datum.data () };
+	sScrDatumTag tag { host_obj, script_name.data (), datum.data () };
 	if (LG->GetScriptData (&tag, &(sMultiParm&)value) != S_OK)
 		throw std::runtime_error ("could not get script datum");
 }
@@ -151,7 +161,7 @@ Script::_get_datum (const String& datum, LGMultiBase& value) const
 bool
 Script::_set_datum (const String& datum, const LGMultiBase& value)
 {
-	sScrDatumTag tag { host_obj.number, script_name.data (), datum.data () };
+	sScrDatumTag tag { host_obj, script_name.data (), datum.data () };
 	return LG->SetScriptData (&tag, &(const sMultiParm&)value) == S_OK;
 }
 
@@ -159,7 +169,7 @@ bool
 Script::unset_datum (const String& datum)
 {
 	LGMultiEmpty junk;
-	sScrDatumTag tag { host_obj.number, script_name.data (), datum.data () };
+	sScrDatumTag tag { host_obj, script_name.data (), datum.data () };
 	return LG->ClearScriptData (&tag, &(sMultiParm&)junk) == S_OK;
 }
 
@@ -312,7 +322,7 @@ TrapTrigger::TrapTrigger (const String& _name, const Object& _host)
 {
 	listen_message ("TurnOn", &TrapTrigger::on_turn_on);
 	listen_message ("TurnOff", &TrapTrigger::on_turn_off);
-	listen_timer ("TrapTimer", &TrapTrigger::on_trap_timer);
+	listen_timer ("Revert", &TrapTrigger::on_revert);
 }
 
 TrapTrigger::~TrapTrigger ()
@@ -338,28 +348,17 @@ TrapTrigger::get_flags () const
 	return flags;
 }
 
-Time
-TrapTrigger::get_timing () const
-{
-	return Property (host (), "ScriptTiming").get (Time ());
-}
-
 void
-TrapTrigger::trigger (bool on)
+TrapTrigger::trigger (bool on, bool unconditional)
 {
-	if (!host_as<Lockable> ().is_locked ())
-	{
-		force_trigger (on);
-		if (get_flags () & FLAG_ONCE)
-			host_as<Lockable> ().lock ();
-	}
-}
+	if (!unconditional && host_as<Lockable> ().is_locked ())
+		return;
 
-void
-TrapTrigger::force_trigger (bool on)
-{
 	GenericMessage (on ? "TurnOn" : "TurnOff").broadcast
 		(host (), "ControlDevice");
+
+	if (!unconditional && (get_flags () & FLAG_ONCE))
+		host_as<Lockable> ().lock ();
 }
 
 Message::Result
@@ -372,7 +371,6 @@ Message::Result
 TrapTrigger::on_turn_on (GenericMessage& message)
 {
 	unsigned flags = get_flags ();
-	Time timing = get_timing ();
 
 	if (flags & FLAG_NO_ON) return Message::HALT;
 	if (host_as<Lockable> ().is_locked ()) return Message::HALT;
@@ -380,8 +378,9 @@ TrapTrigger::on_turn_on (GenericMessage& message)
 	bool on = (flags & FLAG_INVERT) ? false : true;
 	Message::Result result = on_trap (on, message);
 
-	if (result == Message::CONTINUE && timing > 0ul)
-		start_timer ("TrapTimer", timing, false, on);
+	Time revert = host ().script_timing;
+	if (result == Message::CONTINUE && revert != 0ul)
+		start_timer ("Revert", revert, false, !on);
 
 	if (result != Message::ERROR && (flags & FLAG_ONCE))
 		host_as<Lockable> ().lock ();
@@ -407,7 +406,7 @@ TrapTrigger::on_turn_off (GenericMessage& message)
 }
 
 Message::Result
-TrapTrigger::on_trap_timer (TimerMessage& message)
+TrapTrigger::on_revert (TimerMessage& message)
 {
 	bool on = message.get_data<bool> (Message::DATA1);
 	return on_trap (on, message);

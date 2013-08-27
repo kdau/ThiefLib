@@ -109,13 +109,13 @@ OBJECT_TYPE_IMPL_ (AnimLight, Light ())
 bool
 AnimLight::is_anim_light () const
 {
-	return Property (*this, "AnimLight").exists ();
+	return Property (*this, "AnimLight").exists (); //TODO Use a PropField.
 }
 
 bool
 AnimLight::is_light_active () const
 {
-	return !Property (*this, "AnimLight").get_field ("inactive", true);
+	return !Property (*this, "AnimLight").get_field ("inactive", true); //TODO Use a PropField.
 }
 
 void

@@ -56,6 +56,18 @@ struct ScriptMessageHandler : public MessageHandler,
 
 
 
+// Object subclass for objects hosting scripts
+
+class ScriptHost : public virtual Object
+{
+public:
+	THIEF_OBJECT_TYPE (ScriptHost)
+
+	THIEF_PROP_FIELD (Time, script_timing);
+};
+
+
+
 // Base class for all scripts
 
 class Script
@@ -65,7 +77,7 @@ public:
 
 	const String& name () const;
 
-	Object host () const;
+	ScriptHost host () const;
 	template <typename T> T host_as () const;
 
 	IScript* get_interface ();
@@ -121,7 +133,7 @@ private:
 	Impl* impl;
 
 	const String script_name;
-	Object host_obj;
+	Object::Number host_obj;
 	bool initialized, sim, post_sim;
 	Time sim_time;
 };
@@ -179,17 +191,15 @@ protected:
 		FLAG_NO_OFF = 8
 	};
 	unsigned get_flags () const; //TESTME
-	Time get_timing () const;
 
-	void trigger (bool on); //TESTME
-	void force_trigger (bool on); //TESTME
+	void trigger (bool on, bool unconditional = false); //TESTME
 
 private:
 	virtual Message::Result on_trap (bool on, Message&);
 
 	Message::Result on_turn_on (GenericMessage&);
 	Message::Result on_turn_off (GenericMessage&);
-	Message::Result on_trap_timer (TimerMessage&);
+	Message::Result on_revert (TimerMessage&);
 
 #ifdef IS_THIEF1
 	Parameter<String> tcf;
