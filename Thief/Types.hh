@@ -146,19 +146,6 @@ public:
 
 
 
-// Blood
-
-class Blood : public virtual Rendered, public virtual Damageable
-{
-public:
-	THIEF_OBJECT_TYPE (Blood)
-	THIEF_PROP_FIELD (bool, is_blood); //TESTME
-
-	static void cleanse (const Vector& center, float radius = 5.0f);
-};
-
-
-
 // Container
 
 class Container : public virtual Object
@@ -305,22 +292,6 @@ public:
 	void find_secret (); //TESTME
 };
 #endif // IS_THIEF2
-
-
-
-// Weapon
-
-class Weapon : public virtual Interactive
-{
-public:
-	THIEF_OBJECT_TYPE (Weapon)
-	bool is_weapon () const;
-
-	THIEF_PROP_FIELD (int, exposure_drawn);
-	THIEF_PROP_FIELD (int, exposure_swung);
-
-	THIEF_PROP_FIELD (bool, collides_with_terrain);
-};
 
 
 

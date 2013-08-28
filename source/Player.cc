@@ -153,7 +153,7 @@ Player::has_touched (const Object& object) const
 
 
 
-// Weapons
+// Combat
 
 Weapon
 Player::get_selected_weapon () const

@@ -88,6 +88,7 @@ SOURCES = \
 	Base.cc \
 	Private.cc \
 	AI.cc \
+	Combat.cc \
 	Engine.cc \
 	HUD.cc \
 	Link.cc \

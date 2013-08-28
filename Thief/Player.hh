@@ -25,6 +25,7 @@
 #define THIEF_PLAYER_HH
 
 #include <Thief/Base.hh>
+#include <Thief/Combat.hh>
 #include <Thief/Types.hh>
 
 namespace Thief {
@@ -60,7 +61,7 @@ public:
 
 	bool has_touched (const Object&) const;
 
-	// Weapons
+	// Combat
 
 	Weapon get_selected_weapon () const;
 	bool is_bow_selected () const;

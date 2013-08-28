@@ -305,20 +305,6 @@ public:
 
 
 
-class AIAttackMessage : public Message //TESTME
-{
-public:
-	enum Event { WINDUP, START, END };
-
-	AIAttackMessage (Event, const Object& weapon);
-	THIEF_MESSAGE_WRAP (AIAttackMessage);
-
-	Event get_event () const;
-	Weapon get_weapon () const;
-};
-
-
-
 class AIModeChangeMessage : public Message
 {
 public:

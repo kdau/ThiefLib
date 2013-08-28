@@ -220,24 +220,6 @@ FrobMessage::get_duration () const
 
 
 
-// Blood
-
-PROXY_CONFIG (Blood, is_blood, "Blood", nullptr, bool, false);
-
-OBJECT_TYPE_IMPL_ (Blood, Rendered (), Damageable (),
-	PROXY_INIT (is_blood)
-)
-
-void
-Blood::cleanse (const Vector& _center, float radius)
-{
-	Object center = Object::create_temp_fnord ();
-	center.set_location (_center);
-	SService<IDarkPowerupsSrv> (LG)->CleanseBlood (center.number, radius);
-}
-
-
-
 // Container
 
 THIEF_ENUM_CODING (Container::Type, CODE, CODE,
@@ -558,27 +540,6 @@ Secret::find_secret ()
  * Physics: Terrain\Friction = Friction
  * Renderer\Texture Anim Data = AnimTex
  */
-
-
-
-// Weapon
-
-PROXY_CONFIG (Weapon, exposure_drawn, "WpnExposure", nullptr, int, 0);
-PROXY_CONFIG (Weapon, exposure_swung, "SwingExpose", nullptr, int, 0);
-PROXY_CONFIG (Weapon, collides_with_terrain, "WpnTerrColl", nullptr,
-	bool, false);
-
-OBJECT_TYPE_IMPL_ (Weapon, Rendered (), Interactive (),
-	PROXY_INIT (exposure_drawn),
-	PROXY_INIT (exposure_swung),
-	PROXY_INIT (collides_with_terrain)
-)
-
-bool
-Weapon::is_weapon () const
-{
-	return get_inventory_type () == InventoryType::WEAPON;
-}
 
 
 

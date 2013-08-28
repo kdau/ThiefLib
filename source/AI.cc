@@ -141,6 +141,7 @@ AI::get_all_ais ()
 
 
 // AI: state
+//TODO wrap property: AI: AI Core\Efficiency settings = AI_Efficiency
 
 bool
 AI::is_dead () const
@@ -367,6 +368,10 @@ Conversation::remove_actor (size_t _number)
 
 
 
+//TODO wrap link: AIConversationActor - int ("Actor ID")
+
+
+
 // AIAwarenessLink
 
 PROXY_BIT_CONFIG (AIAwarenessLink, seen, "Flags", nullptr, SEEN, false);
@@ -500,15 +505,14 @@ CreatureAttachmentLink::create (const Object& source, const Object& dest,
 
 
 
-//TODO wrap link: AIConversationActor - int ("Actor ID")
-//TODO wrap link: AIProjectile - sAIProjectileRel
-//TODO wrap link: AIAttack - eAIPriority
 //TODO wrap link: AIFleeDest - sAIFleeDest
 //TODO wrap link: AINoFlee - sAINoFleeLink
+
 //TODO wrap link: AIWatchObj - sAIWatchPoint (propdefs.h: sAIWatchPoint - link data same as property?)
 //TODO wrap link: AIDefendObj - sAIDefendPoint
-//TODO wrap link: AICamera - sAICameraLinkData
 //TODO wrap link: AIFollowObj - sAIFollowLink,
+
+//TODO wrap link: AICamera - sAICameraLinkData
 //TODO wrap link: AISuspiciousLink - sAISuspiciousLink
 //TODO wrap link: AIDoor - int (data needed??)
 
@@ -573,37 +577,6 @@ MESSAGE_ACCESSOR (AI::Alert, AIAlertnessMessage, get_new_level,
 	sAIAlertnessMsg, level)
 MESSAGE_ACCESSOR (AI::Alert, AIAlertnessMessage, get_old_level,
 	sAIAlertnessMsg, oldLevel)
-
-
-
-// AIAttackMessage
-
-MESSAGE_WRAPPER_IMPL (AIAttackMessage, sAttackMsg)
-
-AIAttackMessage::AIAttackMessage (Event event, const Object& weapon)
-	: Message (new sAttackMsg ())
-{
-	switch (event)
-	{
-	case WINDUP: message->message = "StartWindup"; break;
-	case START:  message->message = "StartAttack"; break;
-	case END:
-	default:     message->message = "EndAttack"; break;
-	}
-	MESSAGE_AS (sAttackMsg)->weapon = weapon.number;
-}
-
-AIAttackMessage::Event
-AIAttackMessage::get_event () const
-{
-	CIString name = get_name ();
-	if (name == "StartWindup") return WINDUP;
-	if (name == "StartAttack") return START;
-	if (name == "EndAttack") return END;
-	throw MessageWrapError (message, typeid (*this), "invalid event");
-}
-
-MESSAGE_ACCESSOR (Weapon, AIAttackMessage, get_weapon, sAttackMsg, weapon)
 
 
 
@@ -690,33 +663,6 @@ MESSAGE_ACCESSOR (String, AISignalMessage, get_signal, sAISignalMsg, signal)
 
 
 
-/*TODO Create MeleeCombatant : AI and wrap these properties:
- * AI: Ability Settings\HtoHCombat: Audio Response = HTHAudioResp
- * AI: Ability Settings\HtoHCombat: Distances = HTHCombatDist
- * AI: Ability Settings\HtoHCombat: Grunt Always = HTHGruntAlways
- * AI: Ability Settings\HtoHCombat: Motion Response = HTHMotionResp
- */
-
-
-
-/*TODO Create RangedCombatant : AI and wrap these properties:
- * AI: Ability Settings\RangedCombat: Audio Response = RangedAudioResp
- * AI: Ability Settings\RangedCombat: Grunt Always = RngdGruntAlways
- * AI: Ranged Combat\Ranged Combat = AIRCProp
- * AI: Ranged Combat\Ranged Combat Applicabilities = AI_RngApps
- * AI: Ranged Combat\Ranged Combat Flee = AI_RngFlee
- * AI: Ranged Combat\Ranged Combat Ranges = AIRCRanges
- * AI: Ranged Combat\Ranged Combat Shoot = AI_RngShoot
- * AI: Ranged Combat\Ranged Combat Wound Motion = AIRCWound
- * AI: Ranged Combat\Ranged Combat Wound Sound = AIRCWndSnd
- */
-
-
-
-//TODO Create SuicideCombatant : AI and wrap property: AI: Ability Settings\Frog-beast: Explode range = DAI_FrogExpl
-
-
-
 //TODO Create Device : AI and wrap property: AI: Ability Settings\Device: parameters = AI_Device
 
 //TODO Create Camera : Device and wrap property: AI: Ability Settings\Camera: parameters = AI_Camera
@@ -732,7 +678,6 @@ MESSAGE_ACCESSOR (String, AISignalMessage, get_signal, sAISignalMsg, signal)
 
 /*TODO wrap the following AI properties in appropriate locations:
  *
- * AI: AI Core\Efficiency settings = AI_Efficiency
  *
  * AI: AI Core\Movement: max speed = AI_MoveSpeed
  * AI: AI Core\Movement: turn rate = AI_TurnRate
