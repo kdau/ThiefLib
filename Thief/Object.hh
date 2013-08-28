@@ -29,14 +29,7 @@
 
 namespace Thief {
 
-
-
-#define THIEF_OBJECT_TYPE(ClassName) \
-	ClassName (Number = NONE); \
-	ClassName (const Object&); \
-	ClassName (const ClassName&); \
-	ClassName& operator = (const ClassName& copy); \
-	explicit ClassName (const String& name);
+class Container;
 
 
 
@@ -125,7 +118,7 @@ public:
 
 	// Containment and combination
 
-	Object get_container () const;
+	Container get_container () const;
 	THIEF_PROP_FIELD_CONST (bool, has_refs);
 
 	THIEF_PROP_FIELD (int, stack_count);
@@ -147,6 +140,15 @@ public:
 		: LGMultiBase (int (value.number)) {}
 	operator T () const { return T (as_object ()); }
 };
+
+
+
+#define THIEF_OBJECT_TYPE(ClassName) \
+	ClassName (Number = NONE); \
+	ClassName (const Object&); \
+	ClassName (const ClassName&); \
+	ClassName& operator = (const ClassName& copy); \
+	explicit ClassName (const String& name);
 
 
 

@@ -59,7 +59,7 @@ Player::remove_from_inventory (const Object& object)
 	SInterface<IInventory> (LG)->Remove (object.number);
 }
 
-Object
+Interactive
 Player::get_selected_item () const
 {
 	return SInterface<IInventory> (LG)->Selection (kInvItem);
@@ -270,7 +270,7 @@ Player::detach_camera (const Object& camera)
 
 #ifdef IS_THIEF2
 
-Object
+Physical
 Player::get_climbing_object () const
 {
 	LGObject object;

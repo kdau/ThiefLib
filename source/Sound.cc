@@ -114,7 +114,7 @@ OBJECT_TYPE_IMPL_ (SoundSchema,
 bool
 SoundSchema::is_sound_schema () const
 {
-	return Property (*this, "SchPlayParams").exists ();
+	return volume.exists ();
 }
 
 bool
@@ -254,12 +254,12 @@ AmbientHacked::is_ambient_hacked () const
 MESSAGE_WRAPPER_IMPL (SchemaDoneMessage, sSchemaDoneMsg)
 
 SchemaDoneMessage::SchemaDoneMessage (const Vector& location,
-		const Object& target, const char* schema_name)
+		const Object& sound_source, const char* schema_name)
 	: Message (new sSchemaDoneMsg ())
 {
 	message->message = "SchemaDone";
 	MESSAGE_AS (sSchemaDoneMsg)->coordinates = LGVector (location);
-	MESSAGE_AS (sSchemaDoneMsg)->targetObject = target.number;
+	MESSAGE_AS (sSchemaDoneMsg)->targetObject = sound_source.number;
 	MESSAGE_AS (sSchemaDoneMsg)->name = schema_name;
 }
 
@@ -269,17 +269,17 @@ SchemaDoneMessage::get_location () const
 	return LGVector (&MESSAGE_AS (sSchemaDoneMsg)->coordinates);
 }
 
-MESSAGE_ACCESSOR (Object, SchemaDoneMessage, get_target,
+MESSAGE_ACCESSOR (Object, SchemaDoneMessage, get_sound_source,
 	sSchemaDoneMsg, targetObject)
 
 MESSAGE_ACCESSOR (String, SchemaDoneMessage, get_schema_name,
 	sSchemaDoneMsg, name)
 
-Object
+SoundSchema
 SchemaDoneMessage::get_schema () const
 {
 	const char* schema_name = MESSAGE_AS (sSchemaDoneMsg)->name;
-	return schema_name ? Object (schema_name) : Object::NONE;
+	return schema_name ? SoundSchema (schema_name) : SoundSchema ();
 }
 
 

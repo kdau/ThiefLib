@@ -243,7 +243,7 @@ OBJECT_TYPE_IMPL_ (BasicPickable, Rendered (), Interactive (), Lockable ())
 bool
 BasicPickable::is_basic_pickable () const
 {
-	return Property (*this, "PickCfg").exists () && //TODO Check one of the PropFields, once created.
+	return Property (*this, "PickCfg").exists () && //TODO Use a PropField.
 		!AdvPickable (*this).is_advanced_pickable;
 }
 

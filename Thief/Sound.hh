@@ -144,14 +144,14 @@ public:
 class SchemaDoneMessage : public Message //TESTME
 {
 public:
-	SchemaDoneMessage (const Vector& location, const Object& target,
+	SchemaDoneMessage (const Vector& location, const Object& sound_source,
 		const char* schema_name);
 	THIEF_MESSAGE_WRAP (SchemaDoneMessage);
 
 	Vector get_location () const;
-	Object get_target () const;
+	Object get_sound_source () const;
 	String get_schema_name () const;
-	Object get_schema () const;
+	SoundSchema get_schema () const;
 };
 
 

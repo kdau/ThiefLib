@@ -30,6 +30,9 @@
 
 namespace Thief {
 
+class Being;
+class Marker;
+
 
 
 class Physical : public virtual Object
@@ -63,7 +66,10 @@ public:
 	THIEF_PROP_FIELD (bool, collision_no_sound); //TESTME
 	THIEF_PROP_FIELD (bool, collision_no_result); //TESTME
 	THIEF_PROP_FIELD (bool, collision_full_sound); //TESTME
+
 	THIEF_PROP_FIELD (bool, collides_with_ai);
+	THIEF_PROP_FIELD_CONST (bool, blocks_ai); //TESTME
+	THIEF_PROP_FIELD (bool, repels_ai); //TESTME
 
 	THIEF_PROP_FIELD (float, bash_factor);
 	THIEF_PROP_FIELD (float, bash_threshold);
@@ -88,23 +94,17 @@ public:
 #endif // IS_THIEF2
 
 	THIEF_PROP_FIELD (Vector, velocity);
-	THIEF_PROP_FIELD (Vector, rotational_velocity); //TESTME
-
-	bool is_velocity_locked () const;
+	THIEF_PROP_FIELD (bool, velocity_locked);
 	void lock_velocity (const Vector&);
 	void unlock_velocity ();
 
-	bool is_rotational_velocity_locked () const; //TESTME
+	THIEF_PROP_FIELD (Vector, rotational_velocity); //TESTME
+	THIEF_PROP_FIELD (bool, rotational_velocity_locked); //TESTME
 	void lock_rotational_velocity (const Vector&); //TESTME
 	void unlock_rotational_velocity (); //TESTME
 
-	bool is_location_locked () const;
-	void lock_location ();
-	void unlock_location ();
-
-	bool is_rotation_locked () const;
-	void lock_rotation ();
-	void unlock_rotation ();
+	THIEF_PROP_FIELD (bool, location_locked);
+	THIEF_PROP_FIELD (bool, rotation_locked);
 
 	// Physics messages
 
@@ -114,8 +114,8 @@ public:
 		MSG_COLLISION = 1,
 		MSG_CONTACT = 2,
 		MSG_ENTER_EXIT = 4,
-		MSG_FELL_ASLEEP = 8,
-		MSG_WOKE_UP = 16
+		MSG_FALL_ASLEEP = 8,
+		MSG_WAKE_UP = 16
 	};
 	void subscribe_physics (Messages); //TESTME
 	void unsubscribe_physics (Messages); //TESTME
@@ -141,10 +141,23 @@ public:
 
 	THIEF_PROP_FIELD (bool, edge_trigger); //TESTME
 
+	THIEF_PROP_FIELD (bool, pathable); //TESTME
+	THIEF_PROP_FIELD (bool, path_exact); //TESTME
+
 	THIEF_PROP_FIELD (bool, platform_friction); //TESTME
 
 	THIEF_PROP_FIELD (float, pore_size); //TESTME
 	THIEF_PROP_FIELD (bool, ai_fires_through); //TESTME
+};
+
+THIEF_FLAVORED_LINK (PhysAttach) //TESTME
+{
+	THIEF_FLAVORED_LINK_COMMON (PhysAttach)
+
+	static PhysAttachLink create (const Object& source, const Object& dest,
+		const Vector& offset);
+
+	THIEF_LINK_FIELD (Vector, offset);
 };
 
 
@@ -155,10 +168,23 @@ class MovingTerrain : public virtual OBBPhysical
 {
 public:
 	THIEF_OBJECT_TYPE (MovingTerrain)
+	bool is_moving_terrain () const; //TESTME
 
-	THIEF_PROP_FIELD (bool, is_moving_terrain); //TESTME
+	THIEF_PROP_FIELD (bool, active); //TESTME
 
-	THIEF_PROP_FIELD (bool, push_vator_attachments); //TESTME
+	THIEF_PROP_FIELD (bool, push_attachments); //TESTME
+};
+
+THIEF_FLAVORED_LINK (TPath) //TESTME
+{
+	THIEF_FLAVORED_LINK_COMMON (TPath)
+
+	static TPathLink create (const Object& source, const Object& dest,
+		float speed, Time pause, bool path_limit);
+
+	THIEF_LINK_FIELD (float, speed);
+	THIEF_LINK_FIELD (Time, pause);
+	THIEF_LINK_FIELD (bool, path_limit);
 };
 
 class MovingTerrainMessage : public Message //TESTME
@@ -167,7 +193,7 @@ public:
 	MovingTerrainMessage (const Object& waypoint);
 	THIEF_MESSAGE_WRAP (MovingTerrainMessage);
 
-	Object get_waypoint () const;
+	Marker get_waypoint () const;
 };
 
 class WaypointMessage : public Message //TESTME
@@ -203,6 +229,23 @@ public:
 
 
 
+// Explosion
+
+class Explosion : public virtual Object
+{
+public:
+	THIEF_OBJECT_TYPE (Explosion)
+	bool is_explosion () const; //TESTME
+
+	THIEF_PROP_FIELD (float, radius_squared); //TESTME
+	THIEF_PROP_FIELD (int, magnitude); //TESTME
+
+	static void explode (const Vector& center, float radius_squared,
+		int magnitude); //TESTME
+};
+
+
+
 // Projectile
 
 class Projectile : public virtual SpherePhysical
@@ -228,6 +271,23 @@ public:
 	};
 	Projectile launch (const Object& launcher, float velocity_mult = 1.0f,
 		const Vector& velocity_add = Vector (), unsigned flags = NONE); //TESTME
+
+	THIEF_PROP_FIELD_CONST (Being, launcher);
+};
+
+
+
+// Rope
+
+class Rope : public virtual SpherePhysical
+{
+public:
+	THIEF_OBJECT_TYPE (Rope)
+	bool is_rope () const; //TESTME
+
+	THIEF_PROP_FIELD (float, desired_length); //TESTME
+	THIEF_PROP_FIELD (float, length); //TESTME
+	THIEF_PROP_FIELD (bool, deployed); //TESTME
 };
 
 

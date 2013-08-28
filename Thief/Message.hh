@@ -139,49 +139,6 @@ public:
 	Object get_stack () const;
 };
 
-class DamageMessage : public Message //TESTME
-{
-public:
-	DamageMessage (const Object& culprit, const Object& stimulus,
-		int hit_points);
-	THIEF_MESSAGE_WRAP (DamageMessage);
-
-	Object get_culprit () const;
-	Object get_stimulus () const;
-	int get_hit_points () const;
-};
-
-class FrobMessage : public Message //TESTME details only
-{
-public:
-	enum Event { BEGIN, END };
-	enum Location { WORLD, INVENTORY, TOOL, NONE };
-
-	FrobMessage (Event, const Object& frobber, const Object& tool,
-		const Object& frobbed, Location frob_loc, Location obj_loc,
-		Time duration, bool aborted);
-	THIEF_MESSAGE_WRAP (FrobMessage);
-
-	Event get_event () const;
-	Object get_frobber () const;
-	Object get_tool () const;
-	Object get_frobbed () const;
-	Location get_frob_loc () const;
-	Location get_obj_loc () const;
-	Time get_duration () const;
-	bool was_aborted () const;
-};
-
-class SlayMessage : public Message
-{
-public:
-	SlayMessage (const Object& culprit, const Object& stimulus);
-	THIEF_MESSAGE_WRAP (SlayMessage);
-
-	Object get_culprit () const;
-	Object get_stimulus () const;
-};
-
 class TimerMessage : public Message
 {
 public:

@@ -34,6 +34,8 @@
 
 namespace Thief {
 
+class Being;
+
 
 
 // Damageable
@@ -54,6 +56,28 @@ public:
 	void damage (const Object& type, int intensity, const Object& culprit);
 	void slay (const Object& culprit);
 	void resurrect (const Object& culprit);
+};
+
+class DamageMessage : public Message //TESTME
+{
+public:
+	DamageMessage (const Object& culprit, const Object& stimulus,
+		int hit_points);
+	THIEF_MESSAGE_WRAP (DamageMessage);
+
+	Being get_culprit () const;
+	Object get_stimulus () const;
+	int get_hit_points () const;
+};
+
+class SlayMessage : public Message
+{
+public:
+	SlayMessage (const Object& culprit, const Object& stimulus);
+	THIEF_MESSAGE_WRAP (SlayMessage);
+
+	Being get_culprit () const;
+	Object get_stimulus () const;
 };
 
 
@@ -90,12 +114,34 @@ public:
 	THIEF_PROP_FIELD (float, tool_reach); //TESTME
 
 	THIEF_PROP_FIELD (bool, droppable); //TESTME
+	THIEF_PROP_FIELD (String, limb_model); //TESTME
 
 	THIEF_PROP_FIELD (int, loot_value_gold); //TESTME
 	THIEF_PROP_FIELD (int, loot_value_gems); //TESTME
 	THIEF_PROP_FIELD (int, loot_value_goods); //TESTME
 	THIEF_PROP_FIELD (unsigned, loot_value_special); //TESTME
 	THIEF_PROP_FIELD (int, store_price); //TESTME
+};
+
+class FrobMessage : public Message //TESTME details only
+{
+public:
+	enum Event { BEGIN, END };
+	enum Location { WORLD, INVENTORY, TOOL, NONE };
+
+	FrobMessage (Event, const Object& frobber, const Object& tool,
+		const Object& frobbed, Location frob_loc, Location obj_loc,
+		Time duration, bool aborted);
+	THIEF_MESSAGE_WRAP (FrobMessage);
+
+	Event get_event () const;
+	Being get_frobber () const;
+	Interactive get_tool () const;
+	Interactive get_frobbed () const;
+	Location get_frob_loc () const;
+	Location get_obj_loc () const;
+	Time get_duration () const;
+	bool was_aborted () const;
 };
 
 
@@ -171,8 +217,18 @@ public:
 
 	Subject get_subject () const;
 	Event get_event () const;
-	Object get_container () const;
+	Container get_container () const;
 	Object get_contents () const;
+};
+
+
+
+// Marker
+
+class Marker : public Object
+{
+public:
+	THIEF_OBJECT_TYPE (Marker)
 };
 
 

@@ -63,9 +63,48 @@ Damageable::resurrect (const Object& culprit)
 
 
 
+// DamageMessage
+
+MESSAGE_WRAPPER_IMPL (DamageMessage, sDamageScrMsg)
+
+DamageMessage::DamageMessage (const Object& culprit, const Object& stimulus,
+		int hit_points)
+	: Message (new sDamageScrMsg ())
+{
+	message->message = "Damage";
+	MESSAGE_AS (sDamageScrMsg)->culprit = culprit.number;
+	MESSAGE_AS (sDamageScrMsg)->kind = stimulus.number;
+	MESSAGE_AS (sDamageScrMsg)->damage = hit_points;
+}
+
+MESSAGE_ACCESSOR (Being, DamageMessage, get_culprit, sDamageScrMsg, culprit)
+
+MESSAGE_ACCESSOR (Object, DamageMessage, get_stimulus, sDamageScrMsg, kind) //TODO Fix return type once ActReact.hh is ready.
+
+MESSAGE_ACCESSOR (int, DamageMessage, get_hit_points, sDamageScrMsg, damage)
+
+
+
+// SlayMessage
+
+MESSAGE_WRAPPER_IMPL (SlayMessage, sSlayMsg)
+
+SlayMessage::SlayMessage (const Object& culprit, const Object& stimulus)
+	: Message (new sSlayMsg ())
+{
+	message->message = "Slain";
+	MESSAGE_AS (sSlayMsg)->culprit = culprit.number;
+	MESSAGE_AS (sSlayMsg)->kind = stimulus.number;
+}
+
+MESSAGE_ACCESSOR (Being, SlayMessage, get_culprit, sSlayMsg, culprit)
+
+MESSAGE_ACCESSOR (Object, SlayMessage, get_stimulus, sSlayMsg, kind) //TODO Fix return type once ActReact.hh is ready.
+
+
+
 // Interactive
 //TODO wrap property: Inventory\Cycle Order = InvCycleOrder
-//TODO wrap property: Inventory\Limb Model = InvLimbModel
 //TODO wrap property: Inventory\Render Type = InvRendType
 //TODO wrap property: Inventory\Type = InvType
 //TODO wrap link: FrobProxy - FrobProxyInfo
@@ -80,6 +119,7 @@ PROXY_CONFIG (Interactive, pick_distance, "PickDist", nullptr, float, 0.0f);
 PROXY_CONFIG (Interactive, pick_bias, "PickBias", nullptr, float, 0.0f);
 PROXY_CONFIG (Interactive, tool_reach, "ToolReach", nullptr, float, 0.0f);
 PROXY_NEG_CONFIG (Interactive, droppable, "NoDrop", nullptr, bool, false);
+PROXY_CONFIG (Interactive, limb_model, "InvLimbModel", nullptr, String, "");
 PROXY_CONFIG (Interactive, loot_value_gold, "Loot", "Gold", int, 0);
 PROXY_CONFIG (Interactive, loot_value_gems, "Loot", "Gems", int, 0);
 PROXY_CONFIG (Interactive, loot_value_goods, "Loot", "Art", int, 0);
@@ -94,6 +134,7 @@ OBJECT_TYPE_IMPL_ (Interactive, Rendered (),
 	PROXY_INIT (pick_bias),
 	PROXY_INIT (tool_reach),
 	PROXY_INIT (droppable),
+	PROXY_INIT (limb_model),
 	PROXY_INIT (loot_value_gold),
 	PROXY_INIT (loot_value_gems),
 	PROXY_INIT (loot_value_goods),
@@ -105,6 +146,76 @@ Interactive::InventoryType
 Interactive::get_inventory_type () const
 {
 	return InventoryType (SInterface<IInventory> (LG)->GetType (number));
+}
+
+
+
+// FrobMessage
+
+MESSAGE_WRAPPER_IMPL (FrobMessage, sFrobMsg)
+
+FrobMessage::FrobMessage (Event event, const Object& frobber, const Object& tool,
+		const Object& frobbed, Location frob_loc, Location obj_loc,
+		Time duration, bool aborted)
+	: Message (new sFrobMsg ())
+{
+	switch (event)
+	{
+	case BEGIN:
+		switch (frob_loc)
+		{
+		case INVENTORY: message->message = "FrobInvBegin"; break;
+		case TOOL: message->message = "FrobToolBegin"; break;
+		case WORLD: default: message->message = "FrobWorldBegin"; break;
+		}
+		break;
+	case END:
+	default:
+		switch (frob_loc)
+		{
+		case INVENTORY: message->message = "FrobInvEnd"; break;
+		case TOOL: message->message = "FrobToolEnd"; break;
+		case WORLD: default: message->message = "FrobWorldEnd"; break;
+		}
+		break;
+	}
+
+	MESSAGE_AS (sFrobMsg)->Frobber = frobber.number;
+	MESSAGE_AS (sFrobMsg)->SrcObjId = tool.number;
+	MESSAGE_AS (sFrobMsg)->DstObjId = frobbed.number;
+	MESSAGE_AS (sFrobMsg)->SrcLoc = eFrobLoc (frob_loc);
+	MESSAGE_AS (sFrobMsg)->DstLoc = eFrobLoc (obj_loc);
+	MESSAGE_AS (sFrobMsg)->Sec = duration / 1000.0f;
+	MESSAGE_AS (sFrobMsg)->Abort = aborted;
+}
+
+
+MESSAGE_ACCESSOR (Being, FrobMessage, get_frobber, sFrobMsg, Frobber);
+MESSAGE_ACCESSOR (Interactive, FrobMessage, get_tool, sFrobMsg, SrcObjId);
+MESSAGE_ACCESSOR (Interactive, FrobMessage, get_frobbed, sFrobMsg, DstObjId);
+MESSAGE_ACCESSOR (FrobMessage::Location, FrobMessage, get_frob_loc,
+	sFrobMsg, SrcLoc);
+MESSAGE_ACCESSOR (FrobMessage::Location, FrobMessage, get_obj_loc,
+	sFrobMsg, DstLoc);
+MESSAGE_ACCESSOR (bool, FrobMessage, was_aborted, sFrobMsg, Abort);
+
+FrobMessage::Event
+FrobMessage::get_event () const
+{
+	CIString name = get_name ();
+	size_t length = name.length ();
+	if (length > 5 && name.compare (length - 5, 5, "Begin") == 0)
+		return BEGIN;
+	else if (length > 3 && name.compare (length - 3, 3, "End") == 0)
+		return END;
+	else
+		throw MessageWrapError (message, typeid (*this), "invalid event");
+}
+
+Time
+FrobMessage::get_duration () const
+{
+	return MESSAGE_AS (sFrobMsg)->Sec * 1000ul;
 }
 
 
@@ -262,7 +373,7 @@ ContainmentMessage::get_subject () const
 MESSAGE_ACCESSOR (ContainmentMessage::Event, ContainmentMessage, get_event,
 	sContainedScrMsg, event) // the cast will work either way
 
-Object
+Container
 ContainmentMessage::get_container () const
 {
 	return (get_subject () == CONTAINER) ? message->to
@@ -286,11 +397,12 @@ ContainmentMessage::get_contents () const
 
 
 
-/*TODO Create Marker and wrap these properties:
- * AI: Utility\Flee point = AI_FleePoint
- * AI: Utility\Marker: Cover Point = AICoverPt
- * AI: Utility\Marker: Vantage Point = AIVantagePt
- */
+// Marker
+//TODO wrap property: AI: Utility\Flee point = AI_FleePoint
+//TODO wrap property: AI: Utility\Marker: Cover Point = AICoverPt
+//TODO wrap property: AI: Utility\Marker: Vantage Point = AIVantagePt
+
+OBJECT_TYPE_IMPL (Marker)
 
 
 

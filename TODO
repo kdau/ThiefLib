@@ -1,7 +1,7 @@
 Current work
 	* ParameterCache: actually detect hierarchy changes. May need new OSL.
 	* PropField, LinkField: add array option for sequences of equivalent fields?
-	* AI: split into two or more units.
+	* AI, Types: split each into two or more units.
 	* Create full documentation. (!!!)
 
 ActReact.hh

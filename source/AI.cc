@@ -342,7 +342,7 @@ Conversation::start_conversation ()
 
 // The IAIConversationManager::GetNumActors method always returns zero.
 
-Object
+AI
 Conversation::get_actor (size_t _number) const
 {
 	Object::Number _actor = Object::NONE;
@@ -603,7 +603,7 @@ AIAttackMessage::get_event () const
 	throw MessageWrapError (message, typeid (*this), "invalid event");
 }
 
-MESSAGE_ACCESSOR (Object, AIAttackMessage, get_weapon, sAttackMsg, weapon)
+MESSAGE_ACCESSOR (Weapon, AIAttackMessage, get_weapon, sAttackMsg, weapon)
 
 
 
@@ -670,7 +670,7 @@ AIPatrolPointMessage::AIPatrolPointMessage (const Object& patrol_point)
 	MESSAGE_AS (sAIPatrolPointMsg)->patrolObj = patrol_point.number;
 }
 
-MESSAGE_ACCESSOR (Object, AIPatrolPointMessage, get_patrol_point,
+MESSAGE_ACCESSOR (Marker, AIPatrolPointMessage, get_patrol_point,
 	sAIPatrolPointMsg, patrolObj)
 
 

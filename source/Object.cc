@@ -404,7 +404,7 @@ Object::object_to_world (const Vector& relative) const
 
 // Containment and combination
 
-Object
+Container
 Object::get_container () const
 {
 	return SInterface<IContainSys> (LG)->GetContainer (number);

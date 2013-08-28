@@ -45,7 +45,7 @@ public:
 	void add_to_inventory (const Object&);
 	void remove_from_inventory (const Object&);
 
-	Object get_selected_item () const;
+	Interactive get_selected_item () const;
 	bool is_wielding_junk () const;
 
 	void select_item (const Object& item);
@@ -83,7 +83,7 @@ public:
 	bool detach_camera (const Object& camera = Object::ANY);
 
 #ifdef IS_THIEF2
-	Object get_climbing_object () const;
+	Physical get_climbing_object () const;
 #endif
 
 	bool drop_dead ();

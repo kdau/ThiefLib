@@ -28,7 +28,6 @@ namespace Thief {
 
 
 // Physical
-//TODO wrap property: AI: Utility\Path avoid = AI_ObjAvoid
 
 PROXY_CONFIG (Physical, physics_type, "PhysType", "Type",
 	Physical::PhysicsType, PhysicsType::NONE);
@@ -56,13 +55,23 @@ PROXY_BIT_CONFIG (Physical, collision_no_result, "CollisionType", nullptr, 16u,
 PROXY_BIT_CONFIG (Physical, collision_full_sound, "CollisionType", nullptr, 32u,
 	false);
 PROXY_CONFIG (Physical, collides_with_ai, "PhysAIColl", nullptr, bool, false);
+PROXY_BIT_CONFIG (Physical, blocks_ai, "AI_ObjAvoid", "Flags", 1u, false);
+PROXY_BIT_CONFIG (Physical, repels_ai, "AI_ObjAvoid", "Flags", 2u, false);
 PROXY_CONFIG (Physical, bash_factor, "BashFactor", nullptr, float, 0.0f);
 PROXY_CONFIG (Physical, bash_threshold, "BashParams", "Threshold", float, 0.0f);
 PROXY_CONFIG (Physical, bash_coefficient, "BashParams", "Coefficient",
 	float, 0.0f);
 PROXY_CONFIG (Physical, velocity, "PhysState", "Velocity", Vector, Vector ());
+PROXY_BIT_CONFIG (Physical, velocity_locked, "PhysControl", "Controls Active",
+	PHYS_CONTROL_VELS, false);
 PROXY_CONFIG (Physical, rotational_velocity, "PhysState", "Rot Velocity",
 	Vector, Vector ());
+PROXY_BIT_CONFIG (Physical, rotational_velocity_locked, "PhysControl",
+	"Controls Active", PHYS_CONTROL_ROTVELS, false);
+PROXY_BIT_CONFIG (Physical, location_locked, "PhysControl", "Controls Active",
+	PHYS_CONTROL_LOCATION, false);
+PROXY_BIT_CONFIG (Physical, rotation_locked, "PhysControl", "Controls Active",
+	PHYS_CONTROL_ROTATION, false);
 
 OBJECT_TYPE_IMPL_ (Physical,
 	PROXY_INIT (physics_type),
@@ -82,11 +91,17 @@ OBJECT_TYPE_IMPL_ (Physical,
 	PROXY_INIT (collision_no_result),
 	PROXY_INIT (collision_full_sound),
 	PROXY_INIT (collides_with_ai),
+	PROXY_INIT (blocks_ai),
+	PROXY_INIT (repels_ai),
 	PROXY_INIT (bash_factor),
 	PROXY_INIT (bash_threshold),
 	PROXY_INIT (bash_coefficient),
 	PROXY_INIT (velocity),
-	PROXY_INIT (rotational_velocity)
+	PROXY_INIT (velocity_locked),
+	PROXY_INIT (rotational_velocity),
+	PROXY_INIT (rotational_velocity_locked),
+	PROXY_INIT (location_locked),
+	PROXY_INIT (rotation_locked)
 )
 
 bool
@@ -131,23 +146,14 @@ Physical::wake_up_physics ()
 
 #endif // IS_THIEF2
 
-bool
-Physical::is_velocity_locked () const
-{
-	return Property (*this, "PhysControl").get_field ("Controls Active", 0u)
-		& PHYS_CONTROL_VELS;
-}
-
 void
 Physical::lock_velocity (const Vector& _velocity)
 {
 #ifdef IS_THIEF2
 	SService<IPhysSrv> (LG)->ControlVelocity (number, LGVector (_velocity));
 #else
-	Property controls (*this, "PhysControl", true);
-	controls.set_field ("Controls Active", controls.get_field
-		("Controls Active", 0u) | PHYS_CONTROL_VELS);
-	controls.set_field ("Velocity", _velocity);
+	velocity_locked = true;
+	Property (*this, "PhysControl").set_field ("Velocity", _velocity);
 #endif
 }
 
@@ -157,88 +163,22 @@ Physical::unlock_velocity ()
 #ifdef IS_THIEF2
 	SService<IPhysSrv> (LG)->StopControlVelocity (number);
 #else
-	Property controls (*this, "PhysControl", true);
-	controls.set_field ("Controls Active", controls.get_field
-		("Controls Active", 0u) & ~PHYS_CONTROL_VELS);
+	velocity_locked = false;
 #endif
-}
-
-bool
-Physical::is_rotational_velocity_locked () const
-{
-	return Property (*this, "PhysControl").get_field ("Controls Active", 0u)
-		& PHYS_CONTROL_ROTVELS;
 }
 
 void
 Physical::lock_rotational_velocity (const Vector& _rotational_velocity)
 {
-	Property controls (*this, "PhysControl", true);
-	controls.set_field ("Controls Active", controls.get_field
-		("Controls Active", 0u) | PHYS_CONTROL_ROTVELS);
-	controls.set_field ("RotationalVelocity", _rotational_velocity);
+	rotational_velocity_locked = true;
+	Property (*this, "PhysControl").set_field
+		("RotationalVelocity", _rotational_velocity);
 }
 
 void
 Physical::unlock_rotational_velocity ()
 {
-	Property controls (*this, "PhysControl", true);
-	controls.set_field ("Controls Active", controls.get_field
-		("Controls Active", 0u) & ~PHYS_CONTROL_ROTVELS);
-}
-
-bool
-Physical::is_location_locked () const
-{
-	return Property (*this, "PhysControl").get_field ("Controls Active", 0u)
-		& PHYS_CONTROL_LOCATION;
-}
-
-void
-Physical::lock_location ()
-{
-#ifdef IS_THIEF2
-	SService<IPhysSrv> (LG)->ControlCurrentLocation (number);
-#else
-	Property controls (*this, "PhysControl", true);
-	controls.set_field ("Controls Active", controls.get_field
-		("Controls Active", 0u) | PHYS_CONTROL_LOCATION);
-#endif
-}
-
-void
-Physical::unlock_location ()
-{
-	Property controls (*this, "PhysControl", true);
-	controls.set_field ("Controls Active", controls.get_field
-		("Controls Active", 0u) & ~PHYS_CONTROL_LOCATION);
-}
-
-bool
-Physical::is_rotation_locked () const
-{
-	return Property (*this, "PhysControl").get_field ("Controls Active", 0u)
-		& PHYS_CONTROL_ROTATION;
-}
-
-void
-Physical::lock_rotation ()
-{
-#ifdef IS_THIEF2
-	SService<IPhysSrv> (LG)->ControlCurrentRotation (number);
-#else
-	Property controls (*this, "PhysControl", true);
-	controls.set_field ("Controls Active", controls.get_field
-		("Controls Active", 0u) | PHYS_CONTROL_ROTATION);
-#endif
-}
-
-void
-Physical::unlock_rotation ()
-{
-	Property controls (*this, "PhysControl", true);
-	controls.set_field ("Controls Active", controls.get_field
-		("Controls Active", 0u) & ~PHYS_CONTROL_ROTATION);
+	rotational_velocity_locked = false;
 }
 
 void
@@ -256,8 +196,6 @@ Physical::unsubscribe_physics (Messages messages)
 
 
 // OBBPhysical
-//TODO wrap property: AI: Utility\Path Exact OBB = AI_NGOBB
-//TODO wrap property: AI: Utility\Pathable object = AI_ObjPathable
 
 PROXY_CONFIG (OBBPhysical, physics_size, "PhysDims", "Size", Vector, Vector ());
 PROXY_CONFIG (OBBPhysical, physics_offset, "PhysDims", "Offset",
@@ -265,6 +203,8 @@ PROXY_CONFIG (OBBPhysical, physics_offset, "PhysDims", "Offset",
 PROXY_CONFIG (OBBPhysical, climbable_sides, "PhysAttr", "Climbable Sides",
 	unsigned, Physical::ALL_AXES);
 PROXY_BIT_CONFIG (OBBPhysical, edge_trigger, "PhysAttr", "Flags", 1u, false);
+PROXY_CONFIG (OBBPhysical, pathable, "AI_ObjPathable", nullptr, bool, false);
+PROXY_CONFIG (OBBPhysical, path_exact, "AI_NGOBB", nullptr, bool, false);
 PROXY_BIT_CONFIG (OBBPhysical, platform_friction, "PhysAttr", "Flags", 2u,
 	false);
 PROXY_CONFIG (OBBPhysical, pore_size, "PhysAttr", "Pore Size", float, 0.0f);
@@ -276,10 +216,115 @@ OBJECT_TYPE_IMPL_ (OBBPhysical, Physical (),
 	PROXY_INIT (physics_offset),
 	PROXY_INIT (climbable_sides),
 	PROXY_INIT (edge_trigger),
+	PROXY_INIT (pathable),
+	PROXY_INIT (path_exact),
 	PROXY_INIT (platform_friction),
 	PROXY_INIT (pore_size),
 	PROXY_INIT (ai_fires_through)
 )
+
+
+
+// PhysAttachLink
+
+PROXY_CONFIG (PhysAttachLink, offset, "Offset", nullptr, Vector, Vector ());
+
+FLAVORED_LINK_IMPL_ (PhysAttach,
+	PROXY_INIT (offset)
+)
+
+PhysAttachLink
+PhysAttachLink::create (const Object& source, const Object& dest,
+	const Vector& offset)
+{
+	PhysAttachLink link = Link::create (flavor (), source, dest);
+	link.offset = offset;
+	return link;
+}
+
+
+
+//TODO Create Conveyor : OBBPhysical(/Rendered) and wrap property Physics: Model\ConveyorVelocity = ConveyorVel
+
+
+
+// MovingTerrain
+
+PROXY_CONFIG (MovingTerrain, active, "MovingTerrain", "Active", bool, false);
+PROXY_BIT_CONFIG (MovingTerrain, push_attachments, "PhysAttr", "Flags",
+	4u, false);
+
+OBJECT_TYPE_IMPL_ (MovingTerrain, Physical (), OBBPhysical (),
+	PROXY_INIT (active),
+	PROXY_INIT (push_attachments)
+)
+
+bool
+MovingTerrain::is_moving_terrain () const
+{
+	return active.exists ();
+}
+
+
+
+// TPathLink
+
+PROXY_CONFIG (TPathLink, speed, "Speed", nullptr, float, 0.0f);
+PROXY_CONFIG (TPathLink, pause, "Pause (ms)", nullptr, Time, 0ul);
+PROXY_CONFIG (TPathLink, path_limit, "Path Limit?", nullptr, bool, false);
+
+FLAVORED_LINK_IMPL_ (TPath,
+	PROXY_INIT (speed),
+	PROXY_INIT (pause),
+	PROXY_INIT (path_limit)
+)
+
+TPathLink
+TPathLink::create (const Object& source, const Object& dest,
+	float speed, Time pause, bool path_limit)
+{
+	TPathLink link = Link::create (flavor (), source, dest);
+	link.speed = speed;
+	link.pause = pause;
+	link.path_limit = path_limit;
+	return link;
+}
+
+
+
+// MovingTerrainMessage
+
+MESSAGE_WRAPPER_IMPL (MovingTerrainMessage, sMovingTerrainMsg)
+
+MovingTerrainMessage::MovingTerrainMessage (const Object& waypoint)
+	: Message (new sMovingTerrainMsg ())
+{
+	message->message = "MovingTerrainWaypoint";
+	MESSAGE_AS (sMovingTerrainMsg)->waypoint = waypoint.number;
+}
+
+MESSAGE_ACCESSOR (Marker, MovingTerrainMessage, get_waypoint,
+	sMovingTerrainMsg, waypoint)
+
+
+
+// WaypointMessage
+
+MESSAGE_WRAPPER_IMPL (WaypointMessage, sWaypointMsg)
+
+WaypointMessage::WaypointMessage (const MovingTerrain& moving_terrain)
+	: Message (new sWaypointMsg ())
+{
+	message->message = "WaypointReached";
+	MESSAGE_AS (sWaypointMsg)->moving_terrain = moving_terrain.number;
+}
+
+MESSAGE_ACCESSOR (MovingTerrain, WaypointMessage, get_moving_terrain,
+	sWaypointMsg, moving_terrain)
+
+
+
+//TODO Create PressurePlate : OBBPhysical and wrap property: Physics: Misc\Pressure Plate = PhysPPlate
 
 
 
@@ -309,67 +354,48 @@ OBJECT_TYPE_IMPL_ (SpherePhysical, Physical (),
 
 
 
-//TODO wrap link: PhysAttach - sPhysAttachData
+// Explosion
 
+PROXY_CONFIG (Explosion, radius_squared, "PhysExplode", "Radius (squared)",
+	float, 0.0f);
+PROXY_CONFIG (Explosion, magnitude, "PhysExplode", "Magnitude", int, 0);
 
-
-// MovingTerrain
-//TODO wrap link: TPath - sTerrainPath
-
-PROXY_CONFIG (MovingTerrain, is_moving_terrain, "MovingTerrain", nullptr, bool, false);
-PROXY_BIT_CONFIG (MovingTerrain, push_vator_attachments, "PhysAttr", "Flags", 4u, false);
-
-OBJECT_TYPE_IMPL_ (MovingTerrain, Physical (), OBBPhysical (),
-	PROXY_INIT (is_moving_terrain),
-	PROXY_INIT (push_vator_attachments)
+OBJECT_TYPE_IMPL_ (Explosion,
+	PROXY_INIT (radius_squared),
+	PROXY_INIT (magnitude)
 )
 
-
-
-// MovingTerrainMessage
-
-MESSAGE_WRAPPER_IMPL (MovingTerrainMessage, sMovingTerrainMsg)
-
-MovingTerrainMessage::MovingTerrainMessage (const Object& waypoint)
-	: Message (new sMovingTerrainMsg ())
+bool
+Explosion::is_explosion () const
 {
-	message->message = "MovingTerrainWaypoint";
-	MESSAGE_AS (sMovingTerrainMsg)->waypoint = waypoint.number;
+	return radius_squared.exists ();
 }
 
-MESSAGE_ACCESSOR (Object, MovingTerrainMessage, get_waypoint,
-	sMovingTerrainMsg, waypoint)
-
-
-
-// WaypointMessage
-
-MESSAGE_WRAPPER_IMPL (WaypointMessage, sWaypointMsg)
-
-WaypointMessage::WaypointMessage (const MovingTerrain& moving_terrain)
-	: Message (new sWaypointMsg ())
+void
+Explosion::explode (const Vector& center, float radius_squared, int magnitude)
 {
-	message->message = "WaypointReached";
-	MESSAGE_AS (sWaypointMsg)->moving_terrain = moving_terrain.number;
+	Explosion explosion = Object::create_temp_fnord ();
+	explosion.set_location (center);
+	explosion.radius_squared = radius_squared;
+	explosion.magnitude = magnitude;
 }
-
-MESSAGE_ACCESSOR (MovingTerrain, WaypointMessage, get_moving_terrain,
-	sWaypointMsg, moving_terrain)
 
 
 
 // Projectile
-//TODO wrap property: Firer
 //TODO wrap property: Gun\Projectile Description = Projectile
 
-PROXY_CONFIG (Projectile, initial_velocity, "PhysInitVel", nullptr, Vector, Vector ());
+PROXY_CONFIG (Projectile, initial_velocity, "PhysInitVel", nullptr,
+	Vector, Vector ());
 PROXY_CONFIG (Projectile, faces_velocity, "PhysFaceVel", nullptr, bool, false);
 PROXY_CONFIG (Projectile, whizzing_sound, "PrjSound", nullptr, String, "");
+PROXY_CONFIG (Projectile, launcher, "Firer", nullptr, Being, Object::NONE);
 
 OBJECT_TYPE_IMPL_ (Projectile, Physical (), SpherePhysical (),
 	PROXY_INIT (initial_velocity),
 	PROXY_INIT (faces_velocity),
-	PROXY_INIT (whizzing_sound)
+	PROXY_INIT (whizzing_sound),
+	PROXY_INIT (launcher)
 )
 
 bool
@@ -379,25 +405,36 @@ Projectile::is_projectile () const
 }
 
 Projectile
-Projectile::launch (const Object& launcher, float velocity_mult,
+Projectile::launch (const Object& _launcher, float velocity_mult,
 	const Vector& velocity_add, unsigned flags)
 {
 	Projectile archetype = (get_type () == Type::ARCHETYPE)
 		? *this : get_archetype ();
 	LGObject projectile;
-	SService<IPhysSrv> (LG)->LaunchProjectile (projectile, launcher.number,
+	SService<IPhysSrv> (LG)->LaunchProjectile (projectile, _launcher.number,
 		archetype.number, velocity_mult, flags, LGVector (velocity_add));
 	return projectile.id;
 }
 
 
 
-/*TODO wrap these properties, perhaps creating {Conveyor,Explosion,PressurePlate,Rope} : Physical:
- * Physics: Misc\Pressure Plate = PhysPPlate
- * Physics: Misc\Rope = PhysRope
- * Physics: Model\ConveyorVelocity = ConveyorVel
- * Physics: Projectile\Explode Me = PhysExplode
- */
+// Rope
+
+PROXY_CONFIG (Rope, desired_length, "PhysRope", "Desired Length", float, 0.0f);
+PROXY_CONFIG (Rope, length, "PhysRope", "Length", float, 0.0f);
+PROXY_CONFIG (Rope, deployed, "PhysRope", "Deployed", bool, false);
+
+OBJECT_TYPE_IMPL_ (Rope, Physical (), SpherePhysical (),
+	PROXY_INIT (desired_length),
+	PROXY_INIT (length),
+	PROXY_INIT (deployed)
+)
+
+bool
+Rope::is_rope () const
+{
+	return desired_length.exists ();
+}
 
 
 

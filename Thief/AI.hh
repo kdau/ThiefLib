@@ -194,7 +194,7 @@ public:
 
 	bool start_conversation ();
 
-	Object get_actor (size_t number) const;
+	AI get_actor (size_t number) const;
 	void set_actor (size_t number, const Object& actor);
 	void remove_actor (size_t number);
 
@@ -314,7 +314,7 @@ public:
 	THIEF_MESSAGE_WRAP (AIAttackMessage);
 
 	Event get_event () const;
-	Object get_weapon () const;
+	Weapon get_weapon () const;
 };
 
 
@@ -353,7 +353,7 @@ public:
 	AIPatrolPointMessage (const Object& patrol_point);
 	THIEF_MESSAGE_WRAP (AIPatrolPointMessage);
 
-	Object get_patrol_point () const;
+	Marker get_patrol_point () const;
 };
 
 
