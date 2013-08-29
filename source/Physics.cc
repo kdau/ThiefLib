@@ -356,27 +356,29 @@ OBJECT_TYPE_IMPL_ (SpherePhysical, Physical (),
 
 // Explosion
 
-PROXY_CONFIG (Explosion, radius_squared, "PhysExplode", "Radius (squared)",
-	float, 0.0f);
+PROXY_CONFIG_ (Explosion, radius, "PhysExplode", "Radius (squared)",
+	float, 0.0f, 0u,
+	[] (const float& squared) { return std::sqrt (squared); },
+	[] (const float& radius) { return radius * radius; });
 PROXY_CONFIG (Explosion, magnitude, "PhysExplode", "Magnitude", int, 0);
 
 OBJECT_TYPE_IMPL_ (Explosion,
-	PROXY_INIT (radius_squared),
+	PROXY_INIT (radius),
 	PROXY_INIT (magnitude)
 )
 
 bool
 Explosion::is_explosion () const
 {
-	return radius_squared.exists ();
+	return radius.exists ();
 }
 
 void
-Explosion::explode (const Vector& center, float radius_squared, int magnitude)
+Explosion::explode (const Vector& center, float radius, int magnitude)
 {
 	Explosion explosion = Object::create_temp_fnord ();
 	explosion.set_location (center);
-	explosion.radius_squared = radius_squared;
+	explosion.radius = radius;
 	explosion.magnitude = magnitude;
 }
 

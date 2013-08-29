@@ -5,10 +5,12 @@ Current work
 	* Create full documentation. (!!!)
 
 ActReact.hh
-	* IActReactSrv
-	* sStimMsg ("*Stimulus")
-	* reaction_kind
-	* <lg/actreact.h>
+	interfaces:
+		* IActReactSrv
+		* everything in <lg/actreact.h>
+		* class reaction_kind
+	messages:
+		* sStimMsg ("*Stimulus")
 	links:
 		* Receptron - sReceptron
 		* StimSensor - tSensorCount
@@ -24,7 +26,8 @@ ActReact.hh
 		* Game: Dark\BloodMaxDamage = BloodMaxDmg
 
 Tweq.hh
-	* sTweqMsg ("TweqComplete")
+	messages:
+		* sTweqMsg ("TweqComplete")
 	enums:
 		* eTweqAction
 		* eTweqFlag
@@ -56,9 +59,8 @@ Tweq.hh
 		* Tweq\RotateState = StTweqRotate
 		* Tweq\Scale = CfgTweqScale
 		* Tweq\ScaleState = StTweqScale
-	* use in Object::create_temp_fnord
 
-Message wrappers
+Novel messages/wrappers
 	* ConversationDoneMessage: generated from an IAIConversationManager::ListenConversationEnd callback, with subscription on Conversation
 	* HierarchyChangeMessage: wrapping appropriate DHNotify messages, with subscription on Object
 	* ObjectChangeMessage: wrapping appropriate DHNotify messages, with subscription on Object

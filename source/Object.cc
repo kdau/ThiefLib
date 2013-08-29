@@ -111,11 +111,11 @@ Object::finish_create ()
 Object
 Object::create_temp_fnord (Time lifespan)
 {
-	Object fnord = create (Object ("Marker"));
+	Marker fnord = create (Object ("Marker"));
 	fnord.set_transient (true);
 
-	// Add a delete tweq to enforce the lifespan.
-	if (lifespan > 0)
+	// Add a delete tweq to enforce the lifespan. //TODO Use DeleteTweq once created.
+	if (lifespan != 0ul)
 	{
 		Property config (fnord, "CfgTweqDelete", true);
 		config.set_field ("Halt", 0); // Destroy Obj

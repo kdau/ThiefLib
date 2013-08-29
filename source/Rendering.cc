@@ -199,6 +199,14 @@ Flash::flash_world ()
 
 
 
+/*TODO Create FlowGroup and wrap these properties:
+ * Renderer\Flow Group = FlowGroup (hidden type indicator?)
+ * Renderer\Water Flow Color Index = FlowColor
+ * Renderer\Water Texture Color = WaterColor
+ */
+
+
+
 // ParticleGroup
 //TODO wrap property: SFX\Particles = ParticleGroup
 //TODO wrap property: SFX\Particle Launch Info = PGLaunchInfo

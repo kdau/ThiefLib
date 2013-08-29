@@ -146,6 +146,29 @@ public:
 
 
 
+// Being: base class for shared features of AIs and avatars
+
+class Being : public virtual SpherePhysical, public virtual Damageable
+{
+public:
+	THIEF_OBJECT_TYPE (Being)
+	bool is_being () const;
+
+	enum class Team { GOOD, NEUTRAL, BAD_1, BAD_2, BAD_3, BAD_4, BAD_5 };
+	THIEF_PROP_FIELD (Team, team);
+	THIEF_PROP_FIELD (bool, culpable);
+
+	THIEF_PROP_FIELD (String, blood_type);
+
+	THIEF_PROP_FIELD (Time, current_breath);
+	THIEF_PROP_FIELD (Time, maximum_breath);
+	THIEF_PROP_FIELD (float, breath_recovery_rate);
+	THIEF_PROP_FIELD (int, drowning_damage);
+	THIEF_PROP_FIELD (Time, drowning_frequency);
+};
+
+
+
 // Container
 
 class Container : public virtual Object
@@ -216,6 +239,15 @@ class Marker : public Object
 {
 public:
 	THIEF_OBJECT_TYPE (Marker)
+
+	THIEF_PROP_FIELD (int, flee_value);
+
+	THIEF_PROP_FIELD (int, cover_value);
+	THIEF_PROP_FIELD (float, cover_decay_speed);
+	THIEF_PROP_FIELD (bool, cover_can_duck);
+
+	THIEF_PROP_FIELD (int, vantage_value);
+	THIEF_PROP_FIELD (float, vantage_decay_speed);
 };
 
 
@@ -292,29 +324,6 @@ public:
 	void find_secret (); //TESTME
 };
 #endif // IS_THIEF2
-
-
-
-// Being: base class for shared features of AIs and avatars
-
-class Being : public virtual SpherePhysical, public virtual Damageable
-{
-public:
-	THIEF_OBJECT_TYPE (Being)
-	bool is_being () const;
-
-	enum class Team { GOOD, NEUTRAL, BAD_1, BAD_2, BAD_3, BAD_4, BAD_5 };
-	THIEF_PROP_FIELD (Team, team);
-	THIEF_PROP_FIELD (bool, culpable);
-
-	THIEF_PROP_FIELD (String, blood_type);
-
-	THIEF_PROP_FIELD (Time, current_breath);
-	THIEF_PROP_FIELD (Time, maximum_breath);
-	THIEF_PROP_FIELD (float, breath_recovery_rate);
-	THIEF_PROP_FIELD (int, drowning_damage);
-	THIEF_PROP_FIELD (Time, drowning_frequency);
-};
 
 
 

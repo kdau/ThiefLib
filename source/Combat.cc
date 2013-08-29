@@ -66,6 +66,26 @@ Weapon::is_weapon () const
 
 
 
+// AIAttackLink
+
+PROXY_CONFIG (AIAttackLink, priority, nullptr, nullptr,
+	AIAttackLink::Priority, Priority::DEFAULT);
+
+FLAVORED_LINK_IMPL_ (AIAttack,
+	PROXY_INIT (priority)
+)
+
+AIAttackLink
+AIAttackLink::create (const Object& source, const Object& dest,
+	Priority priority)
+{
+	AIAttackLink link = Link::create (flavor (), source, dest);
+	link.priority = priority;
+	return link;
+}
+
+
+
 /*TODO Create MeleeCombatant : AI and wrap these properties:
  * AI: Ability Settings\HtoHCombat: Audio Response = HTHAudioResp
  * AI: Ability Settings\HtoHCombat: Distances = HTHCombatDist
@@ -89,31 +109,11 @@ Weapon::is_weapon () const
 
 
 
-//TODO Create SuicideCombatant : AI and wrap property: AI: Ability Settings\Frog-beast: Explode range = DAI_FrogExpl
-
-
-
-// AIAttackLink
-
-PROXY_CONFIG (AIAttackLink, priority, nullptr, nullptr,
-	AIAttackLink::Priority, Priority::DEFAULT);
-
-FLAVORED_LINK_IMPL_ (AIAttack,
-	PROXY_INIT (priority)
-)
-
-AIAttackLink
-AIAttackLink::create (const Object& source, const Object& dest,
-	Priority priority)
-{
-	AIAttackLink link = Link::create (flavor (), source, dest);
-	link.priority = priority;
-	return link;
-}
-
-
-
 //TODO wrap link: AIProjectile - sAIProjectileRel
+
+
+
+//TODO Create SuicideCombatant : AI and wrap property: AI: Ability Settings\Frog-beast: Explode range = DAI_FrogExpl
 
 
 

@@ -73,30 +73,40 @@ public:
 	bool finish_attack ();
 	bool abort_attack ();
 
-	// Miscellaneous
+	// Physics and movement
+
+#ifdef IS_THIEF2
+	Physical get_climbing_object () const;
+
+	void nudge_physics (int submodel, const Vector& by);
+#endif // IS_THIEF2
+
+	void unstick ();
+
+	void add_speed_control (const String& name, float factor);
+	void remove_speed_control (const String& name);
+
+	// Visibility
+
+	THIEF_PROP_FIELD_CONST (int, visibility);
+	THIEF_PROP_FIELD_CONST (int, vis_light_rating);
+	THIEF_PROP_FIELD_CONST (int, vis_movement_rating);
+	THIEF_PROP_FIELD_CONST (int, vis_exposure_rating);
+	THIEF_PROP_FIELD_CONST (Time, vis_last_update);
+
+	// Limb model (player arm)
 
 	bool show_arm ();
 	bool start_arm_use (); //TESTME
 	bool finish_arm_use (); //TESTME
 	bool hide_arm ();
 
+	// Miscellaneous
+
 	void attach_camera (const Object& camera, bool freelook);
 	bool detach_camera (const Object& camera = Object::ANY);
 
-#ifdef IS_THIEF2
-	Physical get_climbing_object () const;
-#endif
-
 	bool drop_dead ();
-
-#ifdef IS_THIEF2
-	void nudge_physics (int submodel, const Vector& by);
-#endif
-
-	void add_speed_control (const String& name, float factor);
-	void remove_speed_control (const String& name);
-
-	void unstick ();
 
 	void enable_world_focus ();
 	void disable_world_focus ();

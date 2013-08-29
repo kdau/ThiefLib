@@ -220,6 +220,49 @@ FrobMessage::get_duration () const
 
 
 
+// Being
+//TODO wrap property: AI: Utility\Visibility control = AI_VisCtrl
+
+THIEF_ENUM_CODING (Being::Team, CODE, CODE,
+	THIEF_ENUM_VALUE (GOOD, "good"),
+	THIEF_ENUM_VALUE (NEUTRAL, "neutral"),
+	THIEF_ENUM_VALUE (BAD_1, "bad1", "bad_1", "bad 1", "bad-1", "evil"),
+	THIEF_ENUM_VALUE (BAD_2, "bad2", "bad_2", "bad 2", "bad-2"),
+	THIEF_ENUM_VALUE (BAD_3, "bad3", "bad_3", "bad 3", "bad-3"),
+	THIEF_ENUM_VALUE (BAD_4, "bad4", "bad_4", "bad 4", "bad-4"),
+	THIEF_ENUM_VALUE (BAD_5, "bad5", "bad_5", "bad 5", "bad-5", "undead"),
+)
+
+PROXY_CONFIG (Being, team, "AI_Team", nullptr, Being::Team, Team::GOOD);
+PROXY_CONFIG (Being, culpable, "Culpable", nullptr, bool, false);
+PROXY_CONFIG (Being, blood_type, "BloodType", nullptr, String, "");
+PROXY_CONFIG (Being, current_breath, "AirSupply", nullptr, Time, 0ul);
+PROXY_CONFIG (Being, maximum_breath, "BreathConfig", "Max Air (ms)", Time, 0ul);
+PROXY_CONFIG (Being, breath_recovery_rate, "BreathConfig", "Recover rate",
+	float, 0.0f);
+PROXY_CONFIG (Being, drowning_damage, "BreathConfig", "Drown Damage", int, 0);
+PROXY_CONFIG (Being, drowning_frequency, "BreathConfig", "Drown Freq (ms)",
+	Time, 0ul);
+
+OBJECT_TYPE_IMPL_ (Being, Physical (), SpherePhysical (), Damageable (),
+	PROXY_INIT (team),
+	PROXY_INIT (culpable),
+	PROXY_INIT (blood_type),
+	PROXY_INIT (current_breath),
+	PROXY_INIT (maximum_breath),
+	PROXY_INIT (breath_recovery_rate),
+	PROXY_INIT (drowning_damage),
+	PROXY_INIT (drowning_frequency)
+)
+
+bool
+Being::is_being () const
+{
+	return culpable.exists ();
+}
+
+
+
 // Container
 
 THIEF_ENUM_CODING (Container::Type, CODE, CODE,
@@ -371,20 +414,25 @@ ContainmentMessage::get_contents () const
 
 
 
-/*TODO Create FlowGroup and wrap these properties:
- * Renderer\Flow Group = FlowGroup (hidden type indicator?)
- * Renderer\Water Flow Color Index = FlowColor
- * Renderer\Water Texture Color = WaterColor
- */
-
-
-
 // Marker
-//TODO wrap property: AI: Utility\Flee point = AI_FleePoint
-//TODO wrap property: AI: Utility\Marker: Cover Point = AICoverPt
-//TODO wrap property: AI: Utility\Marker: Vantage Point = AIVantagePt
 
-OBJECT_TYPE_IMPL (Marker)
+PROXY_CONFIG (Marker, flee_value, "AI_FleePoint", nullptr, int, 0);
+PROXY_CONFIG (Marker, cover_value, "AICoverPt", "Value", int, 0);
+PROXY_CONFIG (Marker, cover_decay_speed, "AICoverPt", "Decay Speed",
+	float, 0.8f);
+PROXY_CONFIG (Marker, cover_can_duck, "AICoverPt", "Can Duck", bool, false);
+PROXY_CONFIG (Marker, vantage_value, "AIVantagePt", "Value", int, 0);
+PROXY_CONFIG (Marker, vantage_decay_speed, "AIVantagePt", "Decay Speed",
+	float, 0.8f);
+
+OBJECT_TYPE_IMPL_ (Marker,
+	PROXY_INIT (flee_value),
+	PROXY_INIT (cover_value),
+	PROXY_INIT (cover_decay_speed),
+	PROXY_INIT (cover_can_duck),
+	PROXY_INIT (vantage_value),
+	PROXY_INIT (vantage_decay_speed)
+)
 
 
 
@@ -540,50 +588,6 @@ Secret::find_secret ()
  * Physics: Terrain\Friction = Friction
  * Renderer\Texture Anim Data = AnimTex
  */
-
-
-
-// Being
-//TODO wrap property: AI: Utility\Visibility control = AI_VisCtrl
-//TODO wrap property (const): AI: State\Current visibility = AI_Visibility
-
-THIEF_ENUM_CODING (Being::Team, CODE, CODE,
-	THIEF_ENUM_VALUE (GOOD, "good"),
-	THIEF_ENUM_VALUE (NEUTRAL, "neutral"),
-	THIEF_ENUM_VALUE (BAD_1, "bad1", "bad_1", "bad 1", "bad-1", "evil"),
-	THIEF_ENUM_VALUE (BAD_2, "bad2", "bad_2", "bad 2", "bad-2"),
-	THIEF_ENUM_VALUE (BAD_3, "bad3", "bad_3", "bad 3", "bad-3"),
-	THIEF_ENUM_VALUE (BAD_4, "bad4", "bad_4", "bad 4", "bad-4"),
-	THIEF_ENUM_VALUE (BAD_5, "bad5", "bad_5", "bad 5", "bad-5", "undead"),
-)
-
-PROXY_CONFIG (Being, team, "AI_Team", nullptr, Being::Team, Team::GOOD);
-PROXY_CONFIG (Being, culpable, "Culpable", nullptr, bool, false);
-PROXY_CONFIG (Being, blood_type, "BloodType", nullptr, String, "");
-PROXY_CONFIG (Being, current_breath, "AirSupply", nullptr, Time, 0ul);
-PROXY_CONFIG (Being, maximum_breath, "BreathConfig", "Max Air (ms)", Time, 0ul);
-PROXY_CONFIG (Being, breath_recovery_rate, "BreathConfig", "Recover rate",
-	float, 0.0f);
-PROXY_CONFIG (Being, drowning_damage, "BreathConfig", "Drown Damage", int, 0);
-PROXY_CONFIG (Being, drowning_frequency, "BreathConfig", "Drown Freq (ms)",
-	Time, 0ul);
-
-OBJECT_TYPE_IMPL_ (Being, Physical (), SpherePhysical (), Damageable (),
-	PROXY_INIT (team),
-	PROXY_INIT (culpable),
-	PROXY_INIT (blood_type),
-	PROXY_INIT (current_breath),
-	PROXY_INIT (maximum_breath),
-	PROXY_INIT (breath_recovery_rate),
-	PROXY_INIT (drowning_damage),
-	PROXY_INIT (drowning_frequency)
-)
-
-bool
-Being::is_being () const
-{
-	return culpable.exists ();
-}
 
 
 

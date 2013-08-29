@@ -237,11 +237,10 @@ public:
 	THIEF_OBJECT_TYPE (Explosion)
 	bool is_explosion () const; //TESTME
 
-	THIEF_PROP_FIELD (float, radius_squared); //TESTME
+	THIEF_PROP_FIELD (float, radius); //TESTME
 	THIEF_PROP_FIELD (int, magnitude); //TESTME
 
-	static void explode (const Vector& center, float radius_squared,
-		int magnitude); //TESTME
+	static void explode (const Vector& center, float radius, int magnitude); //TESTME
 };
 
 

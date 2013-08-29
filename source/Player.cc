@@ -27,8 +27,23 @@ namespace Thief {
 
 
 
+PROXY_CONFIG (Player, visibility, "AI_Visibility", "Level", int, 0);
+PROXY_CONFIG (Player, vis_light_rating, "AI_Visibility", "Light rating",
+	int, 0);
+PROXY_CONFIG (Player, vis_movement_rating, "AI_Visibility", "Movement rating",
+	int, 0);
+PROXY_CONFIG (Player, vis_exposure_rating, "AI_Visibility", "Exposure rating",
+	int, 0);
+PROXY_CONFIG (Player, vis_last_update, "AI_Visibility", "Last update time",
+	Time, 0ul);
+
 Player::Player ()
-	: Object ("Player")
+	: Object ("Player"),
+	  PROXY_INIT (visibility),
+	  PROXY_INIT (vis_light_rating),
+	  PROXY_INIT (vis_movement_rating),
+	  PROXY_INIT (vis_exposure_rating),
+	  PROXY_INIT (vis_last_update)
 {}
 
 
@@ -218,7 +233,49 @@ Player::abort_attack ()
 
 
 
-// Miscellaneous
+// Physics and movement
+
+#ifdef IS_THIEF2
+
+Physical
+Player::get_climbing_object () const
+{
+	LGObject object;
+	SService<IPhysSrv> (LG)->GetClimbingObject (number, object);
+	return object.id;
+}
+
+void
+Player::nudge_physics (int submodel, const Vector& _by)
+{
+	LGVector by (_by);
+	SService<IPhysSrv> (LG)->PlayerMotionSetOffset (submodel, by);
+}
+
+#endif // IS_THIEF2
+
+void
+Player::unstick ()
+{
+	Engine::run_command ("unstick_player");
+}
+
+void
+Player::add_speed_control (const String& name, float factor)
+{
+	SService<IDarkInvSrv> (LG)->AddSpeedControl
+		(name.data (), factor, factor);
+}
+
+void
+Player::remove_speed_control (const String& name)
+{
+	SService<IDarkInvSrv> (LG)->RemoveSpeedControl (name.data ());
+}
+
+
+
+// Limb model (player arm)
 //TODO wrap property: Renderer\Invisible = INVISIBLE (as render_arm where true == 0 and false == -1)
 
 bool
@@ -249,6 +306,10 @@ Player::hide_arm ()
 		(get_selected_item ().number);
 }
 
+
+
+// Miscellaneous
+
 void
 Player::attach_camera (const Object& camera, bool freelook)
 {
@@ -268,52 +329,10 @@ Player::detach_camera (const Object& camera)
 			(camera.number) == S_OK;
 }
 
-#ifdef IS_THIEF2
-
-Physical
-Player::get_climbing_object () const
-{
-	LGObject object;
-	SService<IPhysSrv> (LG)->GetClimbingObject (number, object);
-	return object.id;
-}
-
-#endif // IS_THIEF2
-
 bool
 Player::drop_dead ()
 {
 	return SService<IDarkGameSrv> (LG)->KillPlayer () == S_OK;
-}
-
-#ifdef IS_THIEF2
-
-void
-Player::nudge_physics (int submodel, const Vector& _by)
-{
-	LGVector by (_by);
-	SService<IPhysSrv> (LG)->PlayerMotionSetOffset (submodel, by);
-}
-
-#endif // IS_THIEF2
-
-void
-Player::add_speed_control (const String& name, float factor)
-{
-	SService<IDarkInvSrv> (LG)->AddSpeedControl
-		(name.data (), factor, factor);
-}
-
-void
-Player::remove_speed_control (const String& name)
-{
-	SService<IDarkInvSrv> (LG)->RemoveSpeedControl (name.data ());
-}
-
-void
-Player::unstick ()
-{
-	Engine::run_command ("unstick_player");
 }
 
 void

@@ -145,9 +145,6 @@ template<>
 bool
 Parameter<Color>::decode (const String& raw) const
 {
-	int _value = decode_quest_ref (raw);
-	if (_value != INT_MAX) { value = _value; return true; }
-
 	try
 	{
 		value = raw;

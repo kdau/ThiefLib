@@ -111,7 +111,6 @@ Key::try_key_operation (Operation operation, const Lockable& lock)
 
 // Door
 //TODO wrap property: Door\Rotating = RotDoor
-//TODO wrap property: Door\Static Light Pos = DoorStaticLight
 //TODO wrap property: Door\Translating = TransDoor
 
 THIEF_ENUM_CODING (Door::State, CODE, CODE,
@@ -122,8 +121,12 @@ THIEF_ENUM_CODING (Door::State, CODE, CODE,
 	THIEF_ENUM_VALUE (HALTED, "halted"),
 )
 
+PROXY_CONFIG (Door, static_light_position, "DoorStaticLight", nullptr,
+	bool, false);
+
 OBJECT_TYPE_IMPL_ (Door, Physical (), OBBPhysical (), Rendered (),
-	Interactive (), Damageable (), Lockable ())
+	Interactive (), Damageable (), Lockable (),
+	PROXY_INIT (static_light_position))
 
 bool
 Door::is_door () const

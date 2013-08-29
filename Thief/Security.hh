@@ -112,6 +112,8 @@ public:
 
 	bool get_blocks_sound () const;
 	void set_blocks_sound (bool);
+
+	THIEF_PROP_FIELD_CONST (bool, static_light_position);
 };
 
 class DoorMessage : public Message
