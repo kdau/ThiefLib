@@ -103,8 +103,6 @@ private:
 
 
 
-// Message wrapping
-
 #define THIEF_MESSAGE_WRAP(Type) Type (sScrMsg*, sMultiParm*);
 
 class MessageWrapError : public std::exception
@@ -121,8 +119,6 @@ private:
 
 
 
-// General and object messages
-
 class GenericMessage : public Message
 {
 public:
@@ -130,14 +126,7 @@ public:
 	THIEF_MESSAGE_WRAP (GenericMessage);
 };
 
-class CombineMessage : public Message //TESTME
-{
-public:
-	CombineMessage (const Object& stack);
-	THIEF_MESSAGE_WRAP (CombineMessage);
 
-	Object get_stack () const;
-};
 
 class TimerMessage : public Message
 {

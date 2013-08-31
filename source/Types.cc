@@ -27,6 +27,47 @@ namespace Thief {
 
 
 
+// Combinable
+
+PROXY_CONFIG (Combinable, stack_count, "StackCount", nullptr, int, 1);
+
+OBJECT_TYPE_IMPL_ (Combinable,
+	PROXY_INIT (stack_count)
+)
+
+int
+Combinable::adjust_stack_count (int by, bool destroy_if_zero)
+{
+	return SInterface<IContainSys> (LG)->StackAdd
+		(number, by, destroy_if_zero);
+}
+
+//TODO wrap void IContainSys::CombineTry (int, int, int)
+//TODO wrap int IContainSys::CombineCount (int, int)
+//TODO wrap void IContainSys::CombineAdd (int, int, int, ulong)
+//TODO wrap bool IContainSys::CanCombine (int, int, int)
+//TODO wrap bool IContainSys::CanCombineContainer (int, int, int)
+//TODO wrap int IContainSys::RemoveFromStack (int, ulong, int)
+
+
+
+// CombineMessage
+
+// "Combine" reports as "sScrMsg", so it can't be tested by type.
+MESSAGE_WRAPPER_IMPL_ (CombineMessage, MESSAGE_NAME_TEST ("Combine"))
+
+CombineMessage::CombineMessage (const Object& stack)
+	: Message (new sCombineScrMsg ())
+{
+	message->message = "Combine";
+	MESSAGE_AS (sCombineScrMsg)->combiner = stack.number;
+}
+
+MESSAGE_ACCESSOR (Combinable, CombineMessage, get_stack,
+	sCombineScrMsg, combiner)
+
+
+
 // Damageable
 
 PROXY_CONFIG (Damageable, hit_points, "HitPoints", nullptr, int, 0);
@@ -330,13 +371,6 @@ Container::move_contents (const Object& new_container, bool combine)
 		(number, new_container.number, combine);
 }
 
-//TODO wrap void IContainSys::CombineTry (int, int, int)
-//TODO wrap int IContainSys::CombineCount (int, int)
-//TODO wrap void IContainSys::CombineAdd (int, int, int, ulong)
-//TODO wrap bool IContainSys::CanCombine (int, int, int)
-//TODO wrap bool IContainSys::CanCombineContainer (int, int, int)
-//TODO wrap int IContainSys::RemoveFromStack (int, ulong, int)
-
 
 
 // ContainsLink
@@ -369,8 +403,8 @@ MESSAGE_WRAPPER_IMPL_ (ContainmentMessage,
 ContainmentMessage::ContainmentMessage (Subject subject, Event event,
 		const Object& container, const Object& contents)
 	: Message ((subject == CONTAINER)
-		? (sScrMsg*) new sContainerScrMsg ()
-		: (sScrMsg*) new sContainedScrMsg ())
+		? static_cast<sScrMsg*> (new sContainerScrMsg ())
+		: static_cast<sScrMsg*> (new sContainedScrMsg ()))
 {
 	if (subject == CONTAINER)
 	{

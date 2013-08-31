@@ -25,7 +25,7 @@
 
 
 
-// Required by lg (and DH2?)
+// Required by the lg library.
 
 IMalloc*
 g_pMalloc = nullptr;

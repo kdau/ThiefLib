@@ -25,11 +25,8 @@
 #define THIEF_OBJECT_HH
 
 #include <Thief/Base.hh>
-#include <Thief/Property.hh>
 
 namespace Thief {
-
-class Container;
 
 
 
@@ -74,6 +71,7 @@ public:
 	Number number;
 	bool operator == (const Object&) const;
 	bool operator != (const Object&) const;
+	bool operator < (const Object&) const;
 	bool operator == (Number) const;
 	bool operator != (Number) const;
 
@@ -116,13 +114,10 @@ public:
 
 	Vector object_to_world (const Vector& relative) const;
 
-	// Containment and combination
+	// Miscellaneous
 
-	Container get_container () const;
-	THIEF_PROP_FIELD_CONST (bool, has_refs);
-
-	THIEF_PROP_FIELD (int, stack_count);
-	int adjust_stack_count (int by, bool destroy_if_zero = true);
+	Object get_container () const;
+	bool has_refs () const;
 
 private:
 	static Number find (const String& name);

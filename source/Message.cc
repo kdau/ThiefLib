@@ -216,22 +216,6 @@ GenericMessage::GenericMessage (const char* name)
 
 
 
-// CombineMessage
-
-// "Combine" reports as "sScrMsg", so it can't be tested by type.
-MESSAGE_WRAPPER_IMPL_ (CombineMessage, MESSAGE_NAME_TEST ("Combine"))
-
-CombineMessage::CombineMessage (const Object& stack)
-	: Message (new sCombineScrMsg ())
-{
-	message->message = "Combine";
-	MESSAGE_AS (sCombineScrMsg)->combiner = stack.number;
-}
-
-MESSAGE_ACCESSOR (Object, CombineMessage, get_stack, sCombineScrMsg, combiner)
-
-
-
 // TimerMessage
 
 MESSAGE_WRAPPER_IMPL (TimerMessage, sScrTimerMsg)

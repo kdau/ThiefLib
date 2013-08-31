@@ -423,7 +423,7 @@ protected:
 
 	LGMultiBase (int enum_value);
 	int as_enum_value () const;
-	ObjectNumber as_object () const;
+	int as_object () const; // int = Object::Number
 };
 
 template <typename T, typename Enable = void>

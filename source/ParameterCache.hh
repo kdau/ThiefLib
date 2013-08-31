@@ -21,8 +21,8 @@
  *
  *****************************************************************************/
 
-#ifndef PARAMETER_CACHE_HH
-#define PARAMETER_CACHE_HH
+#ifndef PARAMETERCACHE_HH
+#define PARAMETERCACHE_HH
 
 #include "Private.hh"
 
@@ -89,9 +89,9 @@ public:
 
 	bool exists (const Object& object, const CIString& parameter,
 		bool inherit);
-	const String& get (const Object& object, const CIString& parameter,
+	const String* get (const Object& object, const CIString& parameter,
 		bool inherit);
-	void set (const Object& object, const CIString& parameter,
+	bool set (const Object& object, const CIString& parameter,
 		const String& value);
 	bool copy (const Object& source, const Object& dest,
 		const CIString& parameter);
@@ -104,6 +104,7 @@ private:
 	ParameterCache ();
 
 	SInterface<IStringProperty> dn_prop;
+
 	PropListenerHandle listen_handle;
 	static void __stdcall on_dn_change (sPropertyListenMsg*,
 		PropListenerData);
@@ -113,7 +114,7 @@ private:
 	void unwatch_ancestor (Object::Number number);
 
 	void read_dn (Object::Number number);
-	void write_dn (Object::Number number);
+	bool write_dn (Object::Number number);
 
 	typedef std::map<Object::Number, DesignNote> Data;
 	Data data;
@@ -125,5 +126,5 @@ private:
 
 } // namespace Thief
 
-#endif // PARAMETER_CACHE_HH
+#endif // PARAMETERCACHE_HH
 

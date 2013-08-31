@@ -32,7 +32,6 @@ class HUDElement;
 
 
 
-
 class HUDBitmap
 {
 public:
@@ -66,25 +65,40 @@ private:
 class HUD
 {
 public:
-	typedef std::shared_ptr<HUD> Ptr;
-	typedef std::weak_ptr<HUD> WeakPtr;
-
 	typedef int ZIndex;
 
 	virtual ~HUD ();
 
-	static Ptr get ();
+	enum class Event { ENTER_GAME_MODE, DRAW_STAGE_1, DRAW_STAGE_2 };
 
-	void register_element (HUDElement&, ZIndex priority);
-	void unregister_element (HUDElement&);
+	typedef std::function<void (HUDElement&, Event)> Callback;
 
-	HUDBitmap::Ptr load_bitmap (const String& path, bool animation);
+	static bool register_element (HUDElement&, Callback, ZIndex priority);
+	static bool unregister_element (HUDElement&);
+
+	static HUDBitmap::Ptr load_bitmap (const String& path, bool animation);
 
 private:
+	typedef std::shared_ptr<HUD> Ptr;
+	typedef std::weak_ptr<HUD> WeakPtr;
+	static Ptr get ();
+
 	friend class HUDImpl;
 	HUD ();
 
-	typedef std::multimap<ZIndex, HUDElement*> Elements;
+	struct ElementInfo
+	{
+		ElementInfo (HUDElement&, Callback, ZIndex, Ptr);
+		bool operator == (const ElementInfo&) const;
+		bool operator < (const ElementInfo&) const;
+
+		HUDElement& element;
+		Callback callback;
+		ZIndex priority;
+		Ptr reference;
+	};
+
+	typedef std::set<ElementInfo> Elements;
 	Elements elements;
 
 	typedef std::map<String, HUDBitmap::WeakPtr> Bitmaps;
@@ -153,14 +167,9 @@ private:
 	void do_offset (CanvasPoint& point) const;
 	void do_offset (CanvasRect& area) const;
 
-	friend class HUDImpl;
-	void on_draw_stage_1 ();
-	void on_draw_stage_2 ();
-	void on_enter_game_mode ();
+	void on_event (HUD::Event event);
 
-	HUD::Ptr hud;
-
-	bool should_draw, needs_redraw, drawing;
+	bool initialized, should_draw, needs_redraw, drawing;
 
 	typedef int Handle;
 	Handle overlay;

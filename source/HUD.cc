@@ -138,21 +138,45 @@ STDMETHODIMP_ (void)
 HUDImpl::DrawHUD ()
 {
 	for (auto& element : elements)
-		element.second->on_draw_stage_1 ();
+		element.callback (element.element, Event::DRAW_STAGE_1);
 }
 
 STDMETHODIMP_ (void)
 HUDImpl::DrawTOverlay ()
 {
 	for (auto& element : elements)
-		element.second->on_draw_stage_2 ();
+		element.callback (element.element, Event::DRAW_STAGE_2);
 }
 
 STDMETHODIMP_ (void)
 HUDImpl::OnUIEnterMode ()
 {
 	for (auto& element : elements)
-		element.second->on_enter_game_mode ();
+		element.callback (element.element, Event::ENTER_GAME_MODE);
+}
+
+
+
+// HUD::ElementInfo
+
+HUD::ElementInfo::ElementInfo (HUDElement& _element, Callback _callback,
+		ZIndex _priority, Ptr _reference)
+	: element (_element),
+	  callback (_callback),
+	  priority (_priority),
+	  reference (_reference)
+{}
+
+bool
+HUD::ElementInfo::operator == (const ElementInfo& rhs) const
+{
+	return &element == &rhs.element;
+}
+
+bool
+HUD::ElementInfo::operator < (const ElementInfo& rhs) const
+{
+	return priority < rhs.priority;
 }
 
 
@@ -178,26 +202,31 @@ HUD::get ()
 	return ptr;
 }
 
-void
-HUD::register_element (HUDElement& element, ZIndex priority)
+bool
+HUD::register_element (HUDElement& element, Callback callback, ZIndex priority)
 {
-	elements.insert (std::make_pair (priority, &element));
+	get ()->elements.insert
+		(ElementInfo (element, callback, priority, get ()));
+	return true;
 }
 
-void
+bool
 HUD::unregister_element (HUDElement& element)
 {
+	Elements& elements = get ()->elements;
 	for (auto entry = elements.begin (); entry != elements.end (); ++entry)
-		if (entry->second == &element)
+		if (&entry->element == &element)
 		{
 			elements.erase (entry);
-			break;
+			return true;
 		}
+	return false;
 }
 
 HUDBitmap::Ptr
 HUD::load_bitmap (const String& path, bool animation)
 {
+	Bitmaps& bitmaps = get ()->bitmaps;
 	HUDBitmap::Ptr bitmap;
 
 	// Look for an existing bitmap first.
@@ -247,8 +276,8 @@ HUD::load_bitmap (const String& path, bool animation)
 	}
 
 HUDElement::HUDElement ()
-	: hud (), should_draw (false), needs_redraw (true), drawing (false),
-	  overlay (INVALID_HANDLE), opacity (1.0f),
+	: initialized (false), should_draw (false), needs_redraw (true),
+	  drawing (false), overlay (INVALID_HANDLE), opacity (1.0f),
 	  _position (0, 0), _size (1, 1), scale (1.0f),
 	  drawing_color (0xFFFFFFu), drawing_offset ()
 {}
@@ -261,15 +290,14 @@ HUDElement::~HUDElement ()
 bool
 HUDElement::initialize (HUD::ZIndex priority)
 {
-	if (hud) // The element has already been registered.
+	if (initialized) // The element has already been registered.
 		return false;
-	else if (hud = HUD::get ()) // Register the element with the handler.
+	else // Register the element with the handler.
 	{
-		hud->register_element (*this, priority);
-		return true;
+		initialized = HUD::register_element
+			(*this, &HUDElement::on_event, priority);
+		return initialized;
 	}
-	else
-		return false;
 }
 
 void
@@ -278,12 +306,9 @@ HUDElement::deinitialize ()
 	// Destroy any overlay.
 	destroy_overlay ();
 
-	// Unregister with the handler and dereference it.
-	if (hud)
-	{
-		hud->unregister_element (*this);
-		hud.reset ();
-	}
+	// Unregister with the handler.
+	if (initialized)
+		HUD::unregister_element (*this);
 }
 
 void
@@ -538,37 +563,41 @@ HUDElement::do_offset (CanvasRect& area) const
 }
 
 void
-HUDElement::on_draw_stage_1 ()
+HUDElement::on_event (HUD::Event event)
 {
-	drawing = true;
-	should_draw = prepare ();
-	if (should_draw && !is_overlay ())
-	{
-		needs_redraw = false;
-		redraw ();
-	}
-	drawing = false;
-}
-
-void
-HUDElement::on_draw_stage_2 ()
-{
-	if (!should_draw || !is_overlay ()) return;
 	SService<IDarkOverlaySrv> DOS (LG);
-	if (needs_redraw && DOS->BeginTOverlayUpdate (overlay))
-	{
-		needs_redraw = false;
-		drawing = true;
-		redraw ();
-		drawing = false;
-		DOS->EndTOverlayUpdate ();
-	}
-	DOS->DrawTOverlayItem (overlay);
-}
 
-void
-HUDElement::on_enter_game_mode ()
-{}
+	switch (event)
+	{
+
+	case HUD::Event::DRAW_STAGE_1:
+		drawing = true;
+		should_draw = prepare ();
+		if (should_draw && !is_overlay ())
+		{
+			needs_redraw = false;
+			redraw ();
+		}
+		drawing = false;
+		break;
+
+	case HUD::Event::DRAW_STAGE_2:
+		if (!should_draw || !is_overlay ()) return;
+		if (needs_redraw && DOS->BeginTOverlayUpdate (overlay))
+		{
+			needs_redraw = false;
+			drawing = true;
+			redraw ();
+			drawing = false;
+			DOS->EndTOverlayUpdate ();
+		}
+		DOS->DrawTOverlayItem (overlay);
+		break;
+
+	default:
+		break;
+	}
+}
 
 
 

@@ -38,6 +38,28 @@ class Being;
 
 
 
+// Combinable
+
+class Combinable : public virtual Object
+{
+public:
+	THIEF_OBJECT_TYPE (Combinable)
+
+	THIEF_PROP_FIELD (int, stack_count);
+	int adjust_stack_count (int by, bool destroy_if_zero = true);
+};
+
+class CombineMessage : public Message //TESTME
+{
+public:
+	CombineMessage (const Object& stack);
+	THIEF_MESSAGE_WRAP (CombineMessage);
+
+	Combinable get_stack () const;
+};
+
+
+
 // Damageable
 
 class Damageable : public virtual Object

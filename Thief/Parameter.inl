@@ -32,29 +32,12 @@ namespace Thief {
 
 
 
-// ParameterBase
+// ParameterBase::Config
 
 inline
 ParameterBase::Config::Config (bool _inheritable)
 	: inheritable (_inheritable)
 {}
-
-inline
-ParameterBase::ParameterBase (const Object& _object, const CIString& _name,
-		const Config& _config)
-	: cache (),
-	  does_exist (false),
-	  object (_object),
-	  name (_name),
-	  config (_config)
-{}
-
-inline bool
-ParameterBase::exists () const
-{
-	initialize ();
-	return does_exist;
-}
 
 
 
@@ -100,7 +83,8 @@ Parameter<T, THIEF_NOT_ENUM>::operator = (const T& _value)
 {
 	initialize ();
 	value = _value;
-	set_raw (encode ());
+	if (!set_raw (encode ()))
+		throw std::runtime_error ("could not set parameter");
 	return *this;
 }
 
@@ -204,7 +188,8 @@ Parameter<T, THIEF_IS_ENUM>::operator = (T _value)
 {
 	initialize ();
 	value = int (_value);
-	set_raw (coding.encode (value));
+	if (!set_raw (coding.encode (value)))
+		throw std::runtime_error ("could not set parameter");
 	return *this;
 }
 

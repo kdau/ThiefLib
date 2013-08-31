@@ -95,8 +95,7 @@ public:
 	THIEF_OBJECT_TYPE (AnimLight)
 	bool is_anim_light () const; //TESTME
 
-	bool is_light_active () const; //TESTME
-	void set_light_active (bool); //TESTME
+	THIEF_PROP_FIELD (bool, light_on); //TESTME
 
 	enum class Mode
 	{
@@ -137,6 +136,12 @@ public:
 	THIEF_OBJECT_TYPE (Flash)
 	bool is_flash () const; //TESTME
 
+	THIEF_PROP_FIELD (Time, world_duration); //TESTME
+	THIEF_PROP_FIELD (Time, screen_duration); //TESTME
+	THIEF_PROP_FIELD (Time, effect_duration); //TESTME
+
+	THIEF_PROP_FIELD (float, range); //TESTME
+
 	void flash_world (); //TESTME
 };
 
@@ -149,6 +154,9 @@ class ParticleGroup : public virtual Object
 public:
 	THIEF_OBJECT_TYPE (ParticleGroup)
 	bool is_particle_group () const; //TESTME
+
+	THIEF_PROP_FIELD (int, particle_count); //TESTME
+	THIEF_PROP_FIELD (float, particle_size); //TESTME
 
 	void set_particles_active (bool); //TESTME
 };

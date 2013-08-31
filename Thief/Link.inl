@@ -51,6 +51,12 @@ Flavor::operator != (const Flavor& rhs) const
 	return number != rhs.number;
 }
 
+inline bool
+Flavor::operator < (const Flavor& rhs) const
+{
+	return number < rhs.number;
+}
+
 inline Flavor
 Flavor::get_reverse () const
 {

@@ -26,25 +26,26 @@
 
 #include <Thief/Base.hh>
 #include <Thief/Message.hh>
+#include <Thief/Object.hh>
 
 namespace Thief {
 
 
 
-// Property: normal access to properties and property fields
+// ObjectProperty: direct access to properties and property fields
 
-class Property
+class ObjectProperty
 {
 public:
-	Property (const Object&, const String& name,
+	ObjectProperty (const String& property, const Object&,
 		bool add_if_missing = false);
-	Property (const Object&, const char* name,
+	ObjectProperty (const char* property, const Object&,
 		bool add_if_missing = false);
-	Property (const Property&);
-	~Property ();
+	ObjectProperty (const ObjectProperty&);
+	~ObjectProperty ();
 
+	String get_property () const;
 	Object get_object () const;
-	String get_name () const;
 
 	bool exists (bool inherited = true) const;
 	bool add ();
@@ -60,8 +61,10 @@ public:
 	template <typename T>
 	T get_field (const String& field, const T& default_value) const;
 
-	void subscribe (const Object& host);
-	void unsubscribe (const Object& host);
+	static bool subscribe (const String& property, const Object&,
+		const Object& host = Object::SELF);
+	static bool unsubscribe (const String& property, const Object&,
+		const Object& host = Object::SELF);
 
 private:
 	friend class PropFieldBase;
@@ -76,8 +79,8 @@ private:
 	bool _set_field (const char* field, const LGMultiBase& value,
 		bool add_if_missing = false);
 
-	ObjectNumber object;
 	IProperty* property;
+	Object object;
 };
 
 
@@ -127,20 +130,21 @@ std::ostream& operator << (std::ostream&, const PropField<T, config>&);
 
 
 
-// PropertyChangeMessage: wrapper of DHNotify for property changes
+// PropertyChangeMessage
 
-class PropertyChangeMessage : public Message
+class PropertyChangeMessage : public Message //TESTME
 {
 public:
-	enum Event { NONE, CHANGE, ADD, REMOVE };
+	enum Event { CHANGE, ADD, REMOVE };
 
-	PropertyChangeMessage (Event, bool inherited, const Property&);
+	PropertyChangeMessage (Event, bool inherited, const char* property,
+		const Object&);
 	THIEF_MESSAGE_WRAP (PropertyChangeMessage);
 
 	Event get_event () const;
 	bool is_inherited () const;
 
-	String get_prop_name () const;
+	String get_property () const;
 	Object get_object () const;
 };
 

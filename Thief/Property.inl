@@ -32,11 +32,11 @@ namespace Thief {
 
 
 
-// Property
+// ObjectProperty
 
 template <typename T>
 inline T
-Property::get (const T& default_value) const
+ObjectProperty::get (const T& default_value) const
 {
 	if (exists ())
 	{
@@ -50,7 +50,7 @@ Property::get (const T& default_value) const
 
 template <typename T>
 inline T
-Property::get_field (const String& field, const T& default_value) const
+ObjectProperty::get_field (const String& field, const T& default_value) const
 {
 	if (exists ())
 	{
@@ -63,13 +63,13 @@ Property::get_field (const String& field, const T& default_value) const
 }
 
 inline void
-Property::_get_field (const String& field, LGMultiBase& value) const
+ObjectProperty::_get_field (const String& field, LGMultiBase& value) const
 {
 	_get_field (field.empty () ? nullptr : field.data (), value);
 }
 
 inline bool
-Property::_set_field (const String& field, const LGMultiBase& value,
+ObjectProperty::_set_field (const String& field, const LGMultiBase& value,
 	bool add_if_missing)
 {
 	return _set_field (field.empty () ? nullptr : field.data (), value,
@@ -93,7 +93,7 @@ template <typename T, const FieldProxyConfig<T>& config>
 inline bool
 PropField<T, config>::exists () const
 {
-	return Property (object, config.major).exists ();
+	return ObjectProperty (config.major, object).exists ();
 }
 
 template <typename T, const FieldProxyConfig<T>& config>
@@ -139,7 +139,7 @@ template <const FieldProxyConfig<bool>& config>
 inline bool
 PropField<bool, config>::exists () const
 {
-	return Property (object, config.major).exists ();
+	return ObjectProperty (config.major, object).exists ();
 }
 
 template <const FieldProxyConfig<bool>& config>

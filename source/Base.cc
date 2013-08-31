@@ -453,7 +453,7 @@ LGMultiBase::as_enum_value () const
 	return data.i;
 }
 
-ObjectNumber
+Object::Number
 LGMultiBase::as_object () const \
 {
 	switch (type)

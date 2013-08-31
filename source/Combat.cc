@@ -52,7 +52,7 @@ PROXY_CONFIG (Weapon, exposure_swung, "SwingExpose", nullptr, int, 0);
 PROXY_CONFIG (Weapon, collides_with_terrain, "WpnTerrColl", nullptr,
 	bool, false);
 
-OBJECT_TYPE_IMPL_ (Weapon, Rendered (), Interactive (),
+OBJECT_TYPE_IMPL_ (Weapon, Rendered (), Interactive (), Combinable (),
 	PROXY_INIT (exposure_drawn),
 	PROXY_INIT (exposure_swung),
 	PROXY_INIT (collides_with_terrain)
@@ -69,7 +69,7 @@ Weapon::is_weapon () const
 // AIAttackLink
 
 PROXY_CONFIG (AIAttackLink, priority, nullptr, nullptr,
-	AIAttackLink::Priority, Priority::DEFAULT);
+	AI::Priority, AI::Priority::DEFAULT);
 
 FLAVORED_LINK_IMPL_ (AIAttack,
 	PROXY_INIT (priority)
@@ -77,7 +77,7 @@ FLAVORED_LINK_IMPL_ (AIAttack,
 
 AIAttackLink
 AIAttackLink::create (const Object& source, const Object& dest,
-	Priority priority)
+	AI::Priority priority)
 {
 	AIAttackLink link = Link::create (flavor (), source, dest);
 	link.priority = priority;

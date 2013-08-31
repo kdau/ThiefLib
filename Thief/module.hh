@@ -42,8 +42,8 @@ struct sScrClassDesc
 
 
 
-// Begin the module definition: open namespace Thief and define
-//	ScriptModule::real_name and ScriptModule::scripts
+// Begin the module definition: open namespace Thief and
+//	define ScriptModule::real_name and ScriptModule::scripts
 
 #define THIEF_MODULE_BEGIN(ModuleName) \
 namespace Thief { \
@@ -64,7 +64,7 @@ ScriptModule::scripts[] = \
 	  [] (const char* name, int host) __cdecl \
 		{ \
 			if (_stricmp (name, Name) != 0) \
-				return (IScript*) nullptr; \
+				return static_cast<IScript*> (nullptr); \
 			Class* script = new (std::nothrow) Class (Name, host); \
 			return script->get_interface (); \
 		} \
@@ -72,8 +72,8 @@ ScriptModule::scripts[] = \
 
 
 
-// End the module definition: close ScriptModule::scripts, define
-//	ScriptModule::script_count, and close namespace Thief
+// End the module definition: close ScriptModule::scripts,
+//	define ScriptModule::script_count, and close namespace Thief
 
 #define THIEF_MODULE_END \
 }; \

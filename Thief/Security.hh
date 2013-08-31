@@ -72,7 +72,7 @@ THIEF_FLAVORED_LINK (Lock) //TESTME
 // Key
 
 class Key : public virtual SpherePhysical, public virtual Interactive,
-	public virtual Damageable
+	public virtual Combinable, public virtual Damageable
 {
 public:
 	THIEF_OBJECT_TYPE (Key)

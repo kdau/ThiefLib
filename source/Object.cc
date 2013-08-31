@@ -27,7 +27,7 @@ namespace Thief {
 
 
 
-// Constants
+// Object: constants
 
 const Object::Number
 Object::NONE = 0;
@@ -40,25 +40,18 @@ Object::SELF = INT_MAX;
 
 
 
-// Constructors and destructors
-
-PROXY_CONFIG (Object, has_refs, "HasRefs", nullptr, bool, true);
-PROXY_CONFIG (Object, stack_count, "StackCount", nullptr, int, 1);
-
-#define OBJECT_COMMON_INIT \
-	PROXY_INIT (has_refs), \
-	PROXY_INIT (stack_count)
+// Object: constructors and destructors
 
 Object::Object (Number _number)
-	: number (_number), OBJECT_COMMON_INIT
+	: number (_number)
 {}
 
 Object::Object (const Object& copy)
-	: number (copy.number), OBJECT_COMMON_INIT
+	: number (copy.number)
 {}
 
 Object::Object (const String& name)
-	: number (find (name)), OBJECT_COMMON_INIT
+	: number (find (name))
 {}
 
 Object&
@@ -71,6 +64,10 @@ Object::operator = (const Object& copy)
 Object::~Object ()
 {}
 
+
+
+// Object: existence, creation and destruction
+
 #ifdef IS_THIEF2
 Object
 Object::find_closest (const Object& archetype, const Object& nearby)
@@ -81,10 +78,6 @@ Object::find_closest (const Object& archetype, const Object& nearby)
 	return closest.id;
 }
 #endif // IS_THIEF2
-
-
-
-// Existence, creation and destruction
 
 Object
 Object::create (const Object& archetype)
@@ -111,18 +104,18 @@ Object::finish_create ()
 Object
 Object::create_temp_fnord (Time lifespan)
 {
-	Marker fnord = create (Object ("Marker"));
+	Object fnord = create (Object ("Marker"));
 	fnord.set_transient (true);
 
 	// Add a delete tweq to enforce the lifespan. //TODO Use DeleteTweq once created.
 	if (lifespan != 0ul)
 	{
-		Property config (fnord, "CfgTweqDelete", true);
+		ObjectProperty config ("CfgTweqDelete", fnord, true);
 		config.set_field ("Halt", 0); // Destroy Obj
 		config.set_field ("AnimC", 2); // Sim
 		config.set_field ("Rate", lifespan);
 
-		Property state (fnord, "StTweqDelete", true);
+		ObjectProperty state ("StTweqDelete", fnord, true);
 		state.set_field ("AnimS", 1); // On
 	}
 
@@ -165,7 +158,7 @@ Object::destroy ()
 
 
 
-// Identity
+// Object: identity
 
 bool
 Object::operator == (const Object& rhs) const
@@ -177,6 +170,12 @@ bool
 Object::operator != (const Object& rhs) const
 {
 	return number != rhs.number;
+}
+
+bool
+Object::operator < (const Object& rhs) const
+{
+	return number < rhs.number;
 }
 
 bool
@@ -241,7 +240,7 @@ Object::get_description () const
 
 
 
-// Inheritance and transience
+// Object: inheritance and transience
 
 Object::Type
 Object::get_type () const
@@ -352,7 +351,7 @@ Object::set_transient (bool transient)
 
 
 
-// Position
+// Object: position
 
 Vector
 Object::get_location () const
@@ -402,24 +401,19 @@ Object::object_to_world (const Vector& relative) const
 
 
 
-// Containment and combination
+// Object: miscellaneous
 
-Container
+Object
 Object::get_container () const
 {
 	return SInterface<IContainSys> (LG)->GetContainer (number);
 }
 
-int
-Object::adjust_stack_count (int by, bool destroy_if_zero)
+bool
+Object::has_refs () const
 {
-	return SInterface<IContainSys> (LG)->StackAdd
-		(number, by, destroy_if_zero);
+	return ObjectProperty ("HasRefs", *this).get (true);
 }
-
-
-
-// Private methods
 
 Object::Number
 Object::find (const String& name)

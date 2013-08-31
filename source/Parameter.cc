@@ -30,10 +30,26 @@ namespace Thief {
 
 // ParameterBase
 
+ParameterBase::ParameterBase (const Object& _object, const CIString& _name,
+		const Config& _config)
+	: cache (),
+	  does_exist (false),
+	  object (_object),
+	  name (_name),
+	  config (_config)
+{}
+
 ParameterBase::~ParameterBase ()
 {
 	if (cache)
 		cache->unwatch_object (object, *this);
+}
+
+bool
+ParameterBase::exists () const
+{
+	initialize ();
+	return does_exist;
 }
 
 bool
@@ -54,14 +70,18 @@ const String&
 ParameterBase::get_raw () const
 {
 	initialize ();
-	return cache->get (object, name, config.inheritable);
+	const String* result = cache->get (object, name, config.inheritable);
+	if (result)
+		return *result;
+	else
+		throw std::runtime_error ("parameter not set for object");
 }
 
-void
+bool
 ParameterBase::set_raw (const String& raw)
 {
 	initialize ();
-	cache->set (object, name, raw);
+	return cache->set (object, name, raw);
 }
 
 void

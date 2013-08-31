@@ -28,6 +28,7 @@
 #include <Thief/Link.hh>
 #include <Thief/Message.hh>
 #include <Thief/Physics.hh>
+#include <Thief/Sound.hh>
 #include <Thief/Types.hh>
 
 namespace Thief {
@@ -71,6 +72,9 @@ public:
 	void unfreeze ();
 
 	// Actions
+
+	enum class Priority
+		{ DEFAULT, VERY_LOW, LOW, NORMAL, HIGH, VERY_HIGH, ABSOLUTE };
 
 	enum class Speed { SLOW, NORMAL, FAST };
 	enum class ActionPriority { LOW, NORMAL, HIGH };
@@ -163,7 +167,7 @@ public:
 
 	THIEF_PROP_FIELD_CONST (bool, is_speaking);
 	THIEF_PROP_FIELD_CONST (Time, last_speech_time);
-	THIEF_PROP_FIELD_CONST (Object, last_speech_schema);
+	THIEF_PROP_FIELD_CONST (SoundSchema, last_speech_schema);
 	THIEF_PROP_FIELD_CONST (int, last_speech_concept);
 
 	void set_speech_enabled (bool enabled); //TESTME
@@ -198,6 +202,8 @@ public:
 	void set_actor (size_t number, const Object& actor);
 	void remove_actor (size_t number);
 
+	THIEF_PROP_FIELD (AI::Alert, abort_level); //TESTME
+	THIEF_PROP_FIELD (AI::Priority, abort_priority); //TESTME
 	THIEF_PROP_FIELD (bool, save_conversation);
 };
 

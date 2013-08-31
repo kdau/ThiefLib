@@ -102,45 +102,34 @@ OBJECT_TYPE_IMPL_ (Light,
 
 
 // AnimLight
-//TODO wrap property: Renderer\Anim Light = AnimLight (propdefs.h: sAnimLight) (Can some of the service methods be replaced with PropFields?)
+//TODO wrap rest of property: Renderer\Anim Light = AnimLight
 
-OBJECT_TYPE_IMPL_ (AnimLight, Light ())
+PROXY_NEG_CONFIG (AnimLight, light_on, "AnimLight", "inactive", bool, true);
+
+OBJECT_TYPE_IMPL_ (AnimLight, Light (),
+	PROXY_INIT (light_on)
+)
 
 bool
 AnimLight::is_anim_light () const
 {
-	return Property (*this, "AnimLight").exists (); //TODO Use a PropField.
-}
-
-bool
-AnimLight::is_light_active () const
-{
-	return !Property (*this, "AnimLight").get_field ("inactive", true); //TODO Use a PropField.
-}
-
-void
-AnimLight::set_light_active (bool active)
-{
-	if (active)
-		SService<ILightScrSrv> (LG)->Activate (number);
-	else
-		SService<ILightScrSrv> (LG)->Deactivate (number);
+	return light_on.exists ();
 }
 
 AnimLight::Mode
-AnimLight::get_light_mode () const
+AnimLight::get_light_mode () const //TODO Replace with PropField?
 {
 	return Mode (SService<ILightScrSrv> (LG)->GetMode (number));
 }
 
 void
-AnimLight::set_light_mode (Mode mode)
+AnimLight::set_light_mode (Mode mode) //TODO Replace with PropField?
 {
 	SService<ILightScrSrv> (LG)->SetMode (number, int (mode));
 }
 
 void
-AnimLight::set_light_range (float minimum, float maximum)
+AnimLight::set_light_range (float minimum, float maximum) //TODO Replace with PropField?
 {
 	SService<ILightScrSrv> (LG)->Set
 		(number, int (get_light_mode ()), minimum, maximum);
@@ -181,14 +170,27 @@ DynamicLight::is_dynamic_light () const
 
 
 // Flash
-//TODO wrap property: SFX\FlashBombInfo = RenderFlash (propdefs.h: sRenderFlash)
+//TODO wrap rest of property: SFX\FlashBombInfo = RenderFlash
 
-OBJECT_TYPE_IMPL (Flash)
+PROXY_CONFIG (Flash, world_duration, "RenderFlash", "world flash duration",
+	Time, 0ul);
+PROXY_CONFIG (Flash, screen_duration, "RenderFlash", "max screen duration (ms)",
+	Time, 0ul);
+PROXY_CONFIG (Flash, effect_duration, "RenderFlash", "after-effec duration (ms)",
+	Time, 0ul);
+PROXY_CONFIG (Flash, range, "RenderFlash", "range", float, 0.0f);
+
+OBJECT_TYPE_IMPL_ (Flash,
+	PROXY_INIT (world_duration),
+	PROXY_INIT (screen_duration),
+	PROXY_INIT (effect_duration),
+	PROXY_INIT (range)
+)
 
 bool
 Flash::is_flash () const
 {
-	return Property (*this, "ParticleGroup").exists (); //TODO use a PropField
+	return range.exists ();
 }
 
 void
@@ -208,22 +210,30 @@ Flash::flash_world ()
 
 
 // ParticleGroup
-//TODO wrap property: SFX\Particles = ParticleGroup
+//TODO wrap rest of property: SFX\Particles = ParticleGroup
 //TODO wrap property: SFX\Particle Launch Info = PGLaunchInfo
 //TODO wrap property: SFX\FrameAnimationConfig = FrameAniConfig
 //TODO wrap property: SFX\FrameAnimationState = FrameAniState
 //TODO wrap link: ParticleAttachement - sParticleAttachLinkData
 
-OBJECT_TYPE_IMPL (ParticleGroup)
+PROXY_CONFIG (ParticleGroup, particle_count, "ParticleGroup",
+	"number of particles", int, 0);
+PROXY_CONFIG (ParticleGroup, particle_size, "ParticleGroup",
+	"size of particle", float, 0.0f);
+
+OBJECT_TYPE_IMPL_ (ParticleGroup,
+	PROXY_INIT (particle_count),
+	PROXY_INIT (particle_size)
+)
 
 bool
 ParticleGroup::is_particle_group () const
 {
-	return Property (*this, "ParticleGroup").exists (); //TODO use a PropField
+	return particle_count.exists ();
 }
 
 void
-ParticleGroup::set_particles_active (bool active)
+ParticleGroup::set_particles_active (bool active) //TODO Replace with PropField?
 {
 	SService<IPGroupSrv> (LG)->SetActive (number, active);
 }

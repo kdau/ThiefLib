@@ -58,7 +58,7 @@ public:
 	bool remove ();
 
 	const String& get_raw () const;
-	void set_raw (const String&);
+	bool set_raw (const String&);
 	virtual void reparse () const;
 
 protected:

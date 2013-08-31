@@ -67,7 +67,7 @@ PROXY_CONFIG (AI, voice, "SpchVoice", nullptr, String, "");
 PROXY_BIT_CONFIG (AI, is_speaking, "Speech", "flags", 1u, false);
 PROXY_CONFIG (AI, last_speech_time, "Speech", "time", Time, 0ul);
 PROXY_CONFIG (AI, last_speech_schema, "Speech", "schemaID",
-	Object, Object::NONE);
+	SoundSchema, Object::NONE);
 PROXY_CONFIG (AI, last_speech_concept, "Speech", "concept", int, 0);
 PROXY_BIT_CONFIG (AI, is_innocent, "DarkStat", nullptr, 1u, false);
 PROXY_BIT_CONFIG (AI, is_robot, "DarkStat", nullptr, 16u, false);
@@ -318,19 +318,25 @@ AI::send_signal (const String& signal)
 
 
 // Conversation
-//TODO wrap property: AI: Conversations\Conversation = AI_Converation [sic]
+//TODO wrap rest of property: AI: Conversations\Conversation = AI_Converation
 
+PROXY_CONFIG (Conversation, abort_level, "AI_Converation", "Abort level",
+	AI::Alert, AI::Alert::NONE);
+PROXY_CONFIG (Conversation, abort_priority, "AI_Converation", "Abort priority",
+	AI::Priority, AI::Priority::DEFAULT);
 PROXY_CONFIG (Conversation, save_conversation, "AI_SaveConverse", nullptr,
 	bool, false);
 
 OBJECT_TYPE_IMPL_ (Conversation,
+	PROXY_INIT (abort_level),
+	PROXY_INIT (abort_priority),
 	PROXY_INIT (save_conversation)
 )
 
 bool
 Conversation::is_conversation () const
 {
-	return Property (*this, "AI_Converation").exists (); //TODO use a PropField
+	return abort_level.exists ();
 }
 
 bool

@@ -23,19 +23,26 @@
 
 
 srcdir = ./source
-bindir1n = ./bin-t1
-bindir1d = ./bin-t1-d
-bindir2n = ./bin-t2
-bindir2d = ./bin-t2-d
-
-HOST = x86_64-linux-gnu
-TARGET = i686-w64-mingw32
+bindir = ./bin
 LGDIR = ./lg
 DH2DIR = ./DH2
 
+HOST = x86_64-linux-gnu
+TARGET = i686-w64-mingw32
+
+bindir1n = $(bindir)/t1
+bindir1d = $(bindir)/t1-d
+bindir2n = $(bindir)/t2
+bindir2d = $(bindir)/t2-d
+
+LIBRARY1N = libthief1.a
+LIBRARY1D = libthief1-d.a
+LIBRARY2N = libthief2.a
+LIBRARY2D = libthief2-d.a
 
 
-.PHONY: default all clean
+
+.PHONY: default dirs all clean
 .PRECIOUS: %.o
 .INTERMEDIATE: ./Thief/Private.hh ./Thief/ParameterCache.hh
 default: all
@@ -61,14 +68,17 @@ DEFINESN = -DNDEBUG
 DEFINESD = -DDEBUG
 DEFINES1 = -D_DARKGAME=1
 DEFINES2 = -D_DARKGAME=2
+
 INCLUDES = -I. -I$(LGDIR) -I$(DH2DIR)
 
 ARFLAGS = rc
-LIBS = $(DH2DIR)/dh2lib.o $(LGDIR)/iids.o
-LIBSN = $(LGDIR)/lg.o $(LGDIR)/scrmsgs.o $(LGDIR)/refcnt.o
-LIBSD = $(LGDIR)/lg-d.o $(LGDIR)/scrmsgs-d.o $(LGDIR)/refcnt-d.o
+
+LIBSN = $(DH2DIR)/dh2lib.o $(LGDIR)/iids.o $(LGDIR)/lg.o $(LGDIR)/scrmsgs.o $(LGDIR)/refcnt.o
+LIBSD = $(DH2DIR)/dh2lib.o $(LGDIR)/iids.o $(LGDIR)/lg-d.o $(LGDIR)/scrmsgs-d.o $(LGDIR)/refcnt-d.o
 
 
+
+dirs: $(bindir1n) $(bindir1d) $(bindir2n) $(bindir2d)
 
 $(bindir1n):
 	mkdir -p $@
@@ -148,10 +158,10 @@ $(bindir1d)/ParameterCache.o: $(srcdir)/ParameterCache.hh
 $(bindir2n)/ParameterCache.o: $(srcdir)/ParameterCache.hh
 $(bindir2d)/ParameterCache.o: $(srcdir)/ParameterCache.hh
 
-$(bindir1n)/Parameter.o: ./Thief/Parameter.inl $(srcdir)/ParameterCache.hh
-$(bindir1d)/Parameter.o: ./Thief/Parameter.inl $(srcdir)/ParameterCache.hh
-$(bindir2n)/Parameter.o: ./Thief/Parameter.inl $(srcdir)/ParameterCache.hh
-$(bindir2d)/Parameter.o: ./Thief/Parameter.inl $(srcdir)/ParameterCache.hh
+$(bindir1n)/Parameter.o: ./Thief/Parameter.inl
+$(bindir1d)/Parameter.o: ./Thief/Parameter.inl
+$(bindir2n)/Parameter.o: ./Thief/Parameter.inl
+$(bindir2d)/Parameter.o: ./Thief/Parameter.inl
 
 $(bindir1n)/Property.o: ./Thief/Property.inl
 $(bindir1d)/Property.o: ./Thief/Property.inl
@@ -165,14 +175,10 @@ $(bindir2d)/Script.o: ./Thief/Script.inl
 
 
 
-LIBRARY1N = libthief1.a
-$(LIBRARY1N): $(OBJECTS1N) $(LIBS) $(LIBSN)
-LIBRARY1D = libthief1-d.a
-$(LIBRARY1D): $(OBJECTS1D) $(LIBS) $(LIBSD)
-LIBRARY2N = libthief2.a
-$(LIBRARY2N): $(OBJECTS2N) $(LIBS) $(LIBSN)
-LIBRARY2D = libthief2-d.a
-$(LIBRARY2D): $(OBJECTS2D) $(LIBS) $(LIBSD)
+$(LIBRARY1N): $(OBJECTS1N) $(LIBSN)
+$(LIBRARY1D): $(OBJECTS1D) $(LIBSD)
+$(LIBRARY2N): $(OBJECTS2N) $(LIBSN)
+$(LIBRARY2D): $(OBJECTS2D) $(LIBSD)
 
 $(LGDIR)/%.o: ;
 $(DH2DIR)/%.o: ;
@@ -181,7 +187,7 @@ $(DH2DIR)/%.o: ;
 
 
 
-all: $(bindir1n) $(LIBRARY1N) $(bindir1d) $(LIBRARY1D) $(bindir2n) $(LIBRARY2N) $(bindir2d) $(LIBRARY2D)
+all: dirs $(LIBRARY1N) $(LIBRARY1D) $(LIBRARY2N) $(LIBRARY2D)
 
 clean:
 	$(RM) $(bindir1n)/*.o $(bindir1d)/*.o $(bindir2n)/*.o $(bindir2d)/*.o *.a

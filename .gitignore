@@ -1,10 +1,10 @@
 lg
 DH2
-bin-t1/*.o
-bin-t1-d/*.o
-bin-t2/*.o
-bin-t2-d/*.o
+bin/t1/*.o
 libthief1.a
+bin/t1-d/*.o
 libthief1-d.a
+bin/t2/*.o
 libthief2.a
+bin/t2-d/*.o
 libthief2-d.a

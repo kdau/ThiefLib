@@ -27,139 +27,143 @@ namespace Thief {
 
 
 
-// Property
+// ObjectProperty
 
-Property::Property (const Object& _object, const String& name,
-		bool add_if_missing)
-	: object (_object.number),
-	  property (SInterface<IPropertyManager> (LG)->GetPropertyNamed
-	  	(name.data ()))
+ObjectProperty::ObjectProperty (const String& _property,
+		const Object& _object, bool add_if_missing)
+	: property (SInterface<IPropertyManager> (LG)->GetPropertyNamed
+		(_property.data ())),
+	  object (_object)
 {
 	if (property) property->AddRef ();
 	if (property && add_if_missing && !exists ())
 		add ();
 }
 
-Property::Property (const Object& _object, const char* name,
-		bool add_if_missing)
-	: object (_object.number),
-	  property (SInterface<IPropertyManager> (LG)->GetPropertyNamed (name))
+ObjectProperty::ObjectProperty (const char* _property,
+		const Object& _object, bool add_if_missing)
+	: property (SInterface<IPropertyManager> (LG)->GetPropertyNamed
+		(_property)),
+	  object (_object)
 {
 	if (property) property->AddRef ();
 	if (property && add_if_missing && !exists ())
 		add ();
 }
 
-Property::Property (const Property& copy)
-	: object (copy.object), property (copy.property)
+ObjectProperty::ObjectProperty (const ObjectProperty& copy)
+	: property (copy.property), object (copy.object)
 {
 	if (property) property->AddRef ();
 }
 
-Property::~Property ()
+ObjectProperty::~ObjectProperty ()
 {
 	if (property) property->Release ();
 }
 
-Object
-Property::get_object () const
-{
-	return object;
-}
-
 String
-Property::get_name () const
+ObjectProperty::get_property () const
 {
 	return (property && property->Describe ())
 		? property->Describe ()->szName : String ();
 }
 
-bool
-Property::exists (bool inherited) const
+Object
+ObjectProperty::get_object () const
 {
-	if (!Object (object).exists () || !property) return false;
+	return object;
+}
+
+bool
+ObjectProperty::exists (bool inherited) const
+{
+	if (!object.exists () || !property) return false;
 	return inherited
-		? property->IsRelevant (object)
-		: property->IsSimplyRelevant (object);
+		? property->IsRelevant (object.number)
+		: property->IsSimplyRelevant (object.number);
 }
 
 bool
-Property::add ()
+ObjectProperty::add ()
 {
-	if (!Object (object).exists () || !property) return false;
-	return property->Create (object) == S_OK;
+	if (!object.exists () || !property) return false;
+	return property->Create (object.number) == S_OK;
 }
 
 bool
-Property::copy_from (const Object& source)
+ObjectProperty::copy_from (const Object& source)
 {
-	if (!Object (object).exists () || !source.exists () || !property) return false;
-	return property->Copy (object, source.number) == S_OK;
+	if (!object.exists () || !source.exists () || !property)
+		return false;
+	return property->Copy (object.number, source.number) == S_OK;
 }
 
 bool
-Property::remove ()
+ObjectProperty::remove ()
 {
-	if (!Object (object).exists () || !property) return false;
-	return property->Delete (object) == S_OK;
+	if (!object.exists () || !property) return false;
+	return property->Delete (object.number) == S_OK;
 }
 
-void
-Property::subscribe (const Object& _host)
+bool
+ObjectProperty::subscribe (const String& property, const Object& object,
+	const Object& _host)
 {
-	if (!property)
-		throw std::runtime_error ("can't subscribe to Property::NONE");
+	if (property.empty ()) return false;
 	Object host = (_host == Object::SELF) ? object : _host;
-	SService<IDarkHookScriptService> (LG)->InstallPropHook (host.number,
-		kDHNotifyDefault, property->Describe ()->szName, object);
+	return SService<IDarkHookScriptService> (LG)->InstallPropHook
+		(host.number, kDHNotifyDefault, property.data (),
+			object.number);
 }
 
-void
-Property::unsubscribe (const Object& _host)
+bool
+ObjectProperty::unsubscribe (const String& property, const Object& object,
+	const Object& _host)
 {
-	if (!property)
-		throw std::runtime_error ("can't subscribe to Property::NONE");
+	if (property.empty ()) return false;
 	Object host = (_host == Object::SELF) ? object : _host;
 	SService<IDarkHookScriptService> (LG)->UninstallPropHook
-		(host.number, property->Describe ()->szName, object);
+		(host.number, property.data (), object.number);
+	return true;
 }
 
 void
-Property::_get (LGMultiBase& value) const
+ObjectProperty::_get (LGMultiBase& value) const
 {
-	if (!Object (object).exists () || !property)
+	if (!object.exists () || !property)
 		value.clear ();
 	else
-		SService<IPropertySrv> (LG)->Get (value, object,
+		SService<IPropertySrv> (LG)->Get (value, object.number,
 			property->Describe ()->szName, nullptr);
 }
 
 bool
-Property::_set (const LGMultiBase& value)
+ObjectProperty::_set (const LGMultiBase& value)
 {
-	if (!Object (object).exists () || !property) return false;
+	if (!object.exists () || !property) return false;
 	if (!exists (false) && !add ()) return false;
-	return SService<IPropertySrv> (LG)->Set (object,
+	return SService<IPropertySrv> (LG)->Set (object.number,
 		property->Describe ()->szName, nullptr, value) == S_OK;
 }
 
 void
-Property::_get_field (const char* field, LGMultiBase& value) const
+ObjectProperty::_get_field (const char* field, LGMultiBase& value) const
 {
-	if (!Object (object).exists () || !property)
+	if (!object.exists () || !property)
 		value.clear ();
 	else
-		SService<IPropertySrv> (LG)->Get (value, object,
+		SService<IPropertySrv> (LG)->Get (value, object.number,
 			property->Describe ()->szName, field);
 }
 
 bool
-Property::_set_field (const char* field, const LGMultiBase& value,
+ObjectProperty::_set_field (const char* field, const LGMultiBase& value,
 	bool add_if_missing)
 {
-	if (!Object (object).exists () || !property) return false;
+	if (!object.exists () || !property) return false;
 	if (!exists (false) && (!add_if_missing || !add ())) return false;
-	return SService<IPropertySrv> (LG)->Set (object,
+	return SService<IPropertySrv> (LG)->Set (object.number,
 		property->Describe ()->szName, field, value) == S_OK;
 }
 
@@ -168,25 +172,25 @@ Property::_set_field (const char* field, const LGMultiBase& value,
 // PropFieldBase
 
 void
-PropFieldBase::get (const Object& object, const char* _property,
+PropFieldBase::get (const Object& object, const char* property,
 	const char* field, LGMultiBase& value) const
 {
-	Property property (object, _property);
-	if (!property.exists ())
+	ObjectProperty objprop (property, object);
+	if (!objprop.exists ())
 		{}
 	else if (field)
-		property._get_field (field, value);
+		objprop._get_field (field, value);
 	else
-		property._get (value);
+		objprop._get (value);
 }
 
 void
-PropFieldBase::set (Object& object, const char* _property, const char* field,
+PropFieldBase::set (Object& object, const char* property, const char* field,
 	const LGMultiBase& value)
 {
-	Property property (object, _property);
-	if (field ? !property._set_field (field, value, true)
-	          : !property._set (value))
+	ObjectProperty objprop (property, object);
+	if (field ? !objprop._set_field (field, value, true)
+	          : !objprop._set (value))
 		throw std::runtime_error ("could not set property field");
 }
 
@@ -203,7 +207,6 @@ void
 PropFieldBase::set_bit (const FieldProxyConfig<bool>& config, Object& object,
 	bool value)
 {
-	Property property (object, config.major);
 	LGMulti<unsigned> field; field = 0u;
 	get (object, config.major, config.minor, field);
 
@@ -212,8 +215,9 @@ PropFieldBase::set_bit (const FieldProxyConfig<bool>& config, Object& object,
 	else
 		field = field & ~config.bitmask;
 
-	if (config.minor ? !property._set_field (config.minor, field, true)
-	                 : !property._set (field))
+	ObjectProperty objprop (config.major, object);
+	if (config.minor ? !objprop._set_field (config.minor, field, true)
+	                 : !objprop._set (field))
 		throw std::runtime_error ("could not set property field");
 }
 
@@ -226,23 +230,24 @@ MESSAGE_WRAPPER_IMPL_ (PropertyChangeMessage,
 	MESSAGE_AS (sDHNotifyMsg)->typeDH == kDH_Property)
 
 PropertyChangeMessage::PropertyChangeMessage (Event event, bool inherited,
-		const Property& property)
+		const char* property, const Object& object)
 	: Message (new sDHNotifyMsg ())
 {
 	message->message = "DHNotify"; // local name is generated by Script
 	MESSAGE_AS (sDHNotifyMsg)->typeDH = kDH_Property;
 	MESSAGE_AS (sDHNotifyMsg)->sProp.event =
-		ePropEvent (event | (inherited ? kProp_Inherited : 0));
-	MESSAGE_AS (sDHNotifyMsg)->sProp.pProp = property.property;
-	MESSAGE_AS (sDHNotifyMsg)->sProp.pszPropName =
-		property.property ? property.property->Describe ()->szName : "";
-	MESSAGE_AS (sDHNotifyMsg)->sProp.idObj = property.object;
+		ePropEvent ((event + 1) | (inherited ? kProp_Inherited : 0));
+	MESSAGE_AS (sDHNotifyMsg)->sProp.pProp =
+		SInterface<IPropertyManager> (LG)->GetPropertyNamed (property);
+	MESSAGE_AS (sDHNotifyMsg)->sProp.pszPropName = property;
+	MESSAGE_AS (sDHNotifyMsg)->sProp.idObj = object.number;
 }
 
 PropertyChangeMessage::Event
 PropertyChangeMessage::get_event () const
 {
-	return Event (MESSAGE_AS (sDHNotifyMsg)->sProp.event & ~kProp_Inherited);
+	return Event ((MESSAGE_AS (sDHNotifyMsg)->sProp.event
+		& ~kProp_Inherited) - 1);
 }
 
 bool
@@ -252,7 +257,7 @@ PropertyChangeMessage::is_inherited () const
 }
 
 String
-PropertyChangeMessage::get_prop_name () const
+PropertyChangeMessage::get_property () const
 {
 	return MESSAGE_AS (sDHNotifyMsg)->sProp.pszPropName
 		? MESSAGE_AS (sDHNotifyMsg)->sProp.pszPropName : String ();

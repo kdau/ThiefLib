@@ -333,7 +333,7 @@ TrapTrigger::get_flags () const
 {
 	unsigned flags = FLAGS_NONE;
 #if defined (IS_THIEF2)
-	Property _flags (host (), "TrapFlags");
+	ObjectProperty _flags ("TrapFlags", host ());
 	if (_flags.exists ())
 		flags = _flags.get<unsigned> ();
 #elif defined (IS_THIEF1)
@@ -503,9 +503,10 @@ ScriptModuleInit (const char* name, IScriptMan* manager, MPrintfProc mprintf,
 	IMalloc* allocator, IScriptModule** module_ptr)
 {
 	if (!manager || !allocator) return false;
+
+	// Confirm that this is NewDark by checking for the new IEngineSrv.
 	try
 	{
-		// IEngineSrv only exists with NewDark
 		SService<IEngineSrv> engine (manager);
 	}
 	catch (no_interface&)
@@ -517,15 +518,18 @@ ScriptModuleInit (const char* name, IScriptMan* manager, MPrintfProc mprintf,
 		return false;
 	}
 
+	// Attach various ThiefLib components to the engine.
 	Thief::LG = manager;
 	Thief::alloc.attach (allocator, name);
 	Thief::mono.attach (mprintf);
 
+	// Load and initialize the OSL.
+	DarkHookInitializeService (manager, allocator);
+
+	// Prepare the ScriptModule.
 	Thief::module.set_name (name);
 	Thief::module.QueryInterface (IID_IScriptModule,
 		reinterpret_cast<void**> (module_ptr));
-
-	DarkHookInitializeService (manager, allocator);
 
 	return true;
 }

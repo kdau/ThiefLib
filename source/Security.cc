@@ -50,10 +50,10 @@ Lockable::set_locked (bool locked)
 	for (auto& locker : LockLink::get_all (*this))
 	{
 		have_locker = true;
-		Property (locker.get_dest (), "Locked").set (locked);
+		ObjectProperty ("Locked", locker.get_dest ()).set (locked);
 	}
 
-	Property self_locked (*this, "Locked");
+	ObjectProperty self_locked ("Locked", *this);
 	if (!have_locker)
 		self_locked.set (locked);
 	else if (self_locked.exists ())
@@ -88,7 +88,7 @@ PROXY_CONFIG (Key, region_mask, "KeySrc", "RegionMask", unsigned, 0u);
 PROXY_CONFIG (Key, lock_number, "KeySrc", "LockID", unsigned, 0u);
 
 OBJECT_TYPE_IMPL_ (Key, Physical (), SpherePhysical (), Rendered (),
-		Interactive (), Damageable (),
+		Interactive (), Combinable (), Damageable (),
 	PROXY_INIT (master_key),
 	PROXY_INIT (region_mask),
 	PROXY_INIT (lock_number)
@@ -246,7 +246,7 @@ OBJECT_TYPE_IMPL_ (BasicPickable, Rendered (), Interactive (), Lockable ())
 bool
 BasicPickable::is_basic_pickable () const
 {
-	return Property (*this, "PickCfg").exists () && //TODO Use a PropField.
+	return ObjectProperty ("PickCfg", *this).exists () && //TODO Use a PropField.
 		!AdvPickable (*this).is_advanced_pickable;
 }
 

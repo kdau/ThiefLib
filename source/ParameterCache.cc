@@ -242,7 +242,7 @@ ParameterCache::exists (const Object& object, const CIString& parameter,
 	return false;
 }
 
-const String&
+const String*
 ParameterCache::get (const Object& object, const CIString& parameter,
 	bool inherit)
 {
@@ -252,7 +252,7 @@ ParameterCache::get (const Object& object, const CIString& parameter,
 	{
 		auto raw_value = dn.raw_values.find (parameter);
 		if (raw_value != dn.raw_values.end ())
-			return raw_value->second;
+			return &raw_value->second;
 	}
 
 	if (inherit || !(dn.state & DesignNote::RELEVANT))
@@ -261,25 +261,24 @@ ParameterCache::get (const Object& object, const CIString& parameter,
 			DesignNote& anc_dn = data [ancestor];
 			auto anc_raw_value = anc_dn.raw_values.find (parameter);
 			if (anc_raw_value != anc_dn.raw_values.end ())
-				return anc_raw_value->second;
+				return &anc_raw_value->second;
 			else if (!inherit &&
 					(anc_dn.state & DesignNote::RELEVANT))
 				break;
 		}
 
-	throw std::runtime_error ("parameter not set for object");
+	return nullptr;
 }
 
-void
+bool
 ParameterCache::set (const Object& object, const CIString& parameter,
 	const String& value)
 {
 	DesignNote& dn = update_object (object.number);
-	if (!(dn.state & DesignNote::EXISTENT))
-		throw std::runtime_error ("object does not exist");
+	if (!(dn.state & DesignNote::EXISTENT)) return false;
 	dn.state |= DesignNote::RELEVANT;
 	dn.raw_values [parameter] = value;
-	write_dn (object.number);
+	return write_dn (object.number);
 }
 
 bool
@@ -297,8 +296,7 @@ ParameterCache::copy (const Object& _source, const Object& _dest,
 
 	dest.state |= DesignNote::RELEVANT;
 	dest.raw_values [parameter] = source.raw_values.at (parameter);
-	write_dn (_dest.number);
-	return true;
+	return write_dn (_dest.number);
 }
 
 bool
@@ -307,8 +305,7 @@ ParameterCache::remove (const Object& object, const CIString& parameter)
 	DesignNote& dn = update_object (object.number);
 	if (!(dn.state & DesignNote::RELEVANT)) return false;
 	if (dn.raw_values.erase (parameter) == 0) return false;
-	write_dn (object.number);
-	return true;
+	return write_dn (object.number);
 }
 
 void
@@ -432,7 +429,7 @@ ParameterCache::read_dn (Object::Number number)
 	if (dn) DesignNoteReader (dn, data [number].raw_values);
 }
 
-void
+bool
 ParameterCache::write_dn (Object::Number number)
 {
 	current = number;
@@ -462,9 +459,10 @@ ParameterCache::write_dn (Object::Number number)
 	catch (...)
 	{
 		current = Object::NONE;
-		throw;
+		return false;
 	}
 	current = Object::NONE;
+	return true;
 }
 
 } // namespace Thief

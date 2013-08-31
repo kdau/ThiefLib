@@ -48,7 +48,7 @@ public:
 
 // Weapon
 
-class Weapon : public virtual Interactive
+class Weapon : public virtual Interactive, public virtual Combinable
 {
 public:
 	THIEF_OBJECT_TYPE (Weapon)
@@ -68,13 +68,10 @@ THIEF_FLAVORED_LINK (AIAttack) //TESTME
 {
 	THIEF_FLAVORED_LINK_COMMON (AIAttack)
 
-	enum class Priority
-		{ DEFAULT, VERY_LOW, LOW, NORMAL, HIGH, VERY_HIGH, ABSOLUTE };
-
 	static AIAttackLink create (const Object& source, const Object& dest,
-		Priority = Priority::DEFAULT);
+		AI::Priority = AI::Priority::DEFAULT);
 
-	THIEF_LINK_FIELD (Priority, priority);
+	THIEF_LINK_FIELD (AI::Priority, priority);
 };
 
 

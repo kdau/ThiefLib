@@ -43,6 +43,7 @@ struct Flavor
 
 	bool operator == (const Flavor&) const;
 	bool operator != (const Flavor&) const;
+	bool operator < (const Flavor&) const;
 
 	Flavor get_reverse () const;
 
@@ -108,9 +109,9 @@ public:
 		const Object& dest = Object::ANY,
 		Inheritance = Inheritance::NONE);
 
-	static void subscribe (const Object& source, Flavor,
+	static bool subscribe (Flavor, const Object& source,
 		const Object& host = Object::SELF);
-	static void unsubscribe (const Object& source, Flavor,
+	static bool unsubscribe (Flavor, const Object& source,
 		const Object& host = Object::SELF);
 
 private:
@@ -168,10 +169,10 @@ std::ostream& operator << (std::ostream&, const LinkField<T, config>&);
 
 // LinkChangeMessage
 
-class LinkChangeMessage : public Message
+class LinkChangeMessage : public Message //TESTME
 {
 public:
-	enum Event { NONE, CHANGE, ADD, REMOVE };
+	enum Event { CHANGE, ADD, REMOVE };
 
 	LinkChangeMessage (Event, Flavor, Link::Number,
 		const Object& source, const Object& dest);
@@ -179,7 +180,7 @@ public:
 
 	Event get_event () const;
 	Flavor get_flavor () const;
-	Link::Number get_number () const;
+	Link::Number get_link () const;
 	Object get_source () const;
 	Object get_dest () const;
 };

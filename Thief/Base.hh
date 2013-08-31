@@ -44,7 +44,7 @@
 #define IS_THIEF2
 #elif defined(_DARKGAME)
 #error "ThiefLib does not support this game."
-#else
+#elif !defined (IS_OSL)
 #error "_DARKGAME must be defined."
 #endif
 
@@ -70,6 +70,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 
@@ -78,7 +79,6 @@ namespace Thief {
 
 class Object;
 typedef std::vector<Object> Objects;
-typedef int ObjectNumber; // use Object::Number instead
 
 struct Flavor;
 class Link;

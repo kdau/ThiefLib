@@ -64,10 +64,14 @@ PROXY_CONFIG (Physical, bash_coefficient, "BashParams", "Coefficient",
 PROXY_CONFIG (Physical, velocity, "PhysState", "Velocity", Vector, Vector ());
 PROXY_BIT_CONFIG (Physical, velocity_locked, "PhysControl", "Controls Active",
 	PHYS_CONTROL_VELS, false);
+PROXY_CONFIG (Physical, velocity_lock_to, "PhysControl", "Velocity",
+	Vector, Vector ());
 PROXY_CONFIG (Physical, rotational_velocity, "PhysState", "Rot Velocity",
 	Vector, Vector ());
 PROXY_BIT_CONFIG (Physical, rotational_velocity_locked, "PhysControl",
 	"Controls Active", PHYS_CONTROL_ROTVELS, false);
+PROXY_CONFIG (Physical, rotational_velocity_lock_to, "PhysControl",
+	"RotationalVelocity", Vector, Vector ());
 PROXY_BIT_CONFIG (Physical, location_locked, "PhysControl", "Controls Active",
 	PHYS_CONTROL_LOCATION, false);
 PROXY_BIT_CONFIG (Physical, rotation_locked, "PhysControl", "Controls Active",
@@ -98,8 +102,10 @@ OBJECT_TYPE_IMPL_ (Physical,
 	PROXY_INIT (bash_coefficient),
 	PROXY_INIT (velocity),
 	PROXY_INIT (velocity_locked),
+	PROXY_INIT (velocity_lock_to),
 	PROXY_INIT (rotational_velocity),
 	PROXY_INIT (rotational_velocity_locked),
+	PROXY_INIT (rotational_velocity_lock_to),
 	PROXY_INIT (location_locked),
 	PROXY_INIT (rotation_locked)
 )
@@ -120,7 +126,7 @@ Physical::remove_physics ()
 #ifdef IS_THIEF2
 	return SService<IPhysSrv> (LG)->DeregisterModel (number) == S_OK;
 #else
-	return Property (*this, "PhysType").remove ();
+	return ObjectProperty ("PhysType", *this).remove ();
 #endif
 }
 
@@ -145,41 +151,6 @@ Physical::wake_up_physics ()
 }
 
 #endif // IS_THIEF2
-
-void
-Physical::lock_velocity (const Vector& _velocity)
-{
-#ifdef IS_THIEF2
-	SService<IPhysSrv> (LG)->ControlVelocity (number, LGVector (_velocity));
-#else
-	velocity_locked = true;
-	Property (*this, "PhysControl").set_field ("Velocity", _velocity);
-#endif
-}
-
-void
-Physical::unlock_velocity ()
-{
-#ifdef IS_THIEF2
-	SService<IPhysSrv> (LG)->StopControlVelocity (number);
-#else
-	velocity_locked = false;
-#endif
-}
-
-void
-Physical::lock_rotational_velocity (const Vector& _rotational_velocity)
-{
-	rotational_velocity_locked = true;
-	Property (*this, "PhysControl").set_field
-		("RotationalVelocity", _rotational_velocity);
-}
-
-void
-Physical::unlock_rotational_velocity ()
-{
-	rotational_velocity_locked = false;
-}
 
 void
 Physical::subscribe_physics (Messages messages)

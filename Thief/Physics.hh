@@ -95,13 +95,11 @@ public:
 
 	THIEF_PROP_FIELD (Vector, velocity);
 	THIEF_PROP_FIELD (bool, velocity_locked);
-	void lock_velocity (const Vector&);
-	void unlock_velocity ();
+	THIEF_PROP_FIELD (Vector, velocity_lock_to); //TESTME
 
 	THIEF_PROP_FIELD (Vector, rotational_velocity); //TESTME
 	THIEF_PROP_FIELD (bool, rotational_velocity_locked); //TESTME
-	void lock_rotational_velocity (const Vector&); //TESTME
-	void unlock_rotational_velocity (); //TESTME
+	THIEF_PROP_FIELD (Vector, rotational_velocity_lock_to); //TESTME
 
 	THIEF_PROP_FIELD (bool, location_locked);
 	THIEF_PROP_FIELD (bool, rotation_locked);
