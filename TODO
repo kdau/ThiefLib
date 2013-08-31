@@ -77,7 +77,6 @@ TNH/NV/TW features
 Miscellaneous
 	* EnumCoding: encoding and decoding of bitmasks
 	* Objective: VictoryCheck(er)-equivalent functionality per lg/convict.h
-	* Script: use DH2 hierarchy messages to reinitialize instances replaced due to metaprop changes?
 	* (all): use C++11 features added in G++ 4.8 once MinGW-w64 is upgraded
 	* (all): use boost::bimap once 1.55 is released (supporting initializer_list)
 

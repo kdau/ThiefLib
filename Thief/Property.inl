@@ -32,6 +32,22 @@ namespace Thief {
 
 
 
+// Property
+
+inline bool
+Property::operator == (const Property& rhs) const
+{
+	return get_number () == rhs.get_number ();
+}
+
+inline bool
+Property::operator != (const Property& rhs) const
+{
+	return get_number () != rhs.get_number ();
+}
+
+
+
 // ObjectProperty
 
 template <typename T>

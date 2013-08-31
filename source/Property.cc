@@ -27,46 +27,70 @@ namespace Thief {
 
 
 
-// ObjectProperty
+// Property
 
-ObjectProperty::ObjectProperty (const String& _property,
-		const Object& _object, bool add_if_missing)
-	: property (SInterface<IPropertyManager> (LG)->GetPropertyNamed
-		(_property.data ())),
-	  object (_object)
+const Property::Number
+Property::NONE = -1;
+
+Property::Property (Number number)
+	: iface (SInterface<IPropertyManager> (LG)->GetProperty (number))
 {
-	if (property) property->AddRef ();
-	if (property && add_if_missing && !exists ())
-		add ();
+	if (iface) iface->AddRef ();
 }
 
-ObjectProperty::ObjectProperty (const char* _property,
-		const Object& _object, bool add_if_missing)
-	: property (SInterface<IPropertyManager> (LG)->GetPropertyNamed
-		(_property)),
-	  object (_object)
+Property::Property (const String& name)
+	: iface (SInterface<IPropertyManager> (LG)->GetPropertyNamed
+		(name.data ()))
 {
-	if (property) property->AddRef ();
-	if (property && add_if_missing && !exists ())
-		add ();
+	if (iface) iface->AddRef ();
 }
 
-ObjectProperty::ObjectProperty (const ObjectProperty& copy)
-	: property (copy.property), object (copy.object)
+Property::Property (const char* name)
+	: iface (SInterface<IPropertyManager> (LG)->GetPropertyNamed (name))
 {
-	if (property) property->AddRef ();
+	if (iface) iface->AddRef ();
 }
 
-ObjectProperty::~ObjectProperty ()
+Property::Property (const Property& copy)
+	: iface (copy.iface)
 {
-	if (property) property->Release ();
+	if (iface) iface->AddRef ();
+}
+
+Property::~Property ()
+{
+	if (iface) iface->Release ();
+}
+
+Property::Number
+Property::get_number () const
+{
+	return iface ? iface->GetID () : NONE;
 }
 
 String
+Property::get_name () const
+{
+	return (iface && iface->Describe ())
+		? iface->Describe ()->szName : String ();
+}
+
+
+
+// ObjectProperty
+
+ObjectProperty::ObjectProperty (const Property& _property,
+		const Object& _object, bool add_if_missing)
+	: property (_property), object (_object)
+{
+	if (property.iface && add_if_missing && !exists ())
+		add ();
+}
+
+Property
 ObjectProperty::get_property () const
 {
-	return (property && property->Describe ())
-		? property->Describe ()->szName : String ();
+	return property;
 }
 
 Object
@@ -78,93 +102,93 @@ ObjectProperty::get_object () const
 bool
 ObjectProperty::exists (bool inherited) const
 {
-	if (!object.exists () || !property) return false;
+	if (!object.exists () || !property.iface) return false;
 	return inherited
-		? property->IsRelevant (object.number)
-		: property->IsSimplyRelevant (object.number);
+		? property.iface->IsRelevant (object.number)
+		: property.iface->IsSimplyRelevant (object.number);
 }
 
 bool
 ObjectProperty::add ()
 {
-	if (!object.exists () || !property) return false;
-	return property->Create (object.number) == S_OK;
+	if (!object.exists () || !property.iface) return false;
+	return property.iface->Create (object.number) == S_OK;
 }
 
 bool
 ObjectProperty::copy_from (const Object& source)
 {
-	if (!object.exists () || !source.exists () || !property)
+	if (!object.exists () || !source.exists () || !property.iface)
 		return false;
-	return property->Copy (object.number, source.number) == S_OK;
+	return property.iface->Copy (object.number, source.number) == S_OK;
 }
 
 bool
 ObjectProperty::remove ()
 {
-	if (!object.exists () || !property) return false;
-	return property->Delete (object.number) == S_OK;
+	if (!object.exists () || !property.iface) return false;
+	return property.iface->Delete (object.number) == S_OK;
 }
 
 bool
-ObjectProperty::subscribe (const String& property, const Object& object,
+ObjectProperty::subscribe (const Property& property, const Object& object,
 	const Object& _host)
 {
-	if (property.empty ()) return false;
+	if (!property.iface) return false;
 	Object host = (_host == Object::SELF) ? object : _host;
 	return SService<IDarkHookScriptService> (LG)->InstallPropHook
-		(host.number, kDHNotifyDefault, property.data (),
+		(host.number, kDHNotifyDefault, property.get_name ().data (),
 			object.number);
 }
 
 bool
-ObjectProperty::unsubscribe (const String& property, const Object& object,
+ObjectProperty::unsubscribe (const Property& property, const Object& object,
 	const Object& _host)
 {
-	if (property.empty ()) return false;
+	if (!property.iface) return false;
 	Object host = (_host == Object::SELF) ? object : _host;
 	SService<IDarkHookScriptService> (LG)->UninstallPropHook
-		(host.number, property.data (), object.number);
+		(host.number, property.get_name ().data (), object.number);
 	return true;
 }
 
 void
 ObjectProperty::_get (LGMultiBase& value) const
 {
-	if (!object.exists () || !property)
+	if (!object.exists () || !property.iface)
 		value.clear ();
 	else
 		SService<IPropertySrv> (LG)->Get (value, object.number,
-			property->Describe ()->szName, nullptr);
+			property.iface->Describe ()->szName, nullptr);
 }
 
 bool
 ObjectProperty::_set (const LGMultiBase& value)
 {
-	if (!object.exists () || !property) return false;
+	if (!object.exists () || !property.iface) return false;
 	if (!exists (false) && !add ()) return false;
 	return SService<IPropertySrv> (LG)->Set (object.number,
-		property->Describe ()->szName, nullptr, value) == S_OK;
+		property.iface->Describe ()->szName, nullptr, value) == S_OK;
 }
 
 void
 ObjectProperty::_get_field (const char* field, LGMultiBase& value) const
 {
-	if (!object.exists () || !property)
+	if (!object.exists () || !property.iface)
 		value.clear ();
 	else
 		SService<IPropertySrv> (LG)->Get (value, object.number,
-			property->Describe ()->szName, field);
+			property.iface->Describe ()->szName, field);
 }
 
 bool
 ObjectProperty::_set_field (const char* field, const LGMultiBase& value,
 	bool add_if_missing)
 {
-	if (!object.exists () || !property) return false;
+	if (!object.exists () || !property.iface) return false;
 	if (!exists (false) && (!add_if_missing || !add ())) return false;
 	return SService<IPropertySrv> (LG)->Set (object.number,
-		property->Describe ()->szName, field, value) == S_OK;
+		property.iface->Describe ()->szName, field, value) == S_OK;
 }
 
 
@@ -230,16 +254,17 @@ MESSAGE_WRAPPER_IMPL_ (PropertyChangeMessage,
 	MESSAGE_AS (sDHNotifyMsg)->typeDH == kDH_Property)
 
 PropertyChangeMessage::PropertyChangeMessage (Event event, bool inherited,
-		const char* property, const Object& object)
+		const Property& property, const Object& object)
 	: Message (new sDHNotifyMsg ())
 {
 	message->message = "DHNotify"; // local name is generated by Script
 	MESSAGE_AS (sDHNotifyMsg)->typeDH = kDH_Property;
 	MESSAGE_AS (sDHNotifyMsg)->sProp.event =
 		ePropEvent ((event + 1) | (inherited ? kProp_Inherited : 0));
-	MESSAGE_AS (sDHNotifyMsg)->sProp.pProp =
-		SInterface<IPropertyManager> (LG)->GetPropertyNamed (property);
-	MESSAGE_AS (sDHNotifyMsg)->sProp.pszPropName = property;
+	MESSAGE_AS (sDHNotifyMsg)->sProp.pProp = property.iface;
+	MESSAGE_AS (sDHNotifyMsg)->sProp.pszPropName =
+		(property.iface && property.iface->Describe ())
+			? property.iface->Describe ()->szName : nullptr;
 	MESSAGE_AS (sDHNotifyMsg)->sProp.idObj = object.number;
 }
 
@@ -256,12 +281,8 @@ PropertyChangeMessage::is_inherited () const
 	return MESSAGE_AS (sDHNotifyMsg)->sProp.event & kProp_Inherited;
 }
 
-String
-PropertyChangeMessage::get_property () const
-{
-	return MESSAGE_AS (sDHNotifyMsg)->sProp.pszPropName
-		? MESSAGE_AS (sDHNotifyMsg)->sProp.pszPropName : String ();
-}
+MESSAGE_ACCESSOR (Property, PropertyChangeMessage, get_property,
+	sDHNotifyMsg, sProp.pszPropName)
 
 MESSAGE_ACCESSOR (Object, PropertyChangeMessage, get_object,
 	sDHNotifyMsg, sProp.idObj)

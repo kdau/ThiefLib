@@ -32,19 +32,42 @@ namespace Thief {
 
 
 
+// Property: pointer to a property type
+
+class Property
+{
+public:
+	typedef int Number;
+	static const Number NONE;
+
+	Property (Number);
+	Property (const String& name);
+	Property (const char* name);
+	Property (const Property&);
+	~Property ();
+
+	bool operator == (const Property&) const;
+	bool operator != (const Property&) const;
+
+	Number get_number () const;
+	String get_name () const;
+
+private:
+	friend class ObjectProperty;
+	friend class PropertyChangeMessage;
+	IProperty* iface;
+};
+
+
 // ObjectProperty: direct access to properties and property fields
 
 class ObjectProperty
 {
 public:
-	ObjectProperty (const String& property, const Object&,
+	ObjectProperty (const Property&, const Object&,
 		bool add_if_missing = false);
-	ObjectProperty (const char* property, const Object&,
-		bool add_if_missing = false);
-	ObjectProperty (const ObjectProperty&);
-	~ObjectProperty ();
 
-	String get_property () const;
+	Property get_property () const;
 	Object get_object () const;
 
 	bool exists (bool inherited = true) const;
@@ -61,9 +84,9 @@ public:
 	template <typename T>
 	T get_field (const String& field, const T& default_value) const;
 
-	static bool subscribe (const String& property, const Object&,
+	static bool subscribe (const Property&, const Object&,
 		const Object& host = Object::SELF);
-	static bool unsubscribe (const String& property, const Object&,
+	static bool unsubscribe (const Property&, const Object&,
 		const Object& host = Object::SELF);
 
 private:
@@ -79,7 +102,7 @@ private:
 	bool _set_field (const char* field, const LGMultiBase& value,
 		bool add_if_missing = false);
 
-	IProperty* property;
+	Property property;
 	Object object;
 };
 
@@ -137,14 +160,14 @@ class PropertyChangeMessage : public Message //TESTME
 public:
 	enum Event { CHANGE, ADD, REMOVE };
 
-	PropertyChangeMessage (Event, bool inherited, const char* property,
+	PropertyChangeMessage (Event, bool inherited, const Property&,
 		const Object&);
 	THIEF_MESSAGE_WRAP (PropertyChangeMessage);
 
 	Event get_event () const;
 	bool is_inherited () const;
 
-	String get_property () const;
+	Property get_property () const;
 	Object get_object () const;
 };
 
