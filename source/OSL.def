@@ -1,0 +1,3 @@
+LIBRARY ThiefLib.osl
+EXPORTS
+	_ThiefLibOSLInit = ThiefLibOSLInit

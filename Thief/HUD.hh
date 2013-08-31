@@ -51,7 +51,7 @@ public:
 		CanvasRect clip = CanvasRect::NOCLIP) const;
 
 private:
-	friend class HUD;
+	friend class HUDImpl;
 	HUDBitmap (const String& path, bool animation);
 
 	const String path;
@@ -67,8 +67,6 @@ class HUD
 public:
 	typedef int ZIndex;
 
-	virtual ~HUD ();
-
 	enum class Event { ENTER_GAME_MODE, DRAW_STAGE_1, DRAW_STAGE_2 };
 
 	typedef std::function<void (HUDElement&, Event)> Callback;
@@ -77,32 +75,6 @@ public:
 	static bool unregister_element (HUDElement&);
 
 	static HUDBitmap::Ptr load_bitmap (const String& path, bool animation);
-
-private:
-	typedef std::shared_ptr<HUD> Ptr;
-	typedef std::weak_ptr<HUD> WeakPtr;
-	static Ptr get ();
-
-	friend class HUDImpl;
-	HUD ();
-
-	struct ElementInfo
-	{
-		ElementInfo (HUDElement&, Callback, ZIndex, Ptr);
-		bool operator == (const ElementInfo&) const;
-		bool operator < (const ElementInfo&) const;
-
-		HUDElement& element;
-		Callback callback;
-		ZIndex priority;
-		Ptr reference;
-	};
-
-	typedef std::set<ElementInfo> Elements;
-	Elements elements;
-
-	typedef std::map<String, HUDBitmap::WeakPtr> Bitmaps;
-	Bitmaps bitmaps;
 };
 
 

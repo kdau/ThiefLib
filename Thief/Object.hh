@@ -69,9 +69,11 @@ public:
 	// Identity
 
 	Number number;
+
 	bool operator == (const Object&) const;
 	bool operator != (const Object&) const;
 	bool operator < (const Object&) const;
+
 	bool operator == (Number) const;
 	bool operator != (Number) const;
 

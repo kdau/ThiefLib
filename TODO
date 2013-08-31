@@ -1,9 +1,3 @@
-Current work
-	* ParameterCache: actually detect hierarchy changes. May need new OSL.
-	* PropField, LinkField: add array option for sequences of equivalent fields?
-	* AI, Types: split each into two or more units.
-	* Create full documentation. (!!!)
-
 ActReact.hh
 	interfaces:
 		* IActReactSrv
@@ -61,11 +55,11 @@ Tweq.hh
 		* Tweq\ScaleState = StTweqScale
 
 Novel messages/wrappers
-	* ConversationDoneMessage: generated from an IAIConversationManager::ListenConversationEnd callback, with subscription on Conversation
-	* HierarchyChangeMessage: wrapping appropriate DHNotify messages, with subscription on Object
-	* ObjectChangeMessage: wrapping appropriate DHNotify messages, with subscription on Object
-	* ObjectiveChangeMessage: wrapping appropriate QuestChange messages, with subscription on Objective
-	* ParameterChangeMessage (or callback): derived from ParameterCache activity, with subscripion on Parameter
+	* ConversationDoneMessage: IAIConversationManager::ListenConversationEnd
+	* HierarchyChangeMessage: ITraitManager::Listen
+	* ObjectChangeMessage: IObjectSystem::Listen
+	* ObjectiveChangeMessage: from appropriate QuestChange messages
+	* ParameterChangeMessage: from ParameterCache activity
 
 TNH/NV/TW features
 	* ParameterCache: NVScript-style syntax (script name prefix, object targetting)
@@ -74,9 +68,12 @@ TNH/NV/TW features
 	* TrapTrigger: requirement counting per cRequirement
 	* TrapTrigger: NVScript-style features (on, off, count, capacitor, falloff, failchance, dest)
 
-Miscellaneous
+Other
+	* AI, Types: split each into two or more units.
 	* EnumCoding: encoding and decoding of bitmasks
 	* Objective: VictoryCheck(er)-equivalent functionality per lg/convict.h
+	* PropField, LinkField: add array option for sequences of equivalent fields?
 	* (all): use C++11 features added in G++ 4.8 once MinGW-w64 is upgraded
 	* (all): use boost::bimap once 1.55 is released (supporting initializer_list)
+	* Create full documentation. (!!!)
 

@@ -46,9 +46,22 @@ Property::operator != (const Property& rhs) const
 	return get_number () != rhs.get_number ();
 }
 
+inline bool
+Property::operator < (const Property& rhs) const
+{
+	return get_number () < rhs.get_number ();
+}
+
 
 
 // ObjectProperty
+
+inline bool
+ObjectProperty::operator < (const ObjectProperty& rhs) const
+{
+	return property < rhs.property ||
+		(property == rhs.property && object < rhs.object);
+}
 
 template <typename T>
 inline T

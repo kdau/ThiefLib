@@ -193,42 +193,32 @@ ParameterCache::ParameterCache ()
 	if (!dn_prop) throw std::runtime_error ("no DesignNote property");
 	listen_handle = dn_prop->Listen (kPropertyFull, on_dn_change,
 		reinterpret_cast<PropListenerData> (this));
-	//TODO Also detect hierarchy changes.
+	SInterface<ITraitManager> (LG)->Listen (on_trait_change, this);
 }
 
 ParameterCache::~ParameterCache ()
 {
 	dn_prop->Unlisten (listen_handle);
-}
-
-ParameterCache::Ptr
-ParameterCache::get ()
-{
-	static WeakPtr impl;
-	Ptr ptr = impl.lock ();
-	if (!ptr)
-	{
-		ptr = Ptr (new ParameterCache ());
-		impl = ptr;
-	}
-	return ptr;
+	// It is not possible to unlisten from ITraitManager, so this dtor
+	// should not be reached before application exit.
 }
 
 bool
 ParameterCache::exists (const Object& object, const CIString& parameter,
 	bool inherit)
 {
-	DesignNote& dn = update_object (object.number);
+	DesignNote* dn = update_object (object.number);
+	if (!dn) return false;
 
-	if (dn.state & DesignNote::RELEVANT)
+	if (dn->state & DesignNote::RELEVANT)
 	{
-		auto raw_value = dn.raw_values.find (parameter);
-		if (raw_value != dn.raw_values.end ())
+		auto raw_value = dn->raw_values.find (parameter);
+		if (raw_value != dn->raw_values.end ())
 			return true;
 	}
 
-	if (inherit || !(dn.state & DesignNote::RELEVANT))
-		for (auto ancestor : dn.ancestors)
+	if (inherit || !(dn->state & DesignNote::RELEVANT))
+		for (auto ancestor : dn->ancestors)
 		{
 			DesignNote& anc_dn = data [ancestor];
 			auto anc_raw_value = anc_dn.raw_values.find (parameter);
@@ -246,17 +236,18 @@ const String*
 ParameterCache::get (const Object& object, const CIString& parameter,
 	bool inherit)
 {
-	DesignNote& dn = update_object (object.number);
+	DesignNote* dn = update_object (object.number);
+	if (!dn) return nullptr;
 
-	if (dn.state & DesignNote::RELEVANT)
+	if (dn->state & DesignNote::RELEVANT)
 	{
-		auto raw_value = dn.raw_values.find (parameter);
-		if (raw_value != dn.raw_values.end ())
+		auto raw_value = dn->raw_values.find (parameter);
+		if (raw_value != dn->raw_values.end ())
 			return &raw_value->second;
 	}
 
-	if (inherit || !(dn.state & DesignNote::RELEVANT))
-		for (auto ancestor : dn.ancestors)
+	if (inherit || !(dn->state & DesignNote::RELEVANT))
+		for (auto ancestor : dn->ancestors)
 		{
 			DesignNote& anc_dn = data [ancestor];
 			auto anc_raw_value = anc_dn.raw_values.find (parameter);
@@ -274,10 +265,10 @@ bool
 ParameterCache::set (const Object& object, const CIString& parameter,
 	const String& value)
 {
-	DesignNote& dn = update_object (object.number);
-	if (!(dn.state & DesignNote::EXISTENT)) return false;
-	dn.state |= DesignNote::RELEVANT;
-	dn.raw_values [parameter] = value;
+	DesignNote* dn = update_object (object.number);
+	if (!dn || !(dn->state & DesignNote::EXISTENT)) return false;
+	dn->state |= DesignNote::RELEVANT;
+	dn->raw_values [parameter] = value;
 	return write_dn (object.number);
 }
 
@@ -286,25 +277,28 @@ ParameterCache::copy (const Object& _source, const Object& _dest,
 	const CIString& parameter)
 {
 	ParameterBase watch_dest (_dest, parameter, { false });
-	DesignNote& source = update_object (_source.number);
-	DesignNote& dest = update_object (_dest.number);
+	DesignNote* source = update_object (_source.number);
+	DesignNote* dest = update_object (_dest.number);
 
-	if (!(source.state & DesignNote::RELEVANT) ||
-	    !(dest.state & DesignNote::EXISTENT) ||
-	    source.raw_values.find (parameter) == source.raw_values.end ())
+	if (!source || (source->state & DesignNote::RELEVANT) ||
+	    !dest || !(dest->state & DesignNote::EXISTENT))
 		return false;
 
-	dest.state |= DesignNote::RELEVANT;
-	dest.raw_values [parameter] = source.raw_values.at (parameter);
+	auto iter = source->raw_values.find (parameter);
+	if (iter == source->raw_values.end ())
+		return false;
+
+	dest->state |= DesignNote::RELEVANT;
+	dest->raw_values [parameter] = iter->second;
 	return write_dn (_dest.number);
 }
 
 bool
 ParameterCache::remove (const Object& object, const CIString& parameter)
 {
-	DesignNote& dn = update_object (object.number);
-	if (!(dn.state & DesignNote::RELEVANT)) return false;
-	if (dn.raw_values.erase (parameter) == 0) return false;
+	DesignNote* dn = update_object (object.number);
+	if (!dn || !(dn->state & DesignNote::RELEVANT)) return false;
+	if (dn->raw_values.erase (parameter) == 0) return false;
 	return write_dn (object.number);
 }
 
@@ -336,12 +330,18 @@ ParameterCache::unwatch_object (const Object& object,
 	}
 }
 
+void
+ParameterCache::reset ()
+{
+	data.clear ();
+}
+
 STDMETHODIMP_ (void)
 ParameterCache::on_dn_change (sPropertyListenMsg* message,
 	PropListenerData _self)
 {
 	// Filter out an unidentified event type known to be irrelevant.
-	if (!message || message->event & 8) return;
+	if (!message || !_self || message->event & 8) return;
 
 	Object object = message->iObjId;
 	auto self = reinterpret_cast<ParameterCache*> (_self);
@@ -360,15 +360,25 @@ ParameterCache::on_dn_change (sPropertyListenMsg* message,
 	}
 }
 
-DesignNote&
+STDMETHODIMP_ (void)
+ParameterCache::on_trait_change (const sHierarchyMsg* message, void* _self)
+{
+	if (!message || !_self) return;
+	auto self = reinterpret_cast<ParameterCache*> (_self);
+
+	auto iter = self->data.find (message->iSubjId);
+	if (iter != self->data.end ())
+		self->update_ancestors (iter->first, iter->second);
+}
+
+DesignNote*
 ParameterCache::update_object (Object::Number number)
 {
 	auto dn_iter = data.find (number);
-	if (dn_iter == data.end ())
-		throw std::out_of_range ("object's parameters not being watched");
+	if (dn_iter == data.end ()) return nullptr;
 
 	DesignNote& dn = dn_iter->second;
-	if (dn.state & DesignNote::CACHED) return dn;
+	if (dn.state & DesignNote::CACHED) return &dn;
 
 	// Reset the data.
 	dn.state = DesignNote::CACHED;
@@ -389,7 +399,7 @@ ParameterCache::update_object (Object::Number number)
 	}
 
 	update_ancestors (object, dn);
-	return dn;
+	return &dn;
 }
 
 void

@@ -24,6 +24,7 @@
  *****************************************************************************/
 
 #include "Private.hh"
+#include "OSL.hh"
 
 #include <windef.h>
 #include <winbase.h>
@@ -32,6 +33,10 @@ namespace Thief {
 
 IScriptMan*
 LG = nullptr;
+
+extern "C" const GUID IID_IHUD = THIEF_IHUD_GUID;
+extern "C" const GUID IID_IParameterCache = THIEF_IParameterCache_GUID;
+extern "C" const GUID IID_IOSLService = THIEF_IOSLService_GUID;
 
 
 
@@ -243,21 +248,6 @@ Script::dispatch (sScrMsg& message, sMultiParm* reply, unsigned trace)
 		result &= dispatch_cycle (timer_handlers, (const char*)
 			static_cast<sScrTimerMsg*> (&message)->name,
 			message, reply);
-
-	if (_stricmp (message.message, "DHNotify") == 0)
-	{
-		const char* translated = nullptr;
-		switch (static_cast<sDHNotifyMsg*> (&message)->typeDH)
-		{
-		case kDH_Property: translated = "PropertyChange"; break;
-		case kDH_Relation: translated = "LinkChange"; break;
-		default: break;
-		}
-
-		if (translated)
-			result &= dispatch_cycle (message_handlers, translated,
-				message, reply);
-	}
 
 	return result;
 }
@@ -523,8 +513,22 @@ ScriptModuleInit (const char* name, IScriptMan* manager, MPrintfProc mprintf,
 	Thief::alloc.attach (allocator, name);
 	Thief::mono.attach (mprintf);
 
-	// Load and initialize the OSL.
-	DarkHookInitializeService (manager, allocator);
+	// Load the OSL.
+	HMODULE osl = ::GetModuleHandleA (OSL_NAME);
+	if (!osl) osl = ::LoadLibraryA (OSL_NAME);
+	if (!osl)
+	{
+		if (mprintf)
+			mprintf ("Could not load the ThiefLib support library "
+				OSL_NAME ".\n");
+		return false;
+	}
+
+	// Initialize the OSL.
+	auto osl_init = reinterpret_cast<Thief::OSLInitProc>
+		(::GetProcAddress (osl, OSL_INIT_PROC));
+	if (!osl_init || !osl_init (manager, mprintf, allocator))
+		return false;
 
 	// Prepare the ScriptModule.
 	Thief::module.set_name (name);

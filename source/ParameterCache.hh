@@ -30,6 +30,37 @@ namespace Thief {
 
 
 
+// IParameterCache
+
+interface IParameterCache : IUnknown
+{
+	STDMETHOD_ (bool, exists) (const Object& object,
+		const CIString& parameter, bool inherit) PURE;
+	STDMETHOD_ (const String*, get) (const Object& object,
+		const CIString& parameter, bool inherit) PURE;
+	STDMETHOD_ (bool, set) (const Object& object,
+		const CIString& parameter, const String& value) PURE;
+	STDMETHOD_ (bool, copy) (const Object& source, const Object& dest,
+		const CIString& parameter) PURE;
+	STDMETHOD_ (bool, remove) (const Object& object,
+		const CIString& parameter) PURE;
+
+	STDMETHOD_ (void, watch_object) (const Object&,
+		const ParameterBase&) PURE;
+	STDMETHOD_ (void, unwatch_object) (const Object&,
+		const ParameterBase&) PURE;
+};
+
+extern "C" const GUID IID_IParameterCache;
+#define THIEF_IParameterCache_GUID { 0x709a2033, 0x3d7e, 0x4424, \
+		{ 0x97, 0x1d, 0xed, 0xf5, 0x55, 0x45, 0x2b, 0x02 } }
+
+
+
+#ifdef IS_OSL
+
+
+
 struct DesignNote
 {
 	DesignNote () : indirect_watchers (0), state (NONE) {}
@@ -77,31 +108,30 @@ private:
 
 
 
-class ParameterCache
+class ParameterCache : public cInterfaceImp<IParameterCache,
+	IID_Def<IParameterCache>, kInterfaceImpStatic>
 {
 public:
-	typedef std::shared_ptr<ParameterCache> Ptr;
-	typedef std::weak_ptr<ParameterCache> WeakPtr;
-
 	virtual ~ParameterCache ();
 
-	static Ptr get ();
-
-	bool exists (const Object& object, const CIString& parameter,
-		bool inherit);
-	const String* get (const Object& object, const CIString& parameter,
-		bool inherit);
-	bool set (const Object& object, const CIString& parameter,
-		const String& value);
-	bool copy (const Object& source, const Object& dest,
+	STDMETHOD_ (bool, exists) (const Object& object,
+		const CIString& parameter, bool inherit);
+	STDMETHOD_ (const String*, get) (const Object& object,
+		const CIString& parameter, bool inherit);
+	STDMETHOD_ (bool, set) (const Object& object,
+		const CIString& parameter, const String& value);
+	STDMETHOD_ (bool, copy) (const Object& source, const Object& dest,
 		const CIString& parameter);
-	bool remove (const Object& object, const CIString& parameter);
+	STDMETHOD_ (bool, remove) (const Object& object,
+		const CIString& parameter);
 
-	void watch_object (const Object&, const ParameterBase&);
-	void unwatch_object (const Object&, const ParameterBase&);
+	STDMETHOD_ (void, watch_object) (const Object&, const ParameterBase&);
+	STDMETHOD_ (void, unwatch_object) (const Object&, const ParameterBase&);
 
 private:
+	friend class OSL;
 	ParameterCache ();
+	void reset ();
 
 	SInterface<IStringProperty> dn_prop;
 
@@ -109,7 +139,9 @@ private:
 	static void __stdcall on_dn_change (sPropertyListenMsg*,
 		PropListenerData);
 
-	DesignNote& update_object (Object::Number number);
+	static void __stdcall on_trait_change (const sHierarchyMsg*, void*);
+
+	DesignNote* update_object (Object::Number number);
 	void update_ancestors (const Object& object, DesignNote& dn);
 	void unwatch_ancestor (Object::Number number);
 
@@ -124,7 +156,11 @@ private:
 
 
 
+#endif // IS_OSL
+
 } // namespace Thief
+
+DEFINE_IIDSTRUCT (Thief::IParameterCache, Thief::IID_IParameterCache);
 
 #endif // PARAMETERCACHE_HH
 

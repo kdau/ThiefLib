@@ -48,13 +48,14 @@ public:
 
 	bool operator == (const Property&) const;
 	bool operator != (const Property&) const;
+	bool operator < (const Property&) const;
 
 	Number get_number () const;
 	String get_name () const;
 
 private:
 	friend class ObjectProperty;
-	friend class PropertyChangeMessage;
+	friend class OSL;
 	IProperty* iface;
 };
 
@@ -67,8 +68,10 @@ public:
 	ObjectProperty (const Property&, const Object&,
 		bool add_if_missing = false);
 
-	Property get_property () const;
-	Object get_object () const;
+	Property get_property () const { return property; }
+	Object get_object () const { return object; }
+
+	bool operator < (const ObjectProperty&) const;
 
 	bool exists (bool inherited = true) const;
 	bool add ();

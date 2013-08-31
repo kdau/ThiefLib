@@ -23,6 +23,7 @@
 
 #include "Private.hh"
 #include "ParameterCache.hh"
+#include "OSL.hh"
 
 namespace Thief {
 
@@ -32,7 +33,7 @@ namespace Thief {
 
 ParameterBase::ParameterBase (const Object& _object, const CIString& _name,
 		const Config& _config)
-	: cache (),
+	: cache (nullptr),
 	  does_exist (false),
 	  object (_object),
 	  name (_name),
@@ -96,7 +97,7 @@ ParameterBase::initialize () const
 {
 	if (!cache)
 	{
-		cache = ParameterCache::get ();
+		cache = SService<IOSLService> (LG)->get_param_cache ();
 		cache->watch_object (object, *this);
 	}
 }

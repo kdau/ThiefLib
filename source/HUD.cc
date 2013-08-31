@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include "Private.hh"
+#include "OSL.hh"
 
 #include <windows.h>
 #undef DrawText // ugh, Windows...
@@ -110,149 +111,27 @@ HUDBitmap::draw (Frame frame, CanvasPoint position, CanvasRect clip) const
 
 
 
-// HUDImpl
-
-class HUDImpl : public IDarkOverlayHandler, public HUD
-{
-public:
-	HUDImpl ();
-	virtual ~HUDImpl ();
-
-	// IDarkOverlayHandler
-	STDMETHOD_ (void, DrawHUD) ();
-	STDMETHOD_ (void, DrawTOverlay) ();
-	STDMETHOD_ (void, OnUIEnterMode) ();
-};
-
-HUDImpl::HUDImpl ()
-{
-	SService<IDarkOverlaySrv> (LG)->SetHandler (this);
-}
-
-HUDImpl::~HUDImpl ()
-{
-	SService<IDarkOverlaySrv> (LG)->SetHandler (nullptr);
-}
-
-STDMETHODIMP_ (void)
-HUDImpl::DrawHUD ()
-{
-	for (auto& element : elements)
-		element.callback (element.element, Event::DRAW_STAGE_1);
-}
-
-STDMETHODIMP_ (void)
-HUDImpl::DrawTOverlay ()
-{
-	for (auto& element : elements)
-		element.callback (element.element, Event::DRAW_STAGE_2);
-}
-
-STDMETHODIMP_ (void)
-HUDImpl::OnUIEnterMode ()
-{
-	for (auto& element : elements)
-		element.callback (element.element, Event::ENTER_GAME_MODE);
-}
-
-
-
-// HUD::ElementInfo
-
-HUD::ElementInfo::ElementInfo (HUDElement& _element, Callback _callback,
-		ZIndex _priority, Ptr _reference)
-	: element (_element),
-	  callback (_callback),
-	  priority (_priority),
-	  reference (_reference)
-{}
-
-bool
-HUD::ElementInfo::operator == (const ElementInfo& rhs) const
-{
-	return &element == &rhs.element;
-}
-
-bool
-HUD::ElementInfo::operator < (const ElementInfo& rhs) const
-{
-	return priority < rhs.priority;
-}
-
-
-
 // HUD
-
-HUD::HUD ()
-{}
-
-HUD::~HUD ()
-{}
-
-HUD::Ptr
-HUD::get ()
-{
-	static WeakPtr impl;
-	Ptr ptr = impl.lock ();
-	if (!ptr)
-	{
-		ptr = Ptr (new HUDImpl ());
-		impl = ptr;
-	}
-	return ptr;
-}
 
 bool
 HUD::register_element (HUDElement& element, Callback callback, ZIndex priority)
 {
-	get ()->elements.insert
-		(ElementInfo (element, callback, priority, get ()));
-	return true;
+	return SService<IOSLService> (LG)->get_hud ()->
+		register_element (element, callback, priority);
 }
 
 bool
 HUD::unregister_element (HUDElement& element)
 {
-	Elements& elements = get ()->elements;
-	for (auto entry = elements.begin (); entry != elements.end (); ++entry)
-		if (&entry->element == &element)
-		{
-			elements.erase (entry);
-			return true;
-		}
-	return false;
+	return SService<IOSLService> (LG)->get_hud ()->
+		unregister_element (element);
 }
 
 HUDBitmap::Ptr
 HUD::load_bitmap (const String& path, bool animation)
 {
-	Bitmaps& bitmaps = get ()->bitmaps;
-	HUDBitmap::Ptr bitmap;
-
-	// Look for an existing bitmap first.
-	Bitmaps::iterator existing = bitmaps.find (path);
-	if (existing != bitmaps.end ())
-	{
-		bitmap = existing->second.lock ();
-		if (bitmap)
-			return bitmap;
-		else
-			bitmaps.erase (existing);
-	}
-
-	try
-	{
-		// The bitmap hasn't been loaded yet, so load it now.
-		bitmap = HUDBitmap::Ptr (new HUDBitmap (path, animation));
-		bitmaps.insert (std::make_pair (path, bitmap));
-	}
-	catch (std::exception& e)
-	{
-		mono << "Warning: Could not load bitmap at \"" << path
-			<< "\": " << e.what () << "." << std::endl;
-	}
-
-	return bitmap;
+	return SService<IOSLService> (LG)->get_hud ()->
+		load_bitmap (path, animation);
 }
 
 

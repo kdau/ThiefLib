@@ -26,7 +26,6 @@
 
 #include <Thief/Thief.hh>
 #include <lg/lg.h>
-#include <darkhook.h>
 
 namespace Thief {
 

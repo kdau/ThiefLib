@@ -30,8 +30,7 @@
 
 namespace Thief {
 
-class ParameterCache;
-typedef std::shared_ptr<ParameterCache> ParameterCachePtr;
+struct IParameterCache;
 
 
 
@@ -66,7 +65,7 @@ protected:
 
 	static int decode_quest_ref (const String& raw);
 
-	mutable ParameterCachePtr cache;
+	mutable IParameterCache* cache;
 	mutable bool does_exist;
 
 	const Object object;
