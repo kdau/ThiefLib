@@ -109,12 +109,20 @@ Script::start_timer (const char* timer, Time delay, bool repeating,
 
 template <typename T>
 Persistent<T>::Persistent (Script& _script, const String& _name)
-	: script (_script), name (_name)
+	: script (_script), name (_name), has_default_value (false)
 {}
 
 template <typename T>
+Persistent<T>::Persistent (Script& _script, const String& _name,
+		const T& _default_value)
+	: script (_script), name (_name), has_default_value (false)
+{
+	set_default_value (_default_value);
+}
+
+template <typename T>
 inline bool
-Persistent<T>::valid () const
+Persistent<T>::exists () const
 {
 	return script.has_datum (name);
 }
@@ -123,11 +131,33 @@ template <typename T>
 inline
 Persistent<T>::operator T () const
 {
-	if (!valid ())
-		throw std::runtime_error ("invalid persistent data");
+	if (!exists ())
+	{
+		if (has_default_value)
+			return default_value;
+		else
+			throw std::runtime_error
+				("persistent variable does not exist");
+	}
 	LGMulti<T> value;
 	script._get_datum (name, value);
 	return value;
+}
+
+template <typename T>
+inline Persistent<T>&
+Persistent<T>::operator = (const T& value)
+{
+	if (!script._set_datum (name, LGMulti<T> (value)))
+		throw std::runtime_error ("could not set persistent variable");
+	return *this;
+}
+
+template <typename T>
+inline bool
+Persistent<T>::remove ()
+{
+	return script.unset_datum (name);
 }
 
 template <typename T>
@@ -145,28 +175,11 @@ Persistent<T>::operator != (const T& rhs) const
 }
 
 template <typename T>
-inline Persistent<T>&
-Persistent<T>::operator = (const T& value)
-{
-	if (!script._set_datum (name, LGMulti<T> (value)))
-		throw std::runtime_error ("could not set persistent variable");
-	return *this;
-}
-
-template <typename T>
 inline void
-Persistent<T>::init (const T& default_value)
+Persistent<T>::set_default_value (const T& _default_value)
 {
-	if (!valid ())
-		*this = default_value;
-}
-
-template <typename T>
-inline void
-Persistent<T>::clear ()
-{
-	if (!script.unset_datum (name))
-		throw std::runtime_error ("could not clear persistent variable");
+	default_value = _default_value;
+	has_default_value = true;
 }
 
 

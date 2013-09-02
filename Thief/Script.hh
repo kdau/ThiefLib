@@ -147,28 +147,32 @@ class Persistent
 {
 public:
 	Persistent (Script& script, const String& name);
+	Persistent (Script& script, const String& name, const T& default_value);
 
 	Persistent (const Persistent&) = delete;
 	Persistent& operator = (const Persistent&) = delete;
 
-	bool valid () const;
-
+	bool exists () const;
 	operator T () const;
 	Persistent& operator = (const T&);
+	bool remove ();
 
 	bool operator == (const T&) const;
 	bool operator != (const T&) const;
 
-	void init (const T& default_value);
-	void clear ();
+	void set_default_value (const T&);
 
 private:
 	Script& script;
 	String name;
+
+	T default_value;
+	bool has_default_value;
 };
 
-// initializer convenience macro
-#define PERSISTENT(Name) Name (*this, #Name)
+// initializer convenience macros
+#define PERSISTENT(Name, Default) Name (*this, #Name, Default)
+#define PERSISTENT_(Name) Name (*this, #Name)
 
 
 
