@@ -1,10 +1,12 @@
 /******************************************************************************
- *  AI.inl
+ *  Message.inl
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
  *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
+ *  Adapted in part from TWScript
+ *  Copyright (C) 2012-2013 Chris Page <chris@starforge.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,46 +23,44 @@
  *
  *****************************************************************************/
 
-#ifndef THIEF_AI_HH
-#error "This file should only be included from <Thief/AI.hh>."
+#ifndef THIEF_MESSAGE_HH
+#error "This file should only be included from <Thief/Message.hh>."
 #endif
 
-#ifndef THIEF_AI_INL
-#define THIEF_AI_INL
+#ifndef THIEF_MESSAGE_INL
+#define THIEF_MESSAGE_INL
 
 namespace Thief {
 
-inline bool
-AI::go_to_location (const Object& nearby, Speed speed, ActionPriority priority)
+template <typename D1, typename D2, typename D3>
+inline GenericMessage
+GenericMessage::with_data (const char* name, const D1& data1,
+	const D2& data2, const D3& data3)
 {
-	return _go_to_location (nearby, speed, priority, LGMulti<Empty> ());
+	GenericMessage message (name);
+	message.set_data (DATA1, data1);
+	if (!std::is_same<D2, Empty> ())
+		message.set_data (DATA2, data2);
+	if (!std::is_same<D3, Empty> ())
+		message.set_data (DATA3, data3);
+	return message;
 }
 
-template <typename T>
-inline bool
-AI::go_to_location (const Object& nearby, Speed speed, ActionPriority priority,
-	const T& result_data)
+template <typename D1, typename D2, typename D3>
+inline TimerMessage
+TimerMessage::with_data (const char* timer_name, const D1& data1,
+	const D2& data2, const D3& data3)
 {
-	return _go_to_location (nearby, speed, priority,
-		LGMulti<T> (result_data));
-}
-
-inline bool
-AI::frob_object (const Object& target, const Object& tool,
-	ActionPriority priority)
-{
-	return _frob_object (target, tool, priority, LGMulti<Empty> ());
-}
-
-template <typename T>
-bool
-AI::frob_object (const Object& target, const Object& tool,
-	ActionPriority priority, const T& result_data)
-{
-	return _frob_object (target, tool, priority, LGMulti<T> (result_data));
+	TimerMessage message (timer_name);
+	message.set_data (DATA1, data1);
+	if (!std::is_same<D2, Empty> ())
+		message.set_data (DATA2, data2);
+	if (!std::is_same<D3, Empty> ())
+		message.set_data (DATA3, data3);
+	return message;
 }
 
 } // namespace Thief
 
-#endif // THIEF_AI_INL
+#endif // THIEF_MESSAGE_INL
 

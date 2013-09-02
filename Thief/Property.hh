@@ -66,7 +66,7 @@ class ObjectProperty
 {
 public:
 	ObjectProperty (const Property&, const Object&,
-		bool add_if_missing = false);
+		bool instantiate_if_missing = false);
 
 	Property get_property () const { return property; }
 	Object get_object () const { return object; }
@@ -74,7 +74,7 @@ public:
 	bool operator < (const ObjectProperty&) const;
 
 	bool exists (bool inherited = true) const;
-	bool add ();
+	bool instantiate ();
 	bool copy_from (const Object& source);
 	bool remove ();
 
@@ -101,9 +101,9 @@ private:
 	void _get_field (const String& field, LGMultiBase& value) const;
 	void _get_field (const char* field, LGMultiBase& value) const;
 	bool _set_field (const String& field, const LGMultiBase& value,
-		bool add_if_missing = false);
+		bool instantiate_if_missing = false);
 	bool _set_field (const char* field, const LGMultiBase& value,
-		bool add_if_missing = false);
+		bool instantiate_if_missing = false);
 
 	Property property;
 	Object object;
@@ -130,6 +130,9 @@ public:
 	PropField (Object&);
 
 	bool exists () const;
+	bool instantiate (); // Affects the entire property, not just this field.
+	bool remove (); // Affects the entire property, not just this field.
+
 	operator T () const;
 	PropField& operator = (const T&);
 
@@ -144,6 +147,9 @@ public:
 	PropField (Object&);
 
 	bool exists () const;
+	bool instantiate (); // Affects the entire property, not just this field.
+	bool remove (); // Affects the entire property, not just this field.
+
 	operator bool () const;
 	PropField& operator = (bool);
 

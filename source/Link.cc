@@ -365,6 +365,32 @@ FLAVORED_LINK_IMPL_ (ScriptParams,
 	PROXY_INIT (data)
 )
 
+ScriptParamsLinks
+ScriptParamsLink::get_all_by_data (const Object& source,
+	const CIString& data, Inheritance inheritance, bool reverse)
+{
+	Links _links = Link::get_all (flavor (reverse), source, Object::ANY,
+		inheritance);
+	ScriptParamsLinks links;
+	for (ScriptParamsLink link : _links)
+		if (data == link.data)
+			links.push_back (link);
+	return links;
+}
+
+ScriptParamsLink
+ScriptParamsLink::get_one_by_data (const Object& source, const CIString& data,
+	bool reverse)
+{
+	auto links = get_all_by_data (source, data, Inheritance::NONE, reverse);
+	switch (links.size ())
+	{
+	case 1u: return links.front ();
+	case 0u: return ScriptParamsLink ();
+	default: throw std::runtime_error ("too many of a singleton link type");
+	}
+}
+
 ScriptParamsLink
 ScriptParamsLink::create (const Object& source, const Object& dest,
 	const String& data)

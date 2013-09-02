@@ -173,7 +173,7 @@ Script::_set_datum (const String& datum, const LGMultiBase& value)
 bool
 Script::unset_datum (const String& datum)
 {
-	LGMultiEmpty junk;
+	LGMulti<Empty> junk;
 	sScrDatumTag tag { host_obj, script_name.data (), datum.data () };
 	return LG->ClearScriptData (&tag, &(sMultiParm&)junk) == S_OK;
 }
@@ -358,7 +358,7 @@ TrapTrigger::on_trap (bool, Message&)
 }
 
 Message::Result
-TrapTrigger::on_turn_on (GenericMessage& message)
+TrapTrigger::on_turn_on (Message& message)
 {
 	unsigned flags = get_flags ();
 
@@ -379,7 +379,7 @@ TrapTrigger::on_turn_on (GenericMessage& message)
 }
 
 Message::Result
-TrapTrigger::on_turn_off (GenericMessage& message)
+TrapTrigger::on_turn_off (Message& message)
 {
 	unsigned flags = get_flags ();
 

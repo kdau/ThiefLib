@@ -233,6 +233,12 @@ THIEF_FLAVORED_LINK (ScriptParams)
 {
 	THIEF_FLAVORED_LINK_COMMON (ScriptParams)
 
+	static ScriptParamsLinks get_all_by_data (const Object& source,
+		const CIString& data, Inheritance, bool reverse = false);
+
+	static ScriptParamsLink get_one_by_data (const Object& source,
+		const CIString& data, bool reverse = false);
+
 	static ScriptParamsLink create (const Object& source,
 		const Object& dest, const String& data = String ());
 

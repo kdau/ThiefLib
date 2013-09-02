@@ -99,10 +99,10 @@ ObjectProperty::_get_field (const String& field, LGMultiBase& value) const
 
 inline bool
 ObjectProperty::_set_field (const String& field, const LGMultiBase& value,
-	bool add_if_missing)
+	bool instantiate_if_missing)
 {
 	return _set_field (field.empty () ? nullptr : field.data (), value,
-		add_if_missing);
+		instantiate_if_missing);
 }
 
 
@@ -123,6 +123,20 @@ inline bool
 PropField<T, config>::exists () const
 {
 	return ObjectProperty (config.major, object).exists ();
+}
+
+template <typename T, const FieldProxyConfig<T>& config>
+inline bool
+PropField<T, config>::instantiate ()
+{
+	return ObjectProperty (config.major, object).instantiate ();
+}
+
+template <typename T, const FieldProxyConfig<T>& config>
+inline bool
+PropField<T, config>::remove ()
+{
+	return ObjectProperty (config.major, object).remove ();
 }
 
 template <typename T, const FieldProxyConfig<T>& config>
@@ -169,6 +183,20 @@ inline bool
 PropField<bool, config>::exists () const
 {
 	return ObjectProperty (config.major, object).exists ();
+}
+
+template <const FieldProxyConfig<bool>& config>
+inline bool
+PropField<bool, config>::instantiate ()
+{
+	return ObjectProperty (config.major, object).instantiate ();
+}
+
+template <const FieldProxyConfig<bool>& config>
+inline bool
+PropField<bool, config>::remove ()
+{
+	return ObjectProperty (config.major, object).remove ();
 }
 
 template <const FieldProxyConfig<bool>& config>

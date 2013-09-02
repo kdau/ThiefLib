@@ -200,11 +200,8 @@ public: \
 	static FlavorName##Links get_all \
 		(const Object& source = Object::ANY, \
 		const Object& dest = Object::ANY, \
-		Inheritance = Inheritance::NONE); \
-	static FlavorName##Links get_all_reverse \
-		(const Object& source = Object::ANY, \
-		const Object& dest = Object::ANY, \
-		Inheritance = Inheritance::NONE);
+		Inheritance = Inheritance::NONE, \
+		bool reverse = false);
 
 #define THIEF_LINK_FIELD(Type, Name) THIEF_FIELD_PROXY (LinkField, Type, Name, )
 

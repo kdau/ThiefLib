@@ -59,7 +59,7 @@ public:
 		DEAD
 	};
 
-	THIEF_PROP_FIELD_CONST (Mode, mode); //TESTME
+	THIEF_PROP_FIELD (Mode, mode); // Changing this may be dangerous. //TESTME
 	bool is_dead () const; //TESTME
 	bool is_dying () const; //TESTME
 
@@ -85,6 +85,8 @@ public:
 	template <typename T>
 	bool go_to_location (const Object& nearby, Speed, ActionPriority,
 		const T& result_data); //TESTME
+
+	bool face_object (const Object& target); //TESTME
 
 	bool frob_object (const Object& target,
 		const Object& tool = Object::NONE,

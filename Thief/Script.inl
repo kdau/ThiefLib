@@ -92,7 +92,7 @@ Script::listen_timer (const CIString& timer,
 inline Timer
 Script::start_timer (const char* timer, Time delay, bool repeating)
 {
-	return _start_timer (timer, delay, repeating, LGMultiEmpty ());
+	return _start_timer (timer, delay, repeating, LGMulti<Empty> ());
 }
 
 template <typename T>
@@ -129,25 +129,49 @@ Persistent<T>::exists () const
 
 template <typename T>
 inline
-Persistent<T>::operator T () const
+Persistent<T>::operator const T& () const
 {
-	if (!exists ())
-	{
-		if (has_default_value)
-			return default_value;
-		else
-			throw std::runtime_error
-				("persistent variable does not exist");
-	}
-	LGMulti<T> value;
-	script._get_datum (name, value);
+	get_value ();
 	return value;
 }
 
 template <typename T>
-inline Persistent<T>&
-Persistent<T>::operator = (const T& value)
+inline T*
+Persistent<T>::operator -> ()
 {
+	get_value ();
+	return &value;
+}
+
+template <typename T>
+inline const T*
+Persistent<T>::operator -> () const
+{
+	get_value ();
+	return &value;
+}
+
+template <typename T>
+inline bool
+Persistent<T>::operator == (const T& rhs) const
+{
+	get_value ();
+	return value == rhs;
+}
+
+template <typename T>
+inline bool
+Persistent<T>::operator != (const T& rhs) const
+{
+	get_value ();
+	return value != rhs;
+}
+
+template <typename T>
+inline Persistent<T>&
+Persistent<T>::operator = (const T& _value)
+{
+	value = _value;
 	if (!script._set_datum (name, LGMulti<T> (value)))
 		throw std::runtime_error ("could not set persistent variable");
 	return *this;
@@ -161,25 +185,27 @@ Persistent<T>::remove ()
 }
 
 template <typename T>
-inline bool
-Persistent<T>::operator == (const T& rhs) const
-{
-	return operator T () == rhs;
-}
-
-template <typename T>
-inline bool
-Persistent<T>::operator != (const T& rhs) const
-{
-	return operator T () != rhs;
-}
-
-template <typename T>
 inline void
 Persistent<T>::set_default_value (const T& _default_value)
 {
 	default_value = _default_value;
 	has_default_value = true;
+}
+
+template <typename T>
+inline void
+Persistent<T>::get_value () const
+{
+	if (exists ())
+	{
+		LGMulti<T> _value;
+		script._get_datum (name, _value);
+		value = _value;
+	}
+	else if (has_default_value)
+		value = default_value;
+	else
+		throw std::runtime_error ("persistent variable does not exist");
 }
 
 

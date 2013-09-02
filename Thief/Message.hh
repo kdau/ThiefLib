@@ -56,7 +56,7 @@ public:
 		ERROR
 	};
 
-	Message (const Message&) = delete;
+	Message (const Message&);
 	virtual ~Message ();
 
 	const char* get_name () const;
@@ -91,6 +91,8 @@ protected:
 
 	const char* get_lg_typename () const;
 
+	template <typename, typename> friend struct ScriptMessageHandler;
+
 private:
 	void _get_data (Datum datum, LGMultiBase& value) const;
 	void _set_data (Datum datum, const LGMultiBase& value);
@@ -124,6 +126,10 @@ class GenericMessage : public Message
 public:
 	GenericMessage (const char* name);
 	THIEF_MESSAGE_WRAP (GenericMessage);
+
+	template <typename D1, typename D2 = Empty, typename D3 = Empty>
+	static GenericMessage with_data (const char* name, const D1& data1,
+		const D2& data2 = D2 (), const D3& data3 = D3 ());
 };
 
 
@@ -135,11 +141,17 @@ public:
 	THIEF_MESSAGE_WRAP (TimerMessage);
 
 	String get_timer_name () const;
+
+	template <typename D1, typename D2 = Empty, typename D3 = Empty>
+	static TimerMessage with_data (const char* timer_name, const D1& data1,
+		const D2& data2 = D2 (), const D3& data3 = D3 ());
 };
 
 
 
 } // namespace Thief
+
+#include <Thief/Message.inl>
 
 #endif // THIEF_MESSAGE_HH
 

@@ -207,6 +207,30 @@ AI::_go_to_location (const Object& nearby, Speed speed, ActionPriority priority,
 }
 
 bool
+AI::face_object (const Object& target)
+{
+	if (!target.exists ()) return false;
+
+	Vector location = get_location (),
+		target_loc = target.get_location (),
+		new_rotation;
+
+	double delta_x = location.x - target_loc.x,
+		delta_y = location.y - target_loc.y;
+
+	if (std::abs (delta_x) >= Vector::EPSILON)
+		new_rotation.z = std::atan (delta_y / delta_x) * 90.0 / M_PI_2
+			+ ((delta_x > 0.0) ? 180.0 : 0.0);
+	else if (std::abs (delta_y) >= Vector::EPSILON)
+		new_rotation.z = (delta_y > 0.0) ? 270.0 : 90.0;
+	else
+		return false;
+
+	set_rotation (new_rotation);
+	return true;
+}
+
+bool
 AI::_frob_object (const Object& target, const Object& tool,
 	ActionPriority priority, const LGMultiBase& result_data)
 {

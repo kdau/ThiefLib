@@ -60,6 +60,21 @@ Message::Message (sScrMsg* _message, sMultiParm* _reply, bool)
 	}
 }
 
+Message::Message (const Message& copy)
+	: message (copy.message),
+	  reply (copy.reply ? new cMultiParm (*copy.reply) : new cMultiParm ()),
+	  own_reply (true)
+{
+	if (message)
+		message->AddRef ();
+	else
+	{
+		delete reply;
+		throw MessageWrapError (message, typeid (*this),
+			"message is null");
+	}
+}
+
 Message::~Message ()
 {
 	if (message) message->Release ();

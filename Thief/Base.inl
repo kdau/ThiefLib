@@ -486,7 +486,7 @@ THIEF_LGMULTI_SPECIALIZE (Vector, Vector ())
 
 
 
-// Anti-wrapper for cMultiParm
+// Anti-wrapper for sMultiParm
 
 template<>
 class LGMulti<sMultiParm> : public LGMultiBase
@@ -496,7 +496,18 @@ public:
 	LGMulti (const sMultiParm& value);
 };
 
-typedef LGMulti<sMultiParm> LGMultiEmpty;
+
+
+// Pseudo-wrapper for std::nullptr_t, allowing convenient use of empty values
+
+typedef std::nullptr_t Empty;
+
+template<>
+class LGMulti<Empty> : public LGMultiBase
+{
+public:
+	LGMulti (const Empty& = nullptr);
+};
 
 
 

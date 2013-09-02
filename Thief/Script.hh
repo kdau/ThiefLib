@@ -153,19 +153,26 @@ public:
 	Persistent& operator = (const Persistent&) = delete;
 
 	bool exists () const;
-	operator T () const;
-	Persistent& operator = (const T&);
-	bool remove ();
+	operator const T& () const;
+
+	T* operator -> (); // Do not use any data-altering methods.
+	const T* operator -> () const;
 
 	bool operator == (const T&) const;
 	bool operator != (const T&) const;
 
+	Persistent& operator = (const T&);
+	bool remove ();
+
 	void set_default_value (const T&);
 
 private:
+	void get_value () const;
+
 	Script& script;
 	String name;
 
+	mutable T value;
 	T default_value;
 	bool has_default_value;
 };
@@ -201,8 +208,8 @@ protected:
 private:
 	virtual Message::Result on_trap (bool on, Message&);
 
-	Message::Result on_turn_on (GenericMessage&);
-	Message::Result on_turn_off (GenericMessage&);
+	Message::Result on_turn_on (Message&);
+	Message::Result on_turn_off (Message&);
 	Message::Result on_revert (TimerMessage&);
 
 #ifdef IS_THIEF1

@@ -591,5 +591,10 @@ LGMulti<sMultiParm>::LGMulti (const sMultiParm& value)
 
 
 
+LGMulti<Empty>::LGMulti (const Empty&)
+{}
+
+
+
 } // namespace Thief
 

@@ -206,25 +206,15 @@ FlavorName##Link::check_valid () const \
 \
 FlavorName##Links \
 FlavorName##Link::get_all (const Object& source, const Object& dest, \
-	Inheritance inheritance) \
+	Inheritance inheritance, bool reverse) \
 { \
-	Links _links = Link::get_all (flavor (), source, dest, inheritance); \
+	Links _links = \
+		Link::get_all (flavor (reverse), source, dest, inheritance); \
 	FlavorName##Links links; \
 	for (auto& link : _links) \
 		links.push_back (link); \
 	return links; \
 } \
-\
-FlavorName##Links \
-FlavorName##Link::get_all_reverse (const Object& source, const Object& dest, \
-	Inheritance inheritance) \
-{ \
-	Links _links = Link::get_all (flavor (true), source, dest, inheritance); \
-	FlavorName##Links links; \
-	for (auto& link : _links) \
-		links.push_back (link); \
-	return links; \
-}
 
 #define FLAVORED_LINK_IMPL_(FlavorName, ...) \
 FLAVORED_LINK_IMPL_COMMON (FlavorName) \

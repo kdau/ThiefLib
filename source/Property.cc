@@ -81,11 +81,11 @@ Property::get_name () const
 // ObjectProperty
 
 ObjectProperty::ObjectProperty (const Property& _property,
-		const Object& _object, bool add_if_missing)
+		const Object& _object, bool instantiate_if_missing)
 	: property (_property), object (_object)
 {
-	if (property.iface && add_if_missing && !exists ())
-		add ();
+	if (property.iface && instantiate_if_missing && !exists ())
+		instantiate ();
 }
 
 bool
@@ -98,7 +98,7 @@ ObjectProperty::exists (bool inherited) const
 }
 
 bool
-ObjectProperty::add ()
+ObjectProperty::instantiate ()
 {
 	if (!object.exists () || !property.iface) return false;
 	return property.iface->Create (object.number) == S_OK;
@@ -149,7 +149,7 @@ bool
 ObjectProperty::_set (const LGMultiBase& value)
 {
 	if (!object.exists () || !property.iface) return false;
-	if (!exists (false) && !add ()) return false;
+	if (!exists (false) && !instantiate ()) return false;
 	return SService<IPropertySrv> (LG)->Set (object.number,
 		property.iface->Describe ()->szName, nullptr, value) == S_OK;
 }
@@ -166,10 +166,11 @@ ObjectProperty::_get_field (const char* field, LGMultiBase& value) const
 
 bool
 ObjectProperty::_set_field (const char* field, const LGMultiBase& value,
-	bool add_if_missing)
+	bool instantiate_if_missing)
 {
 	if (!object.exists () || !property.iface) return false;
-	if (!exists (false) && (!add_if_missing || !add ())) return false;
+	if (!exists (false) && (!instantiate_if_missing || !instantiate ()))
+		return false;
 	return SService<IPropertySrv> (LG)->Set (object.number,
 		property.iface->Describe ()->szName, field, value) == S_OK;
 }
