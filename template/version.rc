@@ -4,27 +4,25 @@
  *  Part of the template for ThiefLib script modules
  *  Copyright (C) 2012-2013 Kevin Daughtridge <kevin@kdau.com>
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
  *****************************************************************************/
 
-#define MODULE_NAME		"SampleModule" //CUSTOMIZE as in the Makefile
-#define PACKAGE_NAME		"Sample Script Module" //CUSTOMIZE
-#define AUTHOR_NAME		"Kevin Daughtridge" //CUSTOMIZE
-#define COPYRIGHT_YEAR		"2013" //CUSTOMIZE
-#define VERSION_NUMBER		1,0,0,0 //CUSTOMIZE
-#define VERSION_STRING		"1.0" //CUSTOMIZE
+// CUSTOMIZE to the short name of your module, as in the Makefile.
+#define MODULE_NAME		"SampleModule"
+
+// CUSTOMIZE to the full name of your module or mission.
+#define PACKAGE_NAME		"Sample Script Module"
+
+// CUSTOMIZE to your name or pseudonym, or leave undefined to be anonymous.
+#define AUTHOR_NAME		"Kevin Daughtridge"
+
+// CUSTOMIZE to the current year.
+#define COPYRIGHT_YEAR		"2013"
+
+// CUSTOMIZE to your module's current version, as four comma-separated integers.
+#define VERSION_NUMBER		1,0,0,0
+
+// CUSTOMIZE to your module's current version, in freeform string format.
+#define VERSION_STRING		"1.0"
 
 #include <Thief/version.rc>
 

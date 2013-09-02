@@ -8,7 +8,7 @@
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
+ *  the Free Software Foundation; either version 3 of the License, or
  *  (at your option) any later version.
  *
  *  This program is distributed in the hope that it will be useful,
@@ -158,7 +158,7 @@ std::ostream& operator << (std::ostream&, const PropField<T, config>&);
 
 // PropertyChangeMessage
 
-class PropertyChangeMessage : public Message //TESTME
+class PropertyChangeMessage : public Message
 {
 public:
 	enum Event { CHANGE, ADD, REMOVE };
@@ -167,8 +167,8 @@ public:
 		const Object&);
 	THIEF_MESSAGE_WRAP (PropertyChangeMessage);
 
-	Event get_event () const;
-	bool is_inherited () const;
+	Event get_event () const; //TESTME
+	bool is_inherited () const; //TESTME
 
 	Property get_property () const;
 	Object get_object () const;

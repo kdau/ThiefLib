@@ -56,8 +56,8 @@ Tweq.hh
 
 Novel messages/wrappers
 	* ConversationDoneMessage: IAIConversationManager::ListenConversationEnd
-	* HierarchyChangeMessage: ITraitManager::Listen
-	* ObjectChangeMessage: IObjectSystem::Listen
+	* HierarchyChangeMessage: ITraitManager::Listen (per DH2)
+	* ObjectChangeMessage: IObjectSystem::Listen (per DH2)
 	* ObjectiveChangeMessage: from appropriate QuestChange messages
 	* ParameterChangeMessage: from ParameterCache activity
 

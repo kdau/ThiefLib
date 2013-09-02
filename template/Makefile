@@ -3,8 +3,6 @@
 #
 #   Part of the template for ThiefLib script modules
 #   Copyright (C) 2012-2013 Kevin Daughtridge <kevin@kdau.com>
-#   Adapted in part from Public Scripts
-#   Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
