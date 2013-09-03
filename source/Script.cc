@@ -398,8 +398,71 @@ TrapTrigger::on_turn_off (Message& message)
 Message::Result
 TrapTrigger::on_revert (TimerMessage& message)
 {
-	bool on = message.get_data<bool> (Message::DATA1);
+	bool on = message.get_data (Message::DATA1, false);
 	return on_trap (on, message);
+}
+
+
+
+// Transition
+
+void
+Transition::start ()
+{
+	if (timer.exists ()) // Stop any previous transition.
+	{
+		timer->cancel ();
+		timer.remove ();
+	}
+
+	remaining = length;
+	TimerMessage::with_data ("TransitionStep", name)
+		.send (host.host (), host.host ());
+}
+
+bool
+Transition::is_finished () const
+{
+	return !remaining.exists () || remaining == 0ul;
+}
+
+float
+Transition::get_progress () const
+{
+	if (!remaining.exists ())
+		return 0.0f;
+	else if (length == 0ul || remaining == 0ul)
+		return 1.0f;
+	else
+	{
+		float _length = float (Time (length)),
+			_remaining = float (Time (remaining));
+		return (_length - _remaining) / _length;
+	}
+}
+
+Message::Result
+Transition::handle (Script&, sScrMsg* _message, sMultiParm* reply)
+{
+	TimerMessage message (_message, reply);
+
+	if (message.get_data (Message::DATA1, String ()) != name)
+		return Message::HALT;
+
+	if (step_method () && remaining.exists () && Time (remaining) > 0ul)
+	{
+		remaining = std::max (0l, long (Time (remaining)) -
+			long (resolution));
+		timer = host.start_timer ("TransitionStep", resolution, false,
+			name);
+	}
+	else
+	{
+		timer.remove ();
+		remaining.remove ();
+	}
+
+	return Message::CONTINUE;
 }
 
 

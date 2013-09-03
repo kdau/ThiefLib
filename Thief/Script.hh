@@ -121,6 +121,7 @@ private:
 	bool dispatch_cycle (Handlers& candidates, const CIString& key,
 		sScrMsg& message, sMultiParm* reply);
 
+	friend class Transition;
 	Timer _start_timer (const char* timer, Time delay, bool repeating,
 		const LGMultiBase& data);
 
@@ -219,7 +220,48 @@ private:
 
 
 
-// ScriptModule
+// Helper for timed transitions with value interpolation
+
+class Transition : public MessageHandler
+{
+public:
+	template <typename _Script>
+	Transition (_Script& host, bool (_Script::*step_method) (),
+		const String& name, Time resolution = 50ul,
+		Time default_length = 0ul, Curve default_curve = Curve::LINEAR,
+		const CIString& length_param = "transition",
+		const CIString& curve_param = "curve");
+
+	void start ();
+
+	bool is_finished () const;
+	float get_progress () const;
+
+	Parameter<Time> length;
+	Parameter<Curve> curve;
+
+	template <typename T> THIEF_INTERPOLATE_RESULT (T)
+	interpolate (const T& from, const T& to) const;
+
+	template <typename T>
+	T interpolate (const Persistent<T>& from, const Persistent<T>& to) const;
+
+private:
+	virtual Message::Result handle (Script&, sScrMsg*, sMultiParm*);
+
+	Script& host;
+	std::function<bool ()> step_method;
+
+	const String name;
+	const Time resolution;
+
+	Persistent<Timer> timer;
+	Persistent<Time> remaining;
+};
+
+
+
+// The script module
 
 class ScriptModule
 {

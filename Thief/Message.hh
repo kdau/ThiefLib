@@ -79,6 +79,9 @@ public:
 	MULTI_GET_ARG (get_data, Datum, datum);
 	MULTI_SET_ARG (set_data, Datum, datum);
 
+	template <typename T>
+	T get_data (Datum, const T& default_value) const;
+
 	MULTI_GET (get_reply);
 	MULTI_SET (set_reply);
 

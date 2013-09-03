@@ -32,6 +32,20 @@
 
 namespace Thief {
 
+template <typename T>
+inline T
+Message::get_data (Datum datum, const T& default_value) const
+{
+	if (has_data (datum))
+	{
+		LGMulti<T> multi;
+		_get_data (datum, multi);
+		return multi;
+	}
+	else
+		return default_value;
+}
+
 template <typename D1, typename D2, typename D3>
 inline GenericMessage
 GenericMessage::with_data (const char* name, const D1& data1,

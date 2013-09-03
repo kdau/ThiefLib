@@ -76,7 +76,7 @@ inline void
 Script::listen_message (const CIString& message,
 	Message::Result (_Script::*handler) (_Message&))
 {
-	message_handlers.insert (Handlers::value_type (message,
+	message_handlers.insert (std::make_pair (message,
 		new ScriptMessageHandler<_Script, _Message> (handler)));
 }
 
@@ -85,7 +85,7 @@ inline void
 Script::listen_timer (const CIString& timer,
 	Message::Result (_Script::*handler) (TimerMessage&))
 {
-	timer_handlers.insert (Handlers::value_type (timer,
+	timer_handlers.insert (std::make_pair (timer,
 		new ScriptMessageHandler<_Script, TimerMessage> (handler)));
 }
 
@@ -206,6 +206,41 @@ Persistent<T>::get_value () const
 		value = default_value;
 	else
 		throw std::runtime_error ("persistent variable does not exist");
+}
+
+
+
+// Transition
+
+template <typename _Script>
+inline
+Transition::Transition (_Script& _host, bool (_Script::*_step_method) (),
+		const String& _name, Time _resolution, Time default_length,
+		Curve default_curve, const CIString& length_param,
+		const CIString& curve_param)
+	: length (_host.host (), length_param, { default_length }),
+	  curve (_host.host (), curve_param, { default_curve }),
+	  host (_host), step_method (std::bind (_step_method, &_host)),
+	  name (_name), resolution (_resolution),
+	  timer (host, "transition_timer_" + name),
+	  remaining (host, "transition_remaining_" + name)
+{
+	host.timer_handlers.insert (std::make_pair ("TransitionStep", this));
+}
+
+template <typename T>
+inline THIEF_INTERPOLATE_RESULT (T)
+Transition::interpolate (const T& from, const T& to) const
+{
+	return Thief::interpolate (from, to, get_progress (), curve);
+}
+
+template <typename T>
+inline T
+Transition::interpolate (const Persistent<T>& from,
+	const Persistent<T>& to) const
+{
+	return Thief::interpolate (T (from), T (to), get_progress (), curve);
 }
 
 
