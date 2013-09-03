@@ -180,7 +180,8 @@ public:
 
 	static String get_book_text (const String& book, int page = 0);
 
-	static void show_book (const String& book, const String& art);
+	static void show_book (const String& book, const String& art,
+		bool reload = false); //TESTME reload=true
 
 	// Other metagame screens
 

@@ -487,13 +487,13 @@ Readable::get_book_text (int page)
 }
 
 bool
-Readable::show_book (bool use_art, Time duration)
+Readable::show_book (bool use_art, Time duration, bool reload)
 {
 	String book = book_name, art = book_art;
 	if (book.empty ()) return false;
 
 	if (use_art && !art.empty ())
-		Mission::show_book (book, art);
+		Mission::show_book (book, art, reload);
 	else
 	{
 		String text = Mission::get_book_text (book);

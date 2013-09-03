@@ -173,7 +173,7 @@ OSL::LinkContext::operator < (const LinkContext& rhs) const
 }
 
 OSL::OSL ()
-	: sim (false), hud (nullptr), param_cache (nullptr)
+	: sim (false)
 {
 	if (initialized)
 		throw std::runtime_error ("Thief::OSL already initialized.");
@@ -190,8 +190,6 @@ OSL::~OSL ()
 {
 	initialized = false;
 	SInterface<ISimManager> (LG)->Unlisten (&IID_IOSLService);
-	if (hud) { delete hud; hud = nullptr; }
-	if (param_cache) { delete param_cache; param_cache = nullptr; }
 }
 
 STDMETHODIMP_ (void)
@@ -206,18 +204,18 @@ STDMETHODIMP_ (SInterface<IHUD>)
 OSL::get_hud ()
 {
 	if (!hud)
-		try { hud = new HUDImpl (sim); }
+		try { hud.reset (new HUDImpl (sim)); }
 		catch (...) {}
-	return hud;
+	return hud.get ();
 }
 
 STDMETHODIMP_ (SInterface<IParameterCache>)
 OSL::get_param_cache ()
 {
 	if (!param_cache)
-		try { param_cache = new ParameterCache (); }
+		try { param_cache.reset (new ParameterCache ()); }
 		catch (...) {}
-	return param_cache;
+	return param_cache.get ();
 }
 
 STDMETHODIMP_ (bool)
@@ -339,10 +337,7 @@ OSL::on_sim (const sDispatchMsg* message, const sDispatchListenerDesc* desc)
 		try
 		{
 			if (self->hud)
-			{
-				delete self->hud;
-				self->hud = nullptr;
-			}
+				self->hud.reset ();
 
 			if (self->param_cache)
 				self->param_cache->reset ();

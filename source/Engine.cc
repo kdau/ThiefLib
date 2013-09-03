@@ -131,21 +131,17 @@ Monolog
 mono;
 
 Monolog::Monolog ()
-	: std::ostream (), buf (nullptr)
+	: std::ostream (), buf ()
 {}
 
 Monolog::~Monolog ()
-{
-	if (buf) delete buf;
-}
+{}
 
 void
 Monolog::attach (MPrintfProc proc)
 {
-	auto _buf = new Streambuf (proc);
-	rdbuf (_buf);
-	if (buf) delete buf;
-	buf = _buf;
+	buf.reset (new Streambuf (proc));
+	rdbuf (buf.get ());
 }
 
 

@@ -218,8 +218,8 @@ private:
 	static int __cdecl on_sim (const sDispatchMsg*,
 		const sDispatchListenerDesc*);
 
-	HUDImpl* hud;
-	ParameterCache* param_cache;
+	std::unique_ptr<HUDImpl> hud;
+	std::unique_ptr<ParameterCache> param_cache;
 
 	// LinkChage message
 

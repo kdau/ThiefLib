@@ -225,7 +225,7 @@ Transition::Transition (_Script& _host, bool (_Script::*_step_method) (),
 	  timer (host, "transition_timer_" + name),
 	  remaining (host, "transition_remaining_" + name)
 {
-	host.timer_handlers.insert (std::make_pair ("TransitionStep", this));
+	initialize ();
 }
 
 template <typename T>

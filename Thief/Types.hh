@@ -286,7 +286,7 @@ public:
 
 	String get_book_text (int page = 0); //TESTME
 
-	bool show_book (bool use_art, Time duration = 0ul); //TESTME
+	bool show_book (bool use_art, Time duration = 0ul, bool reload = false); //TESTME
 };
 
 

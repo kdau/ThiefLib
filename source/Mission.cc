@@ -383,9 +383,12 @@ Mission::get_book_text (const String& book, int page)
 }
 
 void
-Mission::show_book (const String& book, const String& art)
+Mission::show_book (const String& book, const String& art, bool reload)
 {
-	SService<IDarkUISrv> (LG)->ReadBook (book.data (), art.data ());
+	if (reload)
+		Engine::run_command ("test_book_ex", book + "," + art);
+	else
+		SService<IDarkUISrv> (LG)->ReadBook (book.data (), art.data ());
 }
 
 

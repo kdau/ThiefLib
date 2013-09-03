@@ -43,7 +43,7 @@ public:
 
 private:
 	class Streambuf;
-	Streambuf* buf;
+	std::unique_ptr<Streambuf> buf;
 };
 
 extern Monolog mono;

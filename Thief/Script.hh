@@ -39,7 +39,9 @@ class Script;
 
 struct MessageHandler
 {
+	typedef std::unique_ptr<MessageHandler> Ptr;
 	virtual Message::Result handle (Script&, sScrMsg*, sMultiParm*) = 0;
+	virtual ~MessageHandler ();
 };
 
 template <typename _Script, typename _Message>
@@ -50,8 +52,7 @@ struct ScriptMessageHandler : public MessageHandler,
 
 	ScriptMessageHandler (Method method);
 
-	virtual Message::Result handle (Script& script,
-		sScrMsg* message, sMultiParm* reply);
+	virtual Message::Result handle (Script&, sScrMsg*, sMultiParm*);
 };
 
 
@@ -113,7 +114,7 @@ private:
 	virtual void initialize ();
 	void fix_player_links (); //TESTME
 
-	typedef std::multimap<CIString, MessageHandler*> Handlers;
+	typedef std::multimap<CIString, MessageHandler::Ptr> Handlers;
 	Handlers message_handlers;
 	Handlers timer_handlers;
 
@@ -131,7 +132,7 @@ private:
 
 	class Impl;
 	friend class Impl;
-	Impl* impl;
+	Impl& impl;
 
 	const String script_name;
 	Object::Number host_obj;
@@ -231,6 +232,7 @@ public:
 		Time default_length = 0ul, Curve default_curve = Curve::LINEAR,
 		const CIString& length_param = "transition",
 		const CIString& curve_param = "curve");
+	~Transition ();
 
 	void start ();
 
@@ -247,6 +249,7 @@ public:
 	T interpolate (const Persistent<T>& from, const Persistent<T>& to) const;
 
 private:
+	void initialize ();
 	virtual Message::Result handle (Script&, sScrMsg*, sMultiParm*);
 
 	Script& host;

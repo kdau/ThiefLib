@@ -40,6 +40,13 @@ extern "C" const GUID IID_IOSLService = THIEF_IOSLService_GUID;
 
 
 
+// MessageHandler
+
+MessageHandler::~MessageHandler ()
+{}
+
+
+
 // ScriptHost
 
 PROXY_CONFIG (ScriptHost, script_timing, "ScriptTiming", nullptr, Time, 0ul);
@@ -71,7 +78,9 @@ Script::Impl::Impl (Script& _script)
 
 Script::Impl::~Impl ()
 {
-	script.impl = nullptr;
+	// To provide COM lifetime management to derived script classes without
+	// exposing the IUnknown interface in the ThiefLib API, the Script::Impl
+	// has to be the one to delete its owner.
 	delete &script;
 }
 
@@ -118,23 +127,21 @@ Script::Impl::ReceiveMessage (sScrMsg* message, sMultiParm* reply,
 // Script
 
 Script::Script (const String& _name, const Object& _host)
-	: impl (new Impl (*this)), script_name (_name), host_obj (_host.number),
-	  initialized (false), sim (Engine::is_sim ()), post_sim (false),
-	  sim_time (0ul)
+	: impl (*new Impl (*this)),
+	  script_name (_name),
+	  host_obj (_host.number),
+	  initialized (false),
+	  sim (Engine::is_sim ()),
+	  post_sim (false)
 {}
 
 Script::~Script ()
-{
-	for (auto& handler : message_handlers)
-		delete handler.second;
-	for (auto& handler : timer_handlers)
-		delete handler.second;
-}
+{}
 
 IScript*
 Script::get_interface ()
 {
-	return impl;
+	return &impl;
 }
 
 Monolog&
@@ -405,6 +412,32 @@ TrapTrigger::on_revert (TimerMessage& message)
 
 
 // Transition
+
+Transition::~Transition ()
+{
+	try
+	{
+		for (auto iter = host.timer_handlers.begin ();
+		     iter != host.timer_handlers.end (); ++iter)
+			if (iter->second.get () == this)
+			{
+				iter->second.release ();
+				host.timer_handlers.erase (iter);
+				break;
+			}
+	}
+	catch (...) {}
+}
+
+void
+Transition::initialize ()
+{
+	// Creating a unique_ptr to @this is horrible. This only works
+	// because Transition's destructor removes and releases the pointer
+	// before Script's destructor can get to it. The alternative is a
+	// unique_ptr wrapper with conditional deletion, which seems excessive.
+	host.timer_handlers.insert (std::make_pair ("TransitionStep", this));
+}
 
 void
 Transition::start ()

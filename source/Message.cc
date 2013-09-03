@@ -45,40 +45,33 @@ Timer::cancel ()
 
 // Message
 
-Message::Message (sScrMsg* _message, sMultiParm* _reply, bool)
+Message::Message (sScrMsg* _message, sMultiParm* reply, bool)
 	: message (_message),
-	  reply (_reply ? _reply : new cMultiParm ()),
-	  own_reply (!_reply)
+	  reply_local (),
+	  reply_remote (reply)
 {
 	if (message)
 		message->AddRef ();
 	else
-	{
-		if (own_reply) delete reply;
 		throw MessageWrapError (message, typeid (*this),
 			"message is null");
-	}
 }
 
 Message::Message (const Message& copy)
 	: message (copy.message),
-	  reply (copy.reply ? new cMultiParm (*copy.reply) : new cMultiParm ()),
-	  own_reply (true)
+	  reply_local ((const sMultiParm&) copy.reply_local),
+	  reply_remote (copy.reply_remote)
 {
 	if (message)
 		message->AddRef ();
 	else
-	{
-		delete reply;
 		throw MessageWrapError (message, typeid (*this),
 			"message is null");
-	}
 }
 
 Message::~Message ()
 {
 	if (message) message->Release ();
-	if (own_reply) delete reply;
 }
 
 const char*
@@ -92,7 +85,8 @@ Message::send (const Object& from, const Object& to)
 {
 	message->from = from.number;
 	message->to = to.number;
-	LG->SendMessage (message, reply);
+	LG->SendMessage (message, reply_remote ? reply_remote
+		: &(sMultiParm&) reply_local);
 }
 
 void
@@ -187,13 +181,17 @@ Message::_set_data (Datum datum, const LGMultiBase& value)
 void
 Message::_get_reply (LGMultiBase& value) const
 {
-	value = *reply;
+	value = reply_remote ? *reply_remote : (const sMultiParm&) reply_local;
 }
 
 void
 Message::_set_reply (const LGMultiBase& value)
 {
-	*reply = value;
+	if (reply_remote)
+		*reinterpret_cast<LGMultiBase*> (reply_remote) =
+			(const sMultiParm&) value;
+	else
+		reply_local = (const sMultiParm&) value;
 }
 
 const char*

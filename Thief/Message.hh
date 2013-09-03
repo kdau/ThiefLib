@@ -90,7 +90,6 @@ protected:
 		bool own_message = false);
 
 	sScrMsg* const message;
-	sMultiParm* const reply;
 
 	const char* get_lg_typename () const;
 
@@ -103,7 +102,8 @@ private:
 	void _get_reply (LGMultiBase& value) const;
 	void _set_reply (const LGMultiBase& value);
 
-	bool own_reply;
+	LGMulti<sMultiParm> reply_local;
+	sMultiParm* const reply_remote;
 };
 
 
