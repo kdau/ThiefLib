@@ -62,22 +62,18 @@ extern Allocator alloc;
 
 
 
-// CIE color spaces
+// XYZColor: intermediate for CIE color space conversion
 
 struct XYZColor
 {
 	double X, Y, Z;
 	XYZColor (double _x, double _y, double _z) : X (_x), Y (_y), Z (_z) {}
-	XYZColor (const Color& srgb);
-	operator Color () const;
-};
 
-struct LabColor
-{
-	double L, a, b;
-	LabColor (double _l, double _a, double _b) : L (_l), a (_a), b (_b) {}
-	LabColor (const XYZColor& xyz);
-	operator XYZColor () const;
+	explicit XYZColor (const RGBColor& srgb);
+	explicit operator RGBColor () const;
+
+	explicit XYZColor (const LabColor& lab);
+	explicit operator LabColor () const;
 };
 
 

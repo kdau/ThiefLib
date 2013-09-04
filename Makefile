@@ -107,7 +107,7 @@ $(bindir_osl):
 
 
 
-SOURCES = \
+COMMON_SOURCES = \
 	Base.cc \
 	Private.cc \
 	AI.cc \
@@ -124,10 +124,12 @@ SOURCES = \
 	Property.cc \
 	QuestVar.cc \
 	Rendering.cc \
-	Script.cc \
 	Security.cc \
 	Sound.cc \
 	Types.cc
+
+SOURCES = $(COMMON_SOURCES) \
+	Script.cc
 
 OBJECTS1N = $(SOURCES:%.cc=$(bindir1n)/%.o)
 OBJECTS1D = $(SOURCES:%.cc=$(bindir1d)/%.o)
@@ -153,26 +155,37 @@ $(bindir1n)/Base.o: ./Thief/Base.inl
 $(bindir1d)/Base.o: ./Thief/Base.inl
 $(bindir2n)/Base.o: ./Thief/Base.inl
 $(bindir2d)/Base.o: ./Thief/Base.inl
+$(bindir_osl)/Base.o: ./Thief/Base.inl
 
 $(bindir1n)/AI.o: ./Thief/AI.inl
 $(bindir1d)/AI.o: ./Thief/AI.inl
 $(bindir2n)/AI.o: ./Thief/AI.inl
 $(bindir2d)/AI.o: ./Thief/AI.inl
+$(bindir_osl)/AI.o: ./Thief/AI.inl
+
+$(bindir1n)/HUD.o: ./Thief/HUD.inl
+$(bindir1d)/HUD.o: ./Thief/HUD.inl
+$(bindir2n)/HUD.o: ./Thief/HUD.inl
+$(bindir2d)/HUD.o: ./Thief/HUD.inl
+$(bindir_osl)/HUD.o: ./Thief/HUD.inl
 
 $(bindir1n)/Link.o: ./Thief/Link.inl
 $(bindir1d)/Link.o: ./Thief/Link.inl
 $(bindir2n)/Link.o: ./Thief/Link.inl
 $(bindir2d)/Link.o: ./Thief/Link.inl
+$(bindir_osl)/Link.o: ./Thief/Link.inl
 
 $(bindir1n)/Parameter.o: ./Thief/Parameter.inl
 $(bindir1d)/Parameter.o: ./Thief/Parameter.inl
 $(bindir2n)/Parameter.o: ./Thief/Parameter.inl
 $(bindir2d)/Parameter.o: ./Thief/Parameter.inl
+$(bindir_osl)/Parameter.o: ./Thief/Parameter.inl
 
 $(bindir1n)/Property.o: ./Thief/Property.inl
 $(bindir1d)/Property.o: ./Thief/Property.inl
 $(bindir2n)/Property.o: ./Thief/Property.inl
 $(bindir2d)/Property.o: ./Thief/Property.inl
+$(bindir_osl)/Property.o: ./Thief/Property.inl
 
 $(bindir1n)/Script.o: ./Thief/Script.inl
 $(bindir1d)/Script.o: ./Thief/Script.inl
@@ -192,18 +205,7 @@ $(LGDIR)/%.o: ;
 
 
 
-OSL_SOURCES = \
-	Base.cc \
-	Private.cc \
-	Engine.cc \
-	HUD.cc \
-	Link.cc \
-	Message.cc \
-	Mission.cc \
-	Object.cc \
-	Parameter.cc \
-	Property.cc \
-	QuestVar.cc \
+OSL_SOURCES = $(COMMON_SOURCES) \
 	ParameterCache.cc \
 	OSL.cc
 

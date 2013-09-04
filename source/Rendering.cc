@@ -104,16 +104,16 @@ OBJECT_TYPE_IMPL_ (Light,
 // AnimLight
 //TODO wrap rest of property: Renderer\Anim Light = AnimLight
 
-PROXY_NEG_CONFIG (AnimLight, light_on, "AnimLight", "inactive", bool, true);
+PROXY_NEG_CONFIG (AnimLight, initially_on, "AnimLight", "inactive", bool, true);
 
 OBJECT_TYPE_IMPL_ (AnimLight, Light (),
-	PROXY_INIT (light_on)
+	PROXY_INIT (initially_on)
 )
 
 bool
 AnimLight::is_anim_light () const
 {
-	return light_on.exists ();
+	return initially_on.exists ();
 }
 
 AnimLight::Mode

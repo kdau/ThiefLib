@@ -310,6 +310,8 @@ Player::hide_arm ()
 
 // Miscellaneous
 
+#ifndef IS_OSL
+
 void
 Player::attach_camera (const Object& camera, bool freelook)
 {
@@ -328,6 +330,8 @@ Player::detach_camera (const Object& camera)
 		return SService<ICameraSrv> (LG)->CameraReturn
 			(camera.number) == S_OK;
 }
+
+#endif // !IS_OSL
 
 bool
 Player::drop_dead ()

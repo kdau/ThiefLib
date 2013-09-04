@@ -25,10 +25,57 @@
 #define THIEF_HUD_HH
 
 #include <Thief/Base.hh>
+#include <Thief/Engine.hh>
 
 namespace Thief {
 
 class HUDElement;
+
+
+
+struct CanvasPoint
+{
+	int x, y;
+
+	CanvasPoint ();
+	CanvasPoint (int x, int y);
+
+	bool valid () const;
+	bool operator == (const CanvasPoint&) const;
+	bool operator != (const CanvasPoint&) const;
+
+	CanvasPoint operator - () const;
+	CanvasPoint operator + (const CanvasPoint&) const;
+	CanvasPoint operator - (const CanvasPoint&) const;
+	CanvasPoint operator * (int) const;
+	CanvasPoint operator / (int) const;
+
+	CanvasPoint& operator += (const CanvasPoint&);
+	CanvasPoint& operator -= (const CanvasPoint&);
+
+	static const CanvasPoint ORIGIN;
+	static const CanvasPoint OFFSCREEN;
+};
+
+
+
+struct CanvasRect : public CanvasPoint, public CanvasSize
+{
+	CanvasRect ();
+	CanvasRect (int x, int y, int w, int h);
+	CanvasRect (CanvasPoint position, CanvasSize size);
+	explicit CanvasRect (CanvasSize size); // at origin
+
+	bool valid () const;
+	bool operator == (const CanvasRect&) const;
+	bool operator != (const CanvasRect&) const;
+
+	CanvasRect operator + (const CanvasPoint&) const;
+	CanvasRect operator - (const CanvasPoint&) const;
+
+	static const CanvasRect NOCLIP;
+	static const CanvasRect OFFSCREEN;
+};
 
 
 
@@ -158,6 +205,8 @@ private:
 
 
 } // namespace Thief
+
+#include <Thief/HUD.inl>
 
 #endif // THIEF_HUD_HH
 

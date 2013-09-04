@@ -158,6 +158,8 @@ Door::toggle_door ()
 	return SService<IDoorSrv> (LG)->ToggleDoor (number);
 }
 
+#ifndef IS_OSL
+
 bool
 Door::get_blocks_sound () const
 {
@@ -169,6 +171,8 @@ Door::set_blocks_sound (bool blocks_sound)
 {
 	SService<IDoorSrv> (LG)->SetBlocking (number, blocks_sound);
 }
+
+#endif // !IS_OSL
 
 
 

@@ -31,7 +31,7 @@ namespace Thief {
 
 
 
-// Monolog
+// Monolog: logging for DromEd
 
 class Monolog : public std::ostream
 {
@@ -50,7 +50,23 @@ extern Monolog mono;
 
 
 
-// Version
+// CanvasSize: screen extents
+
+struct CanvasSize
+{
+	int w, h;
+
+	CanvasSize ();
+	CanvasSize (int w, int h);
+
+	bool valid () const;
+	bool operator == (const CanvasSize&) const;
+	bool operator != (const CanvasSize&) const;
+};
+
+
+
+// Version: Dark Engine version checking
 
 struct Version
 {

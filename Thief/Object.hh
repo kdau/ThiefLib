@@ -63,8 +63,11 @@ public:
 	static Object create_metaprop (const Object& parent, const String& name);
 
 	bool exists () const;
+
 	Object clone () const;
+
 	void destroy ();
+	void schedule_destruction (Time lifespan);
 
 	// Identity
 

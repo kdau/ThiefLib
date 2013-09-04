@@ -97,67 +97,7 @@ std::ostream& operator << (std::ostream&, const CIString&);
 
 
 
-struct CanvasPoint
-{
-	int x, y;
-
-	CanvasPoint ();
-	CanvasPoint (int x, int y);
-
-	bool valid () const;
-	bool operator == (const CanvasPoint&) const;
-	bool operator != (const CanvasPoint&) const;
-
-	CanvasPoint operator - () const;
-	CanvasPoint operator + (const CanvasPoint&) const;
-	CanvasPoint operator - (const CanvasPoint&) const;
-	CanvasPoint operator * (int) const;
-	CanvasPoint operator / (int) const;
-
-	CanvasPoint& operator += (const CanvasPoint&);
-	CanvasPoint& operator -= (const CanvasPoint&);
-
-	static const CanvasPoint ORIGIN;
-	static const CanvasPoint OFFSCREEN;
-};
-
-
-
-struct CanvasSize
-{
-	int w, h;
-
-	CanvasSize ();
-	CanvasSize (int w, int h);
-
-	bool valid () const;
-	bool operator == (const CanvasSize&) const;
-	bool operator != (const CanvasSize&) const;
-};
-
-
-
-struct CanvasRect : public CanvasPoint, public CanvasSize
-{
-	CanvasRect ();
-	CanvasRect (int x, int y, int w, int h);
-	CanvasRect (CanvasPoint position, CanvasSize size);
-	explicit CanvasRect (CanvasSize size); // at ORIGIN
-
-	bool valid () const;
-	bool operator == (const CanvasRect&) const;
-	bool operator != (const CanvasRect&) const;
-
-	CanvasRect operator + (const CanvasPoint&) const;
-	CanvasRect operator - (const CanvasPoint&) const;
-
-	static const CanvasRect NOCLIP;
-	static const CanvasRect OFFSCREEN;
-};
-
-
-
-struct Color
+struct RGBColor
 {
 	typedef unsigned char Component;
 	typedef unsigned long Value;
@@ -166,19 +106,35 @@ struct Color
 	Component green;
 	Component blue;
 
-	Color ();
-	Color (Component red, Component green, Component blue);
+	RGBColor ();
+	RGBColor (Component red, Component green, Component blue);
 
-	explicit Color (Value);
-	Color& operator = (Value);
+	explicit RGBColor (Value);
+	RGBColor& operator = (Value);
 	operator Value () const;
 
-	explicit Color (const String&);
-	Color& operator = (const String&);
+	explicit RGBColor (const String&);
+	RGBColor& operator = (const String&);
 	explicit operator String () const;
 };
 
-std::ostream& operator << (std::ostream&, const Color&);
+std::ostream& operator << (std::ostream&, const RGBColor&);
+
+typedef RGBColor Color;
+
+
+
+struct LabColor
+{
+	typedef double Component;
+	Component L, a, b;
+
+	LabColor ();
+	LabColor (Component L, Component a, Component b);
+
+	LabColor (const RGBColor&);
+	operator RGBColor () const;
+};
 
 
 
@@ -194,6 +150,9 @@ struct Time
 	operator Value () const { return value; }
 	explicit operator long () const { return value; }
 	explicit operator float () const { return value; }
+
+	Value seconds () const;
+	Value minutes () const;
 
 	explicit Time (const String&);
 	Time& operator = (const String&);

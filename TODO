@@ -55,7 +55,6 @@ Tweq.hh
 		* Tweq\ScaleState = StTweqScale
 
 Novel messages/wrappers
-	* ConversationDoneMessage: IAIConversationManager::ListenConversationEnd
 	* HierarchyChangeMessage: ITraitManager::Listen (per DH2)
 	* ObjectChangeMessage: IObjectSystem::Listen (per DH2)
 	* ObjectiveChangeMessage: from appropriate QuestChange messages

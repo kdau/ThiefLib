@@ -100,138 +100,52 @@ operator << (std::ostream& out, const CIString& string)
 
 
 
-// CanvasPoint
+// RGBColor (=Color)
 
 inline
-CanvasPoint::CanvasPoint ()
-	: x (0), y (0)
-{}
-
-inline
-CanvasPoint::CanvasPoint (int _x, int _y)
-	: x (_x), y (_y)
-{}
-
-inline bool
-CanvasPoint::operator == (const CanvasPoint& rhs) const
-{
-	return x == rhs.x && y == rhs.y;
-}
-
-inline bool
-CanvasPoint::operator != (const CanvasPoint& rhs) const
-{
-	return x != rhs.x || y != rhs.y;
-}
-
-
-
-// CanvasSize
-
-inline
-CanvasSize::CanvasSize ()
-	: w (0), h (0)
-{}
-
-inline
-CanvasSize::CanvasSize (int _w, int _h)
-	: w (_w), h (_h)
-{}
-
-inline bool
-CanvasSize::operator == (const CanvasSize& rhs) const
-{
-	return w == rhs.w && h == rhs.h;
-}
-
-inline bool
-CanvasSize::operator != (const CanvasSize& rhs) const
-{
-	return w != rhs.w || h != rhs.h;
-}
-
-
-
-// CanvasRect
-
-inline
-CanvasRect::CanvasRect ()
-	: CanvasPoint (), CanvasSize ()
-{}
-
-inline
-CanvasRect::CanvasRect (int _x, int _y, int _w, int _h)
-	: CanvasPoint (_x, _y), CanvasSize (_w, _h)
-{}
-
-inline
-CanvasRect::CanvasRect (CanvasPoint position, CanvasSize size)
-	: CanvasPoint (position), CanvasSize (size)
-{}
-
-inline
-CanvasRect::CanvasRect (CanvasSize size)
-	: CanvasPoint (), CanvasSize (size)
-{}
-
-inline bool
-CanvasRect::operator == (const CanvasRect& rhs) const
-{
-	return x == rhs.x && y == rhs.y && w == rhs.w && h == rhs.h;
-}
-
-inline bool
-CanvasRect::operator != (const CanvasRect& rhs) const
-{
-	return x != rhs.x || y != rhs.y || w != rhs.w || h != rhs.h;
-}
-
-inline CanvasRect
-CanvasRect::operator + (const CanvasPoint& rhs) const
-{
-	return CanvasRect (x + rhs.x, y + rhs.y, w, h);
-}
-
-inline CanvasRect
-CanvasRect::operator - (const CanvasPoint& rhs) const
-{
-	return CanvasRect (x - rhs.x, y - rhs.y, w, h);
-}
-
-
-
-// Color
-
-inline
-Color::Color ()
+RGBColor::RGBColor ()
 	: red (0u), green (0u), blue (0u)
 {}
 
 inline
-Color::Color (Component _red, Component _green, Component _blue)
+RGBColor::RGBColor (Component _red, Component _green, Component _blue)
 	: red (_red), green (_green), blue (_blue)
 {}
 
 inline
-Color::Color (Value value)
+RGBColor::RGBColor (Value value)
 	: red (0u), green (0u), blue (0u)
 {
 	*this = value;
 }
 
 inline
-Color::Color (const String& code)
+RGBColor::RGBColor (const String& code)
 	: red (0u), green (0u), blue (0u)
 {
 	*this = code;
 }
 
 inline std::ostream&
-operator << (std::ostream& out, const Color& color)
+operator << (std::ostream& out, const RGBColor& color)
 {
 	out << String (color);
 	return out;
 }
+
+
+
+// LabColor
+
+inline
+LabColor::LabColor ()
+	: L (0.0), a (0.0), b (0.0)
+{}
+
+inline
+LabColor::LabColor (Component _L, Component _a, Component _b)
+	: L (_L), a (_a), b (_b)
+{}
 
 
 
@@ -247,6 +161,18 @@ Time::operator = (Value _value)
 {
 	value = _value;
 	return *this;
+}
+
+inline Time::Value
+Time::seconds () const
+{
+	return value / 1000ul;
+}
+
+inline Time::Value
+Time::minutes () const
+{
+	return value / 60000ul;
 }
 
 inline
@@ -429,14 +355,17 @@ protected:
 template <typename T, typename Enable = void>
 class LGMulti;
 
-#define THIEF_LGMULTI_SPECIALIZE(Type, Default) \
+#define THIEF_LGMULTI_SPECIALIZE_(Type, Parent, Default) \
 template<> \
-class LGMulti<Type> : public LGMultiBase \
+class LGMulti<Type> : public Parent \
 { \
 public: \
 	LGMulti (const Type& value = Default); \
 	operator Type () const; \
 };
+
+#define THIEF_LGMULTI_SPECIALIZE(Type, Default) \
+THIEF_LGMULTI_SPECIALIZE_ (Type, LGMultiBase, Default)
 
 class LGMultiTypeError : public std::exception
 {

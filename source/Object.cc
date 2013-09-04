@@ -106,19 +106,8 @@ Object::create_temp_fnord (Time lifespan)
 {
 	Object fnord = create (Object ("Marker"));
 	fnord.set_transient (true);
-
-	// Add a delete tweq to enforce the lifespan. //TODO Use DeleteTweq once created.
 	if (lifespan != 0ul)
-	{
-		ObjectProperty config ("CfgTweqDelete", fnord, true);
-		config.set_field ("Halt", 0); // Destroy Obj
-		config.set_field ("AnimC", 2); // Sim
-		config.set_field ("Rate", lifespan);
-
-		ObjectProperty state ("StTweqDelete", fnord, true);
-		state.set_field ("AnimS", 1); // On
-	}
-
+		fnord.schedule_destruction (lifespan);
 	return fnord;
 }
 
@@ -154,6 +143,24 @@ void
 Object::destroy ()
 {
 	SService<IObjectSrv> (LG)->Destroy (number);
+}
+
+void
+Object::schedule_destruction (Time lifespan) //TODO Use DeleteTweq once created.
+{
+	if (lifespan == 0ul)
+	{
+		destroy ();
+		return;
+	}
+
+	ObjectProperty config ("CfgTweqDelete", *this, true);
+	config.set_field ("Halt", 0); // Destroy Obj
+	config.set_field ("AnimC", 2); // Sim
+	config.set_field ("Rate", lifespan);
+
+	ObjectProperty state ("StTweqDelete", *this, true);
+	state.set_field ("AnimS", 1); // On
 }
 
 

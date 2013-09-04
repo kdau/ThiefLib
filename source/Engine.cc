@@ -146,6 +146,37 @@ Monolog::attach (MPrintfProc proc)
 
 
 
+// CanvasSize
+
+CanvasSize::CanvasSize ()
+	: w (0), h (0)
+{}
+
+CanvasSize::CanvasSize (int _w, int _h)
+	: w (_w), h (_h)
+{}
+
+bool
+CanvasSize::valid () const
+{
+	// An empty size still counts as valid.
+	return w >= 0 && h >= 0;
+}
+
+bool
+CanvasSize::operator == (const CanvasSize& rhs) const
+{
+	return w == rhs.w && h == rhs.h;
+}
+
+bool
+CanvasSize::operator != (const CanvasSize& rhs) const
+{
+	return w != rhs.w || h != rhs.h;
+}
+
+
+
 // Version
 
 Version::Version (int _major, int _minor)

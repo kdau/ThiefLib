@@ -74,6 +74,11 @@ interface IOSLService : IScriptServiceBase
 		const Object& object, const Object& host) PURE;
 	STDMETHOD_ (bool, unsubscribe_property) (const Property&,
 		const Object& object, const Object& host) PURE;
+
+	STDMETHOD_ (bool, subscribe_conversation) (const Object& conversation,
+		const Object& host) PURE;
+	STDMETHOD_ (bool, unsubscribe_conversation) (const Object& conversation,
+		const Object& host) PURE;
 };
 
 extern "C" const GUID IID_IOSLService;
@@ -131,6 +136,26 @@ struct PropertyChangeMessageImpl : public sScrMsg
 
 	virtual const char* __thiscall GetName () const
 		{ return "PropertyChangeMessageImpl"; }
+};
+
+
+
+// ConversationMessageImpl
+
+struct ConversationMessageImpl : public sScrMsg
+{
+	Object conversation;
+
+	ConversationMessageImpl ()
+		: sScrMsg (),
+		  conversation ()
+	{}
+
+	virtual ~ConversationMessageImpl ()
+	{}
+
+	virtual const char* __thiscall GetName () const
+		{ return "ConversationMessageImpl"; }
 };
 
 
@@ -208,8 +233,13 @@ public:
 	STDMETHOD_ (bool, unsubscribe_property) (const Property&,
 		const Object& object, const Object& host);
 
+	STDMETHOD_ (bool, subscribe_conversation) (const Object& conversation,
+		const Object& host);
+	STDMETHOD_ (bool, unsubscribe_conversation) (const Object& conversation,
+		const Object& host);
+
 private:
-	static bool initialized;
+	static OSL* self;
 	bool sim;
 
 	friend bool ::ThiefLibOSLInit (IScriptMan*, MPrintfProc, IMalloc*);
@@ -221,7 +251,7 @@ private:
 	std::unique_ptr<HUDImpl> hud;
 	std::unique_ptr<ParameterCache> param_cache;
 
-	// LinkChage message
+	// LinkChange message
 
 	static void __stdcall on_link_event (sRelationListenMsg*, void*);
 
@@ -247,6 +277,15 @@ private:
 
 	typedef std::multimap<ObjectProperty, Object> PropertySubscriptions;
 	PropertySubscriptions property_subscriptions;
+
+	// ConversationEnd message
+
+	static void __cdecl on_conversation_end (Object::Number);
+
+	static bool listened_conversations;
+
+	typedef std::multimap<Object, Object> ConversationSubscriptions;
+	ConversationSubscriptions conversation_subscriptions;
 };
 
 

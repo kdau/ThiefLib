@@ -29,7 +29,7 @@ namespace Thief {
 
 // SoundSchema
 
-#ifdef IS_THIEF2
+#if defined(IS_THIEF2) || defined(IS_OSL)
 #define _SOUND_NET , kSoundNetNormal
 #else
 #define _SOUND_NET

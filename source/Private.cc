@@ -207,7 +207,7 @@ sRGB_invgamma (double c)
 		: std::pow ((c + 0.055) / 1.055, 2.4);
 }
 
-XYZColor::XYZColor (const Color& srgb)
+XYZColor::XYZColor (const RGBColor& srgb)
 {
 	double  R = sRGB_invgamma (srgb.red / 255.0),
 		G = sRGB_invgamma (srgb.green / 255.0),
@@ -218,22 +218,17 @@ XYZColor::XYZColor (const Color& srgb)
 	Z = 0.0193339 * R + 0.1191920 * G + 0.9503041 * B;
 }
 
-XYZColor::operator Color () const
+XYZColor::operator RGBColor () const
 {
 	double 	R =  3.2404542 * X - 1.5371385 * Y - 0.4985314 * Z,
 		G = -0.9692660 * X + 1.8760108 * Y + 0.0415560 * Z,
 		B =  0.0556434 * X - 0.2040259 * Y + 1.0572252 * Z;
 
-	R = sRGB_gamma (std::max (0.0, std::min (1.0, R)));
-	G = sRGB_gamma (std::max (0.0, std::min (1.0, G)));
-	B = sRGB_gamma (std::max (0.0, std::min (1.0, B)));
-
-	return Color (R * 255.0, G * 255.0, B * 255.0);
+	R = 255.0 * std::max (0.0, std::min (1.0, sRGB_gamma (R)));
+	G = 255.0 * std::max (0.0, std::min (1.0, sRGB_gamma (G)));
+	B = 255.0 * std::max (0.0, std::min (1.0, sRGB_gamma (B)));
+	return RGBColor (R, G, B);
 }
-
-
-
-// LabColor
 
 static const XYZColor D65_WHITE = { 0.950456, 1.0, 1.088754 };
 
@@ -253,28 +248,28 @@ Lab_invf (double t)
 		: ((t - 4.0 / 29.0) * 108.0 / 841.0);
 }
 
-LabColor::LabColor (const XYZColor& xyz)
+XYZColor::operator LabColor () const
 {
-	double  X = Lab_f (xyz.X / D65_WHITE.X),
-		Y = Lab_f (xyz.Y / D65_WHITE.Y),
-		Z = Lab_f (xyz.Z / D65_WHITE.Z);
-
-	L = 116.0 * Y - 16.0;
-	a = 500.0 * (X - Y);
-	b = 200.0 * (Y - Z);
-}
-
-LabColor::operator XYZColor () const
-{
-	double  Y = (L + 16.0) / 116.0,
-		X = Y + a / 500.0,
-		Z = Y - b / 200.0;
+	double  _X = Lab_f (X / D65_WHITE.X),
+		_Y = Lab_f (Y / D65_WHITE.Y),
+		_Z = Lab_f (Z / D65_WHITE.Z);
 
 	return {
-		D65_WHITE.X * Lab_invf (X),
-		D65_WHITE.Y * Lab_invf (Y),
-		D65_WHITE.Z * Lab_invf (Z)
+		std::max (0.0, 116.0 * _Y - 16.0),
+		500.0 * (_X - _Y),
+		200.0 * (_Y - _Z)
 	};
+}
+
+XYZColor::XYZColor (const LabColor& lab)
+{
+	double  _Y = (lab.L + 16.0) / 116.0,
+		_X = _Y + lab.a / 500.0,
+		_Z = _Y - lab.b / 200.0;
+
+	X = std::max (0.0, std::min (1.0, D65_WHITE.X * Lab_invf (_X)));
+	Y = std::max (0.0, std::min (1.0, D65_WHITE.Y * Lab_invf (_Y)));
+	Z = std::max (0.0, std::min (1.0, D65_WHITE.Z * Lab_invf (_Z)));
 }
 
 

@@ -207,6 +207,9 @@ public:
 	THIEF_PROP_FIELD (AI::Alert, abort_level); //TESTME
 	THIEF_PROP_FIELD (AI::Priority, abort_priority); //TESTME
 	THIEF_PROP_FIELD (bool, save_conversation);
+
+	bool subscribe (const Object& host = Object::SELF);
+	bool unsubscribe (const Object& host = Object::SELF); //TESTME
 };
 
 
@@ -359,6 +362,20 @@ public:
 	THIEF_MESSAGE_WRAP (AISignalMessage);
 
 	String get_signal () const;
+};
+
+
+
+// ConversationMessage: "ConversationEnd", sent when a subscribed conversation
+//	ends (either after the last normal step or after the abort step)
+
+class ConversationMessage : public Message
+{
+public:
+	ConversationMessage (const Object& conversation);
+	THIEF_MESSAGE_WRAP (ConversationMessage);
+
+	Conversation get_conversation () const;
 };
 
 

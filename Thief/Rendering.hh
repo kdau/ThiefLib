@@ -95,7 +95,7 @@ public:
 	THIEF_OBJECT_TYPE (AnimLight)
 	bool is_anim_light () const; //TESTME
 
-	THIEF_PROP_FIELD (bool, light_on); //TESTME
+	THIEF_PROP_FIELD_CONST (bool, initially_on); //TESTME
 
 	enum class Mode
 	{

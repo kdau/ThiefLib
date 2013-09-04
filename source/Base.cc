@@ -27,101 +27,10 @@ namespace Thief {
 
 
 
-// CanvasPoint
+// RGBColor (=Color)
 
-const CanvasPoint
-CanvasPoint::ORIGIN = { 0, 0 };
-
-const CanvasPoint
-CanvasPoint::OFFSCREEN = { -1, -1 };
-
-bool
-CanvasPoint::valid () const
-{
-	// This can't check whether the point is within the canvas size.
-	return x >= 0 && y >= 0;
-}
-
-CanvasPoint
-CanvasPoint::operator - () const
-{
-	return CanvasPoint (-x, -y);
-}
-
-CanvasPoint
-CanvasPoint::operator + (const CanvasPoint& rhs) const
-{
-	return CanvasPoint (x + rhs.x, y + rhs.y);
-}
-
-CanvasPoint
-CanvasPoint::operator - (const CanvasPoint& rhs) const
-{
-	return CanvasPoint (x - rhs.x, y - rhs.y);
-}
-
-CanvasPoint
-CanvasPoint::operator * (int rhs) const
-{
-	return CanvasPoint (x * rhs, y * rhs);
-}
-
-CanvasPoint
-CanvasPoint::operator / (int rhs) const
-{
-	if (rhs == 0) throw std::domain_error ("divide by zero");
-	return CanvasPoint (x / rhs, y / rhs);
-}
-
-CanvasPoint&
-CanvasPoint::operator += (const CanvasPoint& rhs)
-{
-	x += rhs.x; y += rhs.y;
-	return *this;
-}
-
-CanvasPoint&
-CanvasPoint::operator -= (const CanvasPoint& rhs)
-{
-	x -= rhs.x; y -= rhs.y;
-	return *this;
-}
-
-
-
-// CanvasSize
-
-bool
-CanvasSize::valid () const
-{
-	// An empty size still counts as valid.
-	return w >= 0 && h >= 0;
-}
-
-
-
-// CanvasRect
-
-const CanvasRect
-CanvasRect::NOCLIP = { 0, 0, -1, -1 };
-
-const CanvasRect
-CanvasRect::OFFSCREEN = { -1, -1, -1, -1 };
-
-bool
-CanvasRect::valid () const
-{
-	// A rect may legitimately extend off the screen. This can't check
-	// whether at least part of the rect is onscreen.
-	return (*this == NOCLIP) || (w >= 0 && h >= 0);
-}
-
-
-
-// Color
-
-Color&
-Color::operator = (Value value)
+RGBColor&
+RGBColor::operator = (Value value)
 {
 	red = value & 0xFFu;
 	green = value >> 8 & 0xFFu;
@@ -129,13 +38,13 @@ Color::operator = (Value value)
 	return *this;
 }
 
-Color::operator Value () const
+RGBColor::operator Value () const
 {
 	return Value (red) | (Value (green) << 8) | (Value (blue) << 16);
 }
 
-Color&
-Color::operator = (const String& code)
+RGBColor&
+RGBColor::operator = (const String& code)
 {
 	// hexadecimal full
 	if (code.length () == 7 && code.front () == '#')
@@ -210,11 +119,26 @@ Color::operator = (const String& code)
 	throw std::runtime_error ("invalid color code");
 }
 
-Color::operator String () const
+RGBColor::operator String () const
 {
 	char code[8];
 	snprintf (code, sizeof code, "#%.2X%.2X%.2X", red, green, blue);
 	return code;
+}
+
+
+
+// LabColor
+
+LabColor::LabColor (const RGBColor& srgb)
+	: L (0.0), a (0.0), b (0.0)
+{
+	*this = LabColor (XYZColor (srgb));
+}
+
+LabColor::operator RGBColor () const
+{
+	return RGBColor (XYZColor (*this));
 }
 
 
@@ -371,11 +295,12 @@ Color
 interpolate (const Color& _from, const Color& _to, float _alpha, Curve curve)
 {
 	double alpha = calculate_curve (_alpha, curve), inv = 1.0 - alpha;
-	LabColor from = XYZColor (_from), to = XYZColor (_to);
-	double  L = from.L * inv + to.L * alpha,
-		a = from.a * inv + to.a * alpha,
-		b = from.b * inv + to.b * alpha;
-	return XYZColor (LabColor (L, a, b));
+	LabColor from (_from), to (_to);
+	return Color (LabColor (
+		from.L * inv + to.L * alpha,
+		from.a * inv + to.a * alpha,
+		from.b * inv + to.b * alpha
+	));
 }
 
 
@@ -522,7 +447,7 @@ LGMULTI_SPECIALIZE_IMPL (Time, INT, i)
 
 LGMULTI_SPECIALIZE_SET (Color, INT, i)
 
-LGMulti<Color>::operator Color () const \
+LGMulti<Color>::operator Color () const
 {
 	switch (type)
 	{
@@ -541,7 +466,7 @@ LGMulti<String>::LGMulti (const String& value)
 	type = STRING;
 }
 
-LGMulti<String>::operator String () const \
+LGMulti<String>::operator String () const
 {
 	if (type != STRING)
 		throw LGMultiTypeError (type, "String");
@@ -556,7 +481,7 @@ LGMulti<Timer>::LGMulti (const Timer& value)
 	type = INT;
 }
 
-LGMulti<Timer>::operator Timer () const \
+LGMulti<Timer>::operator Timer () const
 {
 	if (type != INT)
 		throw LGMultiTypeError (type, "Timer");
@@ -572,7 +497,7 @@ LGMulti<Vector>::LGMulti (const Vector& value)
 	type = VECTOR;
 }
 
-LGMulti<Vector>::operator Vector () const \
+LGMulti<Vector>::operator Vector () const
 {
 	if (type != VECTOR)
 		throw LGMultiTypeError (type, "Vector");

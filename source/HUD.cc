@@ -35,6 +35,86 @@ namespace Thief {
 
 
 
+// CanvasPoint
+
+const CanvasPoint
+CanvasPoint::ORIGIN = { 0, 0 };
+
+const CanvasPoint
+CanvasPoint::OFFSCREEN = { -1, -1 };
+
+bool
+CanvasPoint::valid () const
+{
+	// This can't check whether the point is within the canvas size.
+	return x >= 0 && y >= 0;
+}
+
+CanvasPoint
+CanvasPoint::operator - () const
+{
+	return CanvasPoint (-x, -y);
+}
+
+CanvasPoint
+CanvasPoint::operator + (const CanvasPoint& rhs) const
+{
+	return CanvasPoint (x + rhs.x, y + rhs.y);
+}
+
+CanvasPoint
+CanvasPoint::operator - (const CanvasPoint& rhs) const
+{
+	return CanvasPoint (x - rhs.x, y - rhs.y);
+}
+
+CanvasPoint
+CanvasPoint::operator * (int rhs) const
+{
+	return CanvasPoint (x * rhs, y * rhs);
+}
+
+CanvasPoint
+CanvasPoint::operator / (int rhs) const
+{
+	if (rhs == 0) throw std::domain_error ("divide by zero");
+	return CanvasPoint (x / rhs, y / rhs);
+}
+
+CanvasPoint&
+CanvasPoint::operator += (const CanvasPoint& rhs)
+{
+	x += rhs.x; y += rhs.y;
+	return *this;
+}
+
+CanvasPoint&
+CanvasPoint::operator -= (const CanvasPoint& rhs)
+{
+	x -= rhs.x; y -= rhs.y;
+	return *this;
+}
+
+
+
+// CanvasRect
+
+const CanvasRect
+CanvasRect::NOCLIP = { 0, 0, -1, -1 };
+
+const CanvasRect
+CanvasRect::OFFSCREEN = { -1, -1, -1, -1 };
+
+bool
+CanvasRect::valid () const
+{
+	// A rect may legitimately extend off the screen. This can't check
+	// whether at least part of the rect is onscreen.
+	return (*this == NOCLIP) || (w >= 0 && h >= 0);
+}
+
+
+
 // HUDBitmap
 
 #define MAX_BITMAP_HANDLE 128

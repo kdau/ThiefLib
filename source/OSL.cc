@@ -156,39 +156,25 @@ HUDImpl::load_bitmap (const String& path, bool animation)
 
 // OSL
 
-bool
-OSL::initialized = false;
-
-OSL::ListenedFlavors
-OSL::listened_flavors;
-
-OSL::ListenedProperties
-OSL::listened_properties;
-
-inline bool
-OSL::LinkContext::operator < (const LinkContext& rhs) const
-{
-	return flavor < rhs.flavor ||
-		(flavor == rhs.flavor && object < rhs.object);
-}
+OSL*
+OSL::self = nullptr;
 
 OSL::OSL ()
 	: sim (false)
 {
-	if (initialized)
+	if (self)
 		throw std::runtime_error ("Thief::OSL already initialized.");
 
 	static sDispatchListenerDesc sim_listener
 		{ &IID_IOSLService, 0xF, on_sim, nullptr };
-	sim_listener.pData = this;
 	SInterface<ISimManager> (LG)->Listen (&sim_listener);
 
-	initialized = true;
+	self = this;
 }
 
 OSL::~OSL ()
 {
-	initialized = false;
+	self = nullptr;
 	SInterface<ISimManager> (LG)->Unlisten (&IID_IOSLService);
 }
 
@@ -218,107 +204,12 @@ OSL::get_param_cache ()
 	return param_cache.get ();
 }
 
-STDMETHODIMP_ (bool)
-OSL::subscribe_links (const Flavor& flavor, const Object& source,
-	const Object& _host)
-{
-	Object host = (_host == Object::SELF) ? source : _host;
-
-	IRelation* relation =
-		SInterface<ILinkManager> (LG)->GetRelation (flavor.number);
-	if (!relation || relation->GetID () == 0 || host == Object::NONE)
-		return false; //TODO Allow subscription to all flavors.
-
-	if (listened_flavors.find (flavor) == listened_flavors.end ())
-	{
-		relation->Listen (kRelationFull, on_link_event, this);
-		listened_flavors.insert (flavor);
-	}
-
-	LinkContext context = { flavor, source };
-	if (link_subscriptions.find (context) == link_subscriptions.end ())
-		link_subscriptions.insert (std::make_pair (context, host));
-
-	return true;
-}
-
-STDMETHODIMP_ (bool)
-OSL::unsubscribe_links (const Flavor& flavor, const Object& source,
-	const Object& _host)
-{
-	Object host = (_host == Object::SELF) ? source : _host;
-
-	auto iter = link_subscriptions.find ({ flavor, source });
-	if (iter == link_subscriptions.end ()) return false;
-
-	link_subscriptions.erase (iter);
-	return true;
-}
-
-STDMETHODIMP_ (bool)
-OSL::subscribe_property (const Property& property, const Object& object,
-	const Object& _host)
-{
-	Object host = (_host == Object::SELF) ? object : _host;
-
-	if (!property.iface || host == Object::NONE)
-		return false; //TODO Allow subscription to all objects.
-
-	if (listened_properties.find (property) == listened_properties.end ())
-	{
-		auto handle = property.iface->Listen (kPropertyFull,
-			on_property_event,
-			reinterpret_cast<PropListenerData> (this));
-		listened_properties.insert (std::make_pair (property, handle));
-	}
-
-	ObjectProperty context (property, object);
-	if (property_subscriptions.find (context) ==
-	    property_subscriptions.end ())
-		property_subscriptions.insert (std::make_pair (context, host));
-
-	return true;
-}
-
-STDMETHODIMP_ (bool)
-OSL::unsubscribe_property (const Property& property, const Object& object,
-	const Object& _host)
-{
-	Object host = (_host == Object::SELF) ? object : _host;
-
-	auto iter = property_subscriptions.find ({ property, object });
-	if (iter == property_subscriptions.end ()) return false;
-	property_subscriptions.erase (iter);
-
-	// Unlisten from the property if no longer needed.
-	bool need_property = false;
-	for (auto& subscription : property_subscriptions)
-		if (subscription.first.get_property () == property)
-		{
-			need_property = true;
-			break;
-		}
-	if (!need_property)
-	{
-		auto listen_iter = listened_properties.find (property);
-		if (listen_iter != listened_properties.end ())
-		{
-			listen_iter->first.iface->Unlisten
-				(listen_iter->second);
-			listened_properties.erase (listen_iter);
-		}
-	}
-
-	return true;
-}
-
 int __cdecl
-OSL::on_sim (const sDispatchMsg* message, const sDispatchListenerDesc* desc)
+OSL::on_sim (const sDispatchMsg* message, const sDispatchListenerDesc*)
 {
-	if (!initialized || !message || !desc)
+	if (!self || !message)
 		return 0;
 
-	auto self = reinterpret_cast<OSL*> (desc->pData);
 	switch (message->dwEventId)
 	{
 
@@ -344,6 +235,7 @@ OSL::on_sim (const sDispatchMsg* message, const sDispatchListenerDesc* desc)
 
 			self->link_subscriptions.clear ();
 			self->property_subscriptions.clear ();
+			self->conversation_subscriptions.clear ();
 
 			for (auto& listen : self->listened_properties)
 				listen.first.iface->Unlisten (listen.second);
@@ -359,13 +251,64 @@ OSL::on_sim (const sDispatchMsg* message, const sDispatchListenerDesc* desc)
 	return 0;
 }
 
-void __stdcall
-OSL::on_link_event (sRelationListenMsg* _message, void* _self)
-{
-	if (!initialized || !_message || !_self || !(_message->event & 0xF))
-		return;
 
-	auto self = reinterpret_cast<OSL*> (_self);
+
+// OSL: LinkChange Message
+
+OSL::ListenedFlavors
+OSL::listened_flavors;
+
+inline bool
+OSL::LinkContext::operator < (const LinkContext& rhs) const
+{
+	return flavor < rhs.flavor ||
+		(flavor == rhs.flavor && object < rhs.object);
+}
+
+STDMETHODIMP_ (bool)
+OSL::subscribe_links (const Flavor& flavor, const Object& source,
+	const Object& _host)
+{
+	Object host = (_host == Object::SELF) ? source : _host;
+
+	IRelation* relation =
+		SInterface<ILinkManager> (LG)->GetRelation (flavor.number);
+	if (!relation || relation->GetID () == 0 || host == Object::NONE)
+		return false; //TODO Allow subscription to all flavors.
+
+	if (listened_flavors.find (flavor) == listened_flavors.end ())
+	{
+		relation->Listen (kRelationFull, on_link_event, nullptr);
+		listened_flavors.insert (flavor);
+	}
+
+	LinkContext context = { flavor, source };
+	link_subscriptions.insert (std::make_pair (context, host));
+	return true;
+}
+
+STDMETHODIMP_ (bool)
+OSL::unsubscribe_links (const Flavor& flavor, const Object& source,
+	const Object& _host)
+{
+	Object host = (_host == Object::SELF) ? source : _host;
+
+	auto range = link_subscriptions.equal_range ({ flavor, source });
+	for (auto iter = range.first; iter != range.second; ++iter)
+		if (iter->second == host)
+		{
+			link_subscriptions.erase (iter);
+			return true;
+		}
+
+	return false;
+}
+
+void __stdcall
+OSL::on_link_event (sRelationListenMsg* _message, void*)
+{
+	if (!self || !_message || !(_message->event & 0xF))
+		return;
 
 	// Translate the event type.
 	LinkChangeMessage::Event event;
@@ -397,14 +340,74 @@ OSL::on_link_event (sRelationListenMsg* _message, void* _self)
 		message.send (Object::NONE, iter->second);
 }
 
-void __stdcall
-OSL::on_property_event (sPropertyListenMsg* _message, PropListenerData _self)
+
+
+// OSL: PropertyChange message
+
+OSL::ListenedProperties
+OSL::listened_properties;
+
+STDMETHODIMP_ (bool)
+OSL::subscribe_property (const Property& property, const Object& object,
+	const Object& _host)
 {
-	if (!initialized || !_message || !_self || (_message->event & 8) != 0 ||
+	Object host = (_host == Object::SELF) ? object : _host;
+
+	if (!property.iface || host == Object::NONE)
+		return false; //TODO Allow subscription to all objects.
+
+	if (listened_properties.find (property) == listened_properties.end ())
+	{
+		auto handle = property.iface->Listen (kPropertyFull,
+			on_property_event, nullptr);
+		listened_properties.insert (std::make_pair (property, handle));
+	}
+
+	ObjectProperty context (property, object);
+	property_subscriptions.insert (std::make_pair (context, host));
+	return true;
+}
+
+STDMETHODIMP_ (bool)
+OSL::unsubscribe_property (const Property& property, const Object& object,
+	const Object& _host)
+{
+	Object host = (_host == Object::SELF) ? object : _host;
+
+	bool found_sub = false;
+	auto range = property_subscriptions.equal_range ({ property, object });
+	for (auto iter = range.first; iter != range.second; ++iter)
+		if (iter->second == host)
+		{
+			property_subscriptions.erase (iter);
+			found_sub = true;
+			break;
+		}
+
+	if (!found_sub) return false;
+
+	// Check whether the property is still needed.
+	for (auto& subscription : property_subscriptions)
+		if (subscription.first.get_property () == property)
+			return true;
+
+	// Unlisten from the property since it is no longer needed.
+	auto listen_iter = listened_properties.find (property);
+	if (listen_iter != listened_properties.end ())
+	{
+		listen_iter->first.iface->Unlisten (listen_iter->second);
+		listened_properties.erase (listen_iter);
+	}
+
+	return true;
+}
+
+void __stdcall
+OSL::on_property_event (sPropertyListenMsg* _message, PropListenerData)
+{
+	if (!self || !_message || (_message->event & 8) != 0 ||
 	    (_message->event & 48) == kPropertyInherited)
 		return;
-
-	auto self = reinterpret_cast<OSL*> (_self);
 
 	// Translate the event type.
 	PropertyChangeMessage::Event event;
@@ -439,6 +442,63 @@ OSL::on_property_event (sPropertyListenMsg* _message, PropListenerData _self)
 
 
 
+// OSL: ConversationEnd message
+
+bool
+OSL::listened_conversations = false;
+
+STDMETHODIMP_ (bool)
+OSL::subscribe_conversation (const Object& conversation, const Object& _host)
+{
+	Object host = (_host == Object::SELF) ? conversation : _host;
+
+	if (!listened_conversations)
+	{
+		SInterface<IAIManager> (LG)->GetConversationManager ()->
+			ListenConversationEnd (on_conversation_end);
+		listened_conversations = true;
+	}
+
+	conversation_subscriptions.insert (std::make_pair (conversation, host));
+	return true;
+}
+
+STDMETHODIMP_ (bool)
+OSL::unsubscribe_conversation (const Object& conversation, const Object& _host)
+{
+	Object host = (_host == Object::SELF) ? conversation : _host;
+
+	auto range = conversation_subscriptions.equal_range (conversation);
+	for (auto iter = range.first; iter != range.second; ++iter)
+		if (iter->second == host)
+		{
+			conversation_subscriptions.erase (iter);
+			return true;
+		}
+
+	return false;
+}
+
+void __cdecl
+OSL::on_conversation_end (Object::Number conversation)
+{
+	if (!self) return;
+
+	ConversationMessage message (conversation);
+
+	// Send message to object-specific subscribers.
+	auto range = self->conversation_subscriptions.equal_range (conversation);
+	for (auto iter = range.first; iter != range.second; ++iter)
+		message.send (Object::NONE, iter->second);
+
+	// Send message to generic subscribers.
+	range = self->conversation_subscriptions.equal_range (Object::ANY);
+	for (auto iter = range.first; iter != range.second; ++iter)
+		message.send (Object::NONE, iter->second);
+}
+
+
+
 } // namespace Thief
 
 
@@ -449,7 +509,7 @@ extern "C"
 bool __declspec(dllexport)
 ThiefLibOSLInit (IScriptMan* manager, MPrintfProc mprintf, IMalloc* allocator)
 {
-	if (Thief::OSL::initialized)
+	if (Thief::OSL::self)
 		return true; // A copy of the OSL service already exists.
 
 	// Attach various ThiefLib components to the engine.

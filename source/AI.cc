@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include "Private.hh"
+#include "OSL.hh"
 
 namespace Thief {
 
@@ -396,6 +397,18 @@ Conversation::remove_actor (size_t _number)
 		RemoveActorObj (number, _number); // one-based
 }
 
+bool
+Conversation::subscribe (const Object& host)
+{
+	return SService<IOSLService> (LG)->subscribe_conversation (*this, host);
+}
+
+bool
+Conversation::unsubscribe (const Object& host)
+{
+	return SService<IOSLService> (LG)->unsubscribe_conversation (*this, host);
+}
+
 
 
 //TODO wrap link: AIConversationActor - int ("Actor ID")
@@ -690,6 +703,22 @@ AISignalMessage::AISignalMessage (const char* signal)
 }
 
 MESSAGE_ACCESSOR (String, AISignalMessage, get_signal, sAISignalMsg, signal)
+
+
+
+// ConversationMessage
+
+MESSAGE_WRAPPER_IMPL (ConversationMessage, ConversationMessageImpl)
+
+ConversationMessage::ConversationMessage (const Object& conversation)
+	: Message (new ConversationMessageImpl ())
+{
+	message->message = "ConversationEnd";
+	MESSAGE_AS (ConversationMessageImpl)->conversation = conversation;
+}
+
+MESSAGE_ACCESSOR (Conversation, ConversationMessage, get_conversation,
+	ConversationMessageImpl, conversation)
 
 
 
