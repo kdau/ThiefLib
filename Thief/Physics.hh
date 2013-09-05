@@ -214,10 +214,8 @@ public:
 
 	// Dimensions
 
-	THIEF_PROP_FIELD (float, physics_radius_1);
-	THIEF_PROP_FIELD (float, physics_radius_2);
-	THIEF_PROP_FIELD (Vector, physics_offset_1);
-	THIEF_PROP_FIELD (Vector, physics_offset_2);
+	THIEF_PROP_FIELD_ARRAY (float, physics_radius, 2);
+	THIEF_PROP_FIELD_ARRAY (Vector, physics_offset, 2);
 
 	// Attributes
 

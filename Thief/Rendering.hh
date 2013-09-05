@@ -47,18 +47,8 @@ public:
 
 	THIEF_PROP_FIELD (String, model);
 	THIEF_PROP_FIELD (Vector, model_scale);
-
-	THIEF_PROP_FIELD (String, replacement_texture_0); //TESTME et seq.
-	THIEF_PROP_FIELD (String, replacement_texture_1);
-	THIEF_PROP_FIELD (String, replacement_texture_2);
-	THIEF_PROP_FIELD (String, replacement_texture_3);
-
-	THIEF_PROP_FIELD (float, joint_position_1); //TESTME et seq.
-	THIEF_PROP_FIELD (float, joint_position_2);
-	THIEF_PROP_FIELD (float, joint_position_3);
-	THIEF_PROP_FIELD (float, joint_position_4);
-	THIEF_PROP_FIELD (float, joint_position_5);
-	THIEF_PROP_FIELD (float, joint_position_6);
+	THIEF_PROP_FIELD_ARRAY (String, replacement_texture, 4);
+	THIEF_PROP_FIELD_ARRAY (float, joint_position, 6);
 
 	THIEF_PROP_FIELD (float, extra_light);
 	THIEF_PROP_FIELD (bool, extra_light_additive);

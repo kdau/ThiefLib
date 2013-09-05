@@ -44,11 +44,7 @@ public:
 	THIEF_PROP_FIELD (unsigned, lock_number); //TESTME
 
 	bool is_locked () const;
-	void lock () { set_locked (true); }
-	void unlock () { set_locked (false); }
-
-protected:
-	void set_locked (bool locked); //TESTME with Lock links present
+	void set_locked (bool); //TESTME with Lock links present
 };
 
 

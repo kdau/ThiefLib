@@ -40,16 +40,18 @@ PROXY_CONFIG (Rendered, opacity, "RenderAlpha", nullptr, float, 1.0f);
 PROXY_CONFIG (Rendered, model, "ModelName", "", String, "");
 PROXY_CONFIG (Rendered, model_scale, "Scale", "",
 	Vector, Vector (1.0f, 1.0f, 1.0f));
-PROXY_CONFIG (Rendered, replacement_texture_0, "OTxtRepr0", nullptr, String, "");
-PROXY_CONFIG (Rendered, replacement_texture_1, "OTxtRepr1", nullptr, String, "");
-PROXY_CONFIG (Rendered, replacement_texture_2, "OTxtRepr2", nullptr, String, "");
-PROXY_CONFIG (Rendered, replacement_texture_3, "OTxtRepr3", nullptr, String, "");
-PROXY_CONFIG (Rendered, joint_position_1, "JointPos", "Joint 1", float, 0.0f);
-PROXY_CONFIG (Rendered, joint_position_2, "JointPos", "Joint 2", float, 0.0f);
-PROXY_CONFIG (Rendered, joint_position_3, "JointPos", "Joint 3", float, 0.0f);
-PROXY_CONFIG (Rendered, joint_position_4, "JointPos", "Joint 4", float, 0.0f);
-PROXY_CONFIG (Rendered, joint_position_5, "JointPos", "Joint 5", float, 0.0f);
-PROXY_CONFIG (Rendered, joint_position_6, "JointPos", "Joint 6", float, 0.0f);
+PROXY_ARRAY_CONFIG (Rendered, replacement_texture, 4u, String, "",
+	PROXY_ARRAY_ITEM ("OTxtRepr0", nullptr),
+	PROXY_ARRAY_ITEM ("OTxtRepr1", nullptr),
+	PROXY_ARRAY_ITEM ("OTxtRepr2", nullptr),
+	PROXY_ARRAY_ITEM ("OTxtRepr3", nullptr));
+PROXY_ARRAY_CONFIG (Rendered, joint_position, 6u, float, 0.0f,
+	PROXY_ARRAY_ITEM ("JointPos", "Joint 1"),
+	PROXY_ARRAY_ITEM ("JointPos", "Joint 2"),
+	PROXY_ARRAY_ITEM ("JointPos", "Joint 3"),
+	PROXY_ARRAY_ITEM ("JointPos", "Joint 4"),
+	PROXY_ARRAY_ITEM ("JointPos", "Joint 5"),
+	PROXY_ARRAY_ITEM ("JointPos", "Joint 6"));
 PROXY_CONFIG (Rendered, extra_light, "ExtraLight", "Amount (-1..1)",
 	float, 0.0f);
 PROXY_CONFIG (Rendered, extra_light_additive, "ExtraLight", "Additive?",
@@ -66,16 +68,8 @@ OBJECT_TYPE_IMPL_ (Rendered,
 	PROXY_INIT (opacity),
 	PROXY_INIT (model),
 	PROXY_INIT (model_scale),
-	PROXY_INIT (replacement_texture_0),
-	PROXY_INIT (replacement_texture_1),
-	PROXY_INIT (replacement_texture_2),
-	PROXY_INIT (replacement_texture_3),
-	PROXY_INIT (joint_position_1),
-	PROXY_INIT (joint_position_2),
-	PROXY_INIT (joint_position_3),
-	PROXY_INIT (joint_position_4),
-	PROXY_INIT (joint_position_5),
-	PROXY_INIT (joint_position_6),
+	PROXY_ARRAY_INIT (replacement_texture, 4),
+	PROXY_ARRAY_INIT (joint_position, 6),
 	PROXY_INIT (extra_light),
 	PROXY_INIT (extra_light_additive),
 	PROXY_INIT (self_illumination),

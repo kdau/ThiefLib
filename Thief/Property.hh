@@ -119,15 +119,15 @@ protected:
 	void get (const Object&, const char*, const char*, LGMultiBase&) const;
 	void set (Object&, const char*, const char*, const LGMultiBase&);
 
-	bool get_bit (const FieldProxyConfig<bool>&, const Object&) const;
-	void set_bit (const FieldProxyConfig<bool>&, Object&, bool);
+	bool get_bit (const FieldProxyConfig<bool, 1u>&, const Object&) const;
+	void set_bit (const FieldProxyConfig<bool, 1u>&, Object&, bool);
 };
 
-template <typename T, const FieldProxyConfig<T>& config>
+template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
 class PropField : public PropFieldBase
 {
 public:
-	PropField (Object&);
+	PropField (Object&, size_t index);
 
 	bool exists () const;
 	bool instantiate (); // Affects the entire property, not just this field.
@@ -138,27 +138,17 @@ public:
 
 private:
 	Object& object;
+	size_t index;
 };
 
-template <const FieldProxyConfig<bool>& config>
-class PropField<bool, config> : public PropFieldBase
-{
-public:
-	PropField (Object&);
+template <typename T, const FieldProxyConfig<T, 1u>& config>
+class PropField<T, 1u, config>;
 
-	bool exists () const;
-	bool instantiate (); // Affects the entire property, not just this field.
-	bool remove (); // Affects the entire property, not just this field.
+template <const FieldProxyConfig<bool, 1u>& config>
+class PropField<bool, 1u, config>;
 
-	operator bool () const;
-	PropField& operator = (bool);
-
-private:
-	Object& object;
-};
-
-template <typename T, const FieldProxyConfig<T>& config>
-std::ostream& operator << (std::ostream&, const PropField<T, config>&);
+template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
+std::ostream& operator << (std::ostream&, const PropField<T, count, config>&);
 
 
 

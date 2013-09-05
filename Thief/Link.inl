@@ -113,33 +113,36 @@ Link::_set_data_field (const String& field, const LGMultiBase& multi)
 
 // LinkField
 
-template <typename T, const FieldProxyConfig<T>& config>
+template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
 inline
-LinkField<T, config>::LinkField (Link& _link)
-	: link (_link)
-{}
+LinkField<T, count, config>::LinkField (Link& _link, size_t _index)
+	: link (_link), index (_index)
+{
+	if (index >= count)
+		throw std::out_of_range ("bad field index");
+}
 
-template <typename T, const FieldProxyConfig<T>& config>
+template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
 inline
-LinkField<T, config>::operator T () const
+LinkField<T, count, config>::operator T () const
 {
 	LGMulti<T> raw (config.default_value);
-	link._get_data_field (config.major, raw);
+	link._get_data_field (config.id [index].major, raw);
 	return config.get_filter ? config.get_filter (raw) : T (raw);
 }
 
-template <typename T, const FieldProxyConfig<T>& config>
-inline LinkField<T, config>&
-LinkField<T, config>::operator = (const T& value)
+template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
+inline LinkField<T, count, config>&
+LinkField<T, count, config>::operator = (const T& value)
 {
 	LGMulti<T> raw (config.set_filter ? config.set_filter (value) : value);
-	link._set_data_field (config.major, raw);
+	link._set_data_field (config.id [index].major, raw);
 	return *this;
 }
 
-template <typename T, const FieldProxyConfig<T>& config>
+template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
 inline std::ostream&
-operator << (std::ostream& out, const LinkField<T, config>& field)
+operator << (std::ostream& out, const LinkField<T, count, config>& field)
 {
 	out << T (field);
 	return out;
@@ -147,35 +150,97 @@ operator << (std::ostream& out, const LinkField<T, config>& field)
 
 
 
-// LinkField<bool>
+// LinkField<T, 1u>
 
-template <const FieldProxyConfig<bool>& config>
+template <typename T, const FieldProxyConfig<T, 1u>& config>
+class LinkField<T, 1u, config> : public LinkFieldBase
+{
+public:
+	LinkField (Link&);
+
+	operator T () const;
+	LinkField& operator = (const T&);
+
+private:
+	Link& link;
+};
+
+template <typename T, const FieldProxyConfig<T, 1u>& config>
 inline
-LinkField<bool, config>::LinkField (Link& _link)
+LinkField<T, 1u, config>::LinkField (Link& _link)
 	: link (_link)
 {}
 
-template <const FieldProxyConfig<bool>& config>
+template <typename T, const FieldProxyConfig<T, 1u>& config>
 inline
-LinkField<bool, config>::operator bool () const
+LinkField<T, 1u, config>::operator T () const
+{
+	LGMulti<T> raw (config.default_value);
+	link._get_data_field (config.id [0u].major, raw);
+	return config.get_filter ? config.get_filter (raw) : T (raw);
+}
+
+template <typename T, const FieldProxyConfig<T, 1u>& config>
+inline LinkField<T, 1u, config>&
+LinkField<T, 1u, config>::operator = (const T& value)
+{
+	LGMulti<T> raw (config.set_filter ? config.set_filter (value) : value);
+	link._set_data_field (config.id [0u].major, raw);
+	return *this;
+}
+
+template <typename T, const FieldProxyConfig<T, 1u>& config>
+inline std::ostream&
+operator << (std::ostream& out, const LinkField<T, 1u, config>& field)
+{
+	out << T (field);
+	return out;
+}
+
+
+
+// LinkField<bool, 1u>
+
+template <const FieldProxyConfig<bool, 1u>& config>
+class LinkField<bool, 1u, config> : public LinkFieldBase
+{
+public:
+	LinkField (Link&);
+
+	operator bool () const;
+	LinkField& operator = (bool);
+
+private:
+	Link& link;
+};
+
+template <const FieldProxyConfig<bool, 1u>& config>
+inline
+LinkField<bool, 1u, config>::LinkField (Link& _link)
+	: link (_link)
+{}
+
+template <const FieldProxyConfig<bool, 1u>& config>
+inline
+LinkField<bool, 1u, config>::operator bool () const
 {
 	LGMulti<bool> raw (config.default_value);
 	if (config.bitmask)
 		raw = get_bit (config, link);
 	else
-		link._get_data_field (config.major, raw);
+		link._get_data_field (config.id [0u].major, raw);
 	return config.get_filter ? config.get_filter (raw) : bool (raw);
 }
 
-template <const FieldProxyConfig<bool>& config>
-inline LinkField<bool, config>&
-LinkField<bool, config>::operator = (bool value)
+template <const FieldProxyConfig<bool, 1u>& config>
+inline LinkField<bool, 1u, config>&
+LinkField<bool, 1u, config>::operator = (bool value)
 {
 	LGMulti<bool> raw (config.set_filter ? config.set_filter (value) : value);
 	if (config.bitmask)
 		set_bit (config, link, raw);
 	else
-		link._set_data_field (config.major, raw);
+		link._set_data_field (config.id [0u].major, raw);
 	return *this;
 }
 
@@ -204,6 +269,9 @@ public: \
 		bool reverse = false);
 
 #define THIEF_LINK_FIELD(Type, Name) THIEF_FIELD_PROXY (LinkField, Type, Name, )
+
+#define THIEF_LINK_FIELD_ARRAY(Type, Name, Count) \
+THIEF_FIELD_PROXY_ARRAY (LinkField, Type, Name, Count, )
 
 #define THIEF_LINK_FIELD_CONST(Type, Name) \
 THIEF_FIELD_PROXY (LinkField, Type, Name, const)

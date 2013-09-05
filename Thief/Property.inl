@@ -109,57 +109,62 @@ ObjectProperty::_set_field (const String& field, const LGMultiBase& value,
 
 // PropField
 
-template <typename T, const FieldProxyConfig<T>& config>
+template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
 inline
-PropField<T, config>::PropField (Object& _object)
-	: object (_object)
+PropField<T, count, config>::PropField (Object& _object, size_t _index)
+	: object (_object), index (_index)
 {
-	if (!config.major)
+	if (index >= count)
+		throw std::out_of_range ("bad field index");
+	if (!config.id [index].major)
 		throw std::runtime_error ("no property specified");
 }
 
-template <typename T, const FieldProxyConfig<T>& config>
+template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
 inline bool
-PropField<T, config>::exists () const
+PropField<T, count, config>::exists () const
 {
-	return ObjectProperty (config.major, object).exists ();
+	return ObjectProperty (config.id [index].major, object).exists ();
 }
 
-template <typename T, const FieldProxyConfig<T>& config>
+template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
 inline bool
-PropField<T, config>::instantiate ()
+PropField<T, count, config>::instantiate ()
 {
-	return ObjectProperty (config.major, object).instantiate ();
+	return ObjectProperty (config.id [index].major, object).instantiate ();
 }
 
-template <typename T, const FieldProxyConfig<T>& config>
+template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
 inline bool
-PropField<T, config>::remove ()
+PropField<T, count, config>::remove ()
 {
-	return ObjectProperty (config.major, object).remove ();
+	return ObjectProperty (config.id [index].major, object).remove ();
 }
 
-template <typename T, const FieldProxyConfig<T>& config>
+template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
 inline
-PropField<T, config>::operator T () const
+PropField<T, count, config>::operator T () const
 {
 	LGMulti<T> raw (config.default_value);
-	if (exists ()) get (object, config.major, config.minor, raw);
+	if (exists ())
+		get (object, config.id [index].major, config.id [index].minor,
+			raw);
 	return config.get_filter ? config.get_filter (raw) : T (raw);
 }
 
-template <typename T, const FieldProxyConfig<T>& config>
-inline PropField<T, config>&
-PropField<T, config>::operator = (const T& value)
+template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
+inline PropField<T, count, config>&
+PropField<T, count, config>::operator = (const T& value)
 {
-	set (object, config.major, config.minor, LGMulti<T>
-		(config.set_filter ? config.set_filter (value) : T (value)));
+	set (object, config.id [index].major, config.id [index].minor,
+		LGMulti<T> (config.set_filter ? config.set_filter (value)
+			: T (value)));
 	return *this;
 }
 
-template <typename T, const FieldProxyConfig<T>& config>
+template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
 inline std::ostream&
-operator << (std::ostream& out, const PropField<T, config>& field)
+operator << (std::ostream& out, const PropField<T, count, config>& field)
 {
 	out << T (field);
 	return out;
@@ -167,60 +172,150 @@ operator << (std::ostream& out, const PropField<T, config>& field)
 
 
 
-// PropField<bool>
+// PropField<T, 1u>
 
-template <const FieldProxyConfig<bool>& config>
+
+template <typename T, const FieldProxyConfig<T, 1u>& config>
+class PropField<T, 1u, config> : public PropFieldBase
+{
+public:
+	PropField (Object&);
+
+	bool exists () const;
+	bool instantiate ();
+	bool remove ();
+
+	operator T () const;
+	PropField& operator = (const T&);
+
+private:
+	Object& object;
+};
+
+template <typename T, const FieldProxyConfig<T, 1u>& config>
 inline
-PropField<bool, config>::PropField (Object& _object)
+PropField<T, 1u, config>::PropField (Object& _object)
 	: object (_object)
 {
-	if (!config.major)
+	if (!config.id [0u].major)
 		throw std::runtime_error ("no property specified");
 }
 
-template <const FieldProxyConfig<bool>& config>
+template <typename T, const FieldProxyConfig<T, 1u>& config>
 inline bool
-PropField<bool, config>::exists () const
+PropField<T, 1u, config>::exists () const
 {
-	return ObjectProperty (config.major, object).exists ();
+	return ObjectProperty (config.id [0u].major, object).exists ();
 }
 
-template <const FieldProxyConfig<bool>& config>
+template <typename T, const FieldProxyConfig<T, 1u>& config>
 inline bool
-PropField<bool, config>::instantiate ()
+PropField<T, 1u, config>::instantiate ()
 {
-	return ObjectProperty (config.major, object).instantiate ();
+	return ObjectProperty (config.id [0u].major, object).instantiate ();
 }
 
-template <const FieldProxyConfig<bool>& config>
+template <typename T, const FieldProxyConfig<T, 1u>& config>
 inline bool
-PropField<bool, config>::remove ()
+PropField<T, 1u, config>::remove ()
 {
-	return ObjectProperty (config.major, object).remove ();
+	return ObjectProperty (config.id [0u].major, object).remove ();
 }
 
-template <const FieldProxyConfig<bool>& config>
+template <typename T, const FieldProxyConfig<T, 1u>& config>
 inline
-PropField<bool, config>::operator bool () const
+PropField<T, 1u, config>::operator T () const
+{
+	LGMulti<T> raw (config.default_value);
+	if (exists ())
+		get (object, config.id [0u].major, config.id [0u].minor, raw);
+	return config.get_filter ? config.get_filter (raw) : T (raw);
+}
+
+template <typename T, const FieldProxyConfig<T, 1u>& config>
+inline PropField<T, 1u, config>&
+PropField<T, 1u, config>::operator = (const T& value)
+{
+	set (object, config.id [0u].major, config.id [0u].minor,
+		LGMulti<T> (config.set_filter ? config.set_filter (value)
+			: T (value)));
+	return *this;
+}
+
+
+
+// PropField<bool, 1u>
+
+template <const FieldProxyConfig<bool, 1u>& config>
+class PropField<bool, 1u, config> : public PropFieldBase
+{
+public:
+	PropField (Object&);
+
+	bool exists () const;
+	bool instantiate ();
+	bool remove ();
+
+	operator bool () const;
+	PropField& operator = (bool);
+
+private:
+	Object& object;
+};
+
+template <const FieldProxyConfig<bool, 1u>& config>
+inline
+PropField<bool, 1u, config>::PropField (Object& _object)
+	: object (_object)
+{
+	if (!config.id [0u].major)
+		throw std::runtime_error ("no property specified");
+}
+
+template <const FieldProxyConfig<bool, 1u>& config>
+inline bool
+PropField<bool, 1u, config>::exists () const
+{
+	return ObjectProperty (config.id [0u].major, object).exists ();
+}
+
+template <const FieldProxyConfig<bool, 1u>& config>
+inline bool
+PropField<bool, 1u, config>::instantiate ()
+{
+	return ObjectProperty (config.id [0u].major, object).instantiate ();
+}
+
+template <const FieldProxyConfig<bool, 1u>& config>
+inline bool
+PropField<bool, 1u, config>::remove ()
+{
+	return ObjectProperty (config.id [0u].major, object).remove ();
+}
+
+template <const FieldProxyConfig<bool, 1u>& config>
+inline
+PropField<bool, 1u, config>::operator bool () const
 {
 	LGMulti<bool> raw (config.default_value);
 	if (config.bitmask)
 		raw = get_bit (config, object);
 	else if (exists ())
-		get (object, config.major, config.minor, raw);
+		get (object, config.id [0u].major, config.id [0u].minor, raw);
 	return config.get_filter ? config.get_filter (raw) : bool (raw);
 }
 
-template <const FieldProxyConfig<bool>& config>
-inline PropField<bool, config>&
-PropField<bool, config>::operator = (bool value)
+template <const FieldProxyConfig<bool, 1u>& config>
+inline PropField<bool, 1u, config>&
+PropField<bool, 1u, config>::operator = (bool value)
 {
 	bool raw = config.set_filter ? config.set_filter (value) : value;
 
 	if (config.bitmask)
 		set_bit (config, object, raw);
 	else
-		set (object, config.major, config.minor, LGMulti<bool> (raw));
+		set (object, config.id [0u].major, config.id [0u].minor,
+			LGMulti<bool> (raw));
 
 	return *this;
 }
@@ -230,6 +325,9 @@ PropField<bool, config>::operator = (bool value)
 // Convenience macro for PropField members of Object subclasses
 
 #define THIEF_PROP_FIELD(Type, Name) THIEF_FIELD_PROXY (PropField, Type, Name, )
+
+#define THIEF_PROP_FIELD_ARRAY(Type, Name, Count) \
+THIEF_FIELD_PROXY_ARRAY (PropField, Type, Name, Count, )
 
 #define THIEF_PROP_FIELD_CONST(Type, Name) \
 THIEF_FIELD_PROXY (PropField, Type, Name, const)

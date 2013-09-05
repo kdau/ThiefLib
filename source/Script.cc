@@ -355,7 +355,7 @@ TrapTrigger::trigger (bool on, bool unconditional)
 		(host (), "ControlDevice");
 
 	if (!unconditional && (get_flags () & FLAG_ONCE))
-		host_as<Lockable> ().lock ();
+		host_as<Lockable> ().set_locked (true);
 }
 
 Message::Result
@@ -380,7 +380,7 @@ TrapTrigger::on_turn_on (Message& message)
 		start_timer ("Revert", revert, false, !on);
 
 	if (result != Message::ERROR && (flags & FLAG_ONCE))
-		host_as<Lockable> ().lock ();
+		host_as<Lockable> ().set_locked (true);
 
 	return result;
 }
@@ -397,7 +397,7 @@ TrapTrigger::on_turn_off (Message& message)
 	Message::Result result = on_trap (on, message);
 
 	if (result != Message::ERROR && (flags & FLAG_ONCE))
-		host_as<Lockable> ().lock ();
+		host_as<Lockable> ().set_locked (true);
 
 	return result;
 }

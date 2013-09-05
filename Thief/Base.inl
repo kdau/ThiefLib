@@ -490,11 +490,14 @@ Method (const T& value) \
 
 // FieldProxyConfig: common base for PropField and LinkField proxy objects
 
-template <typename T>
+template <typename T, size_t count>
 struct FieldProxyConfig
 {
-	const char* major;
-	const char* minor;
+	struct Identity
+	{
+		const char* major;
+		const char* minor;
+	} id [count];
 
 	typedef typename std::conditional<std::is_same<T, String>::value,
 		const char*, T>::type DefaultValue;
@@ -509,9 +512,13 @@ struct FieldProxyConfig
 	SetFilter set_filter;
 };
 
+#define THIEF_FIELD_PROXY_ARRAY(ProxyType, Type, Name, Count, Specifiers) \
+static const FieldProxyConfig<Type, Count> F_##Name; \
+Specifiers ProxyType<Type, Count, F_##Name> Name [Count];
+
 #define THIEF_FIELD_PROXY(ProxyType, Type, Name, Specifiers) \
-static const FieldProxyConfig<Type> F_##Name; \
-Specifiers ProxyType<Type, F_##Name> Name;
+static const FieldProxyConfig<Type, 1u> F_##Name; \
+Specifiers ProxyType<Type, 1u, F_##Name> Name;
 
 
 

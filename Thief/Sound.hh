@@ -86,7 +86,7 @@ public:
 	THIEF_PROP_FIELD (bool, is_speech); //TESTME
 	THIEF_PROP_FIELD (bool, is_ambient); //TESTME
 	THIEF_PROP_FIELD (bool, is_music); //TESTME
-	THIEF_PROP_FIELD (bool, is_meta_ui); //TESTME all
+	THIEF_PROP_FIELD (bool, is_meta_ui); //TESTME
 
 	THIEF_PROP_FIELD (int, volume); //TESTME
 	THIEF_PROP_FIELD (int, pan); //TESTME
@@ -123,9 +123,7 @@ public:
 
 	THIEF_PROP_FIELD (bool, active); //TESTME
 
-	THIEF_PROP_FIELD (String, ambient_schema_1); //TESTME
-	THIEF_PROP_FIELD (String, ambient_schema_2); //TESTME
-	THIEF_PROP_FIELD (String, ambient_schema_3); //TESTME
+	THIEF_PROP_FIELD_ARRAY (String, ambient_schema, 3); //TESTME
 
 	THIEF_PROP_FIELD (int, ambient_radius); //TESTME
 	THIEF_PROP_FIELD (int, ambient_volume); //TESTME

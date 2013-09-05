@@ -26,6 +26,7 @@
 
 #include <Thief/Thief.hh>
 #include <lg/lg.h>
+#include <boost/preprocessor/repetition/repeat.hpp>
 
 namespace Thief {
 
@@ -131,8 +132,8 @@ public:
 // Field proxy convenience macros
 
 #define PROXY_CONFIG_(Class, Member, Major, Minor, Type, ...) \
-const FieldProxyConfig<Type> \
-Class::F_##Member = { Major, Minor, __VA_ARGS__ }
+const FieldProxyConfig<Type, 1u> \
+Class::F_##Member = { { { Major, Minor } }, __VA_ARGS__ }
 
 #define PROXY_CONFIG(Class, Member, Major, Minor, Type, Default) \
 PROXY_CONFIG_ (Class, Member, Major, Minor, Type, Default, 0u, nullptr, nullptr)
@@ -148,7 +149,17 @@ PROXY_CONFIG_ (Class, Member, Major, Minor, Type, Default, 0u, negate, negate)
 #define PROXY_NEG_BIT_CONFIG(Class, Member, Major, Minor, Mask, Default) \
 PROXY_CONFIG_ (Class, Member, Major, Minor, bool, Default, Mask, negate, negate)
 
+#define PROXY_ARRAY_CONFIG(Class, Member, Count, Type, Default, ...) \
+const FieldProxyConfig<Type, Count> \
+Class::F_##Member = { { __VA_ARGS__ }, Default, 0u, nullptr, nullptr }
+
+#define PROXY_ARRAY_ITEM(Major, Minor) { Major, Minor }
+
 #define PROXY_INIT(Member) Member (*this)
+
+#define PROXY_ARRAY_INIT_ONE(z, n, text) { *this, n##u },
+#define PROXY_ARRAY_INIT(Member, Count) \
+Member { BOOST_PP_REPEAT (Count, PROXY_ARRAY_INIT_ONE, junk) }
 
 
 

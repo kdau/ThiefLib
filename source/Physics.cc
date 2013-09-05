@@ -301,24 +301,20 @@ MESSAGE_ACCESSOR (MovingTerrain, WaypointMessage, get_moving_terrain,
 
 // SpherePhysical
 
-PROXY_CONFIG (SpherePhysical, physics_radius_1, "PhysDims", "Radius 1",
-	float, 0.0f);
-PROXY_CONFIG (SpherePhysical, physics_radius_2, "PhysDims", "Radius 2",
-	float, 0.0f);
-PROXY_CONFIG (SpherePhysical, physics_offset_1, "PhysDims", "Offset 1",
-	Vector, Vector ());
-PROXY_CONFIG (SpherePhysical, physics_offset_2, "PhysDims", "Offset 2",
-	Vector, Vector ());
+PROXY_ARRAY_CONFIG (SpherePhysical, physics_radius, 2u, float, 0.0f, //TODO Support more than two submodels.
+	PROXY_ARRAY_ITEM ("PhysDims", "Radius 1"),
+	PROXY_ARRAY_ITEM ("PhysDims", "Radius 2"));
+PROXY_ARRAY_CONFIG (SpherePhysical, physics_offset, 2u, Vector, Vector (), //TODO Support more than two submodels.
+	PROXY_ARRAY_ITEM ("PhysDims", "Offset 1"),
+	PROXY_ARRAY_ITEM ("PhysDims", "Offset 2"));
 PROXY_CONFIG (SpherePhysical, rotation_axes, "PhysAttr", "Rotation Axes",
 	unsigned, Physical::ALL_POS_AXES);
 PROXY_CONFIG (SpherePhysical, rest_axes, "PhysAttr", "Rest Axes",
 	unsigned, Physical::ALL_AXES);
 
 OBJECT_TYPE_IMPL_ (SpherePhysical, Physical (),
-	PROXY_INIT (physics_radius_1),
-	PROXY_INIT (physics_radius_2),
-	PROXY_INIT (physics_offset_1),
-	PROXY_INIT (physics_offset_2),
+	PROXY_ARRAY_INIT (physics_radius, 2),
+	PROXY_ARRAY_INIT (physics_offset, 2),
 	PROXY_INIT (rotation_axes),
 	PROXY_INIT (rest_axes)
 )

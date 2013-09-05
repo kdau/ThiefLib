@@ -200,12 +200,10 @@ SoundSchema::play_by_tags (const String& tags, Tagged location,
 
 PROXY_NEG_BIT_CONFIG (AmbientHacked, active, "AmbientHacked", "Flags",
 	4u, false);
-PROXY_CONFIG (AmbientHacked, ambient_schema_1, "AmbientHacked", "Schema Name",
-	String, "");
-PROXY_CONFIG (AmbientHacked, ambient_schema_2, "AmbientHacked", "Aux Schema 1",
-	String, "");
-PROXY_CONFIG (AmbientHacked, ambient_schema_3, "AmbientHacked", "Aux Schema 2",
-	String, "");
+PROXY_ARRAY_CONFIG (AmbientHacked, ambient_schema, 3u, String, "",
+	PROXY_ARRAY_ITEM ("AmbientHacked", "Schema Name"),
+	PROXY_ARRAY_ITEM ("AmbientHacked", "Aux Schema 1"),
+	PROXY_ARRAY_ITEM ("AmbientHacked", "Aux Schema 2"));
 PROXY_CONFIG (AmbientHacked, ambient_radius, "AmbientHacked", "Radius", int, 0);
 PROXY_CONFIG (AmbientHacked, ambient_volume, "AmbientHacked", "Override Volume",
 	int, 0);
@@ -222,9 +220,7 @@ PROXY_BIT_CONFIG (AmbientHacked, destroy_after, "AmbientHacked", "Flags",
 
 OBJECT_TYPE_IMPL_ (AmbientHacked,
 	PROXY_INIT (active),
-	PROXY_INIT (ambient_schema_1),
-	PROXY_INIT (ambient_schema_2),
-	PROXY_INIT (ambient_schema_3),
+	PROXY_ARRAY_INIT (ambient_schema, 3),
 	PROXY_INIT (ambient_radius),
 	PROXY_INIT (ambient_volume),
 	PROXY_INIT (environmental),
