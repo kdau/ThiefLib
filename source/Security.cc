@@ -111,7 +111,6 @@ Key::try_key_operation (Operation operation, const Lockable& lock)
 
 // Door
 //TODO wrap property: Door\Rotating = RotDoor
-//TODO wrap property: Door\Translating = TransDoor
 
 THIEF_ENUM_CODING (Door::State, CODE, CODE,
 	THIEF_ENUM_VALUE (CLOSED, "closed"),
@@ -237,6 +236,42 @@ DoorMessage::get_old_state () const
 {
 	return translate_door_action (*this, message,
 		MESSAGE_AS (sDoorMsg)->PrevActionType);
+}
+
+
+
+// TranslatingDoor
+
+PROXY_CONFIG (TranslatingDoor, axis, "TransDoor", "Axis", Door::Axis, Axis::X);
+PROXY_CONFIG (TranslatingDoor, initial_position, "TransDoor", "Closed Position", float, 0.0f);
+PROXY_CONFIG (TranslatingDoor, open_position, "TransDoor", "Open Position", float, 0.0f);
+PROXY_CONFIG (TranslatingDoor, base_speed, "TransDoor", "Base Speed", float, 0.0f);
+PROXY_CONFIG (TranslatingDoor, push_mass, "TransDoor", "Push Mass", float, 25.0f);
+PROXY_CONFIG (TranslatingDoor, blocks_vision, "TransDoor", "Blocks Vision?", bool, true);
+PROXY_CONFIG (TranslatingDoor, blocks_sound_pct, "TransDoor", "Blocks Sound %", float, 60.0f);
+PROXY_ARRAY_CONFIG_ (TranslatingDoor, room, 2u, Room, Object::NONE,
+	[] (const Room& room) { return room == -1 ? Object::NONE : room; },
+	nullptr,
+	PROXY_ARRAY_ITEM ("TransDoor", "Room ID #1"),
+	PROXY_ARRAY_ITEM ("TransDoor", "Room ID #2")
+);
+
+OBJECT_TYPE_IMPL_ (TranslatingDoor, Physical (), OBBPhysical (), Rendered (),
+	Interactive (), Damageable (), Lockable (), Door (),
+	PROXY_INIT (axis),
+	PROXY_INIT (initial_position),
+	PROXY_INIT (open_position),
+	PROXY_INIT (base_speed),
+	PROXY_INIT (push_mass),
+	PROXY_INIT (blocks_vision),
+	PROXY_INIT (blocks_sound_pct),
+	PROXY_ARRAY_INIT (room, 2)
+)
+
+bool
+TranslatingDoor::is_translating_door () const
+{
+	return axis.exists ();
 }
 
 

@@ -45,6 +45,7 @@ struct Flavor
 	bool operator != (const Flavor&) const;
 	bool operator < (const Flavor&) const;
 
+	bool is_reverse () const;
 	Flavor get_reverse () const;
 
 	Flavor (const String& name);

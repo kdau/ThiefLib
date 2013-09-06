@@ -57,6 +57,12 @@ Flavor::operator < (const Flavor& rhs) const
 	return number < rhs.number;
 }
 
+inline bool
+Flavor::is_reverse () const
+{
+	return number < ANY;
+}
+
 inline Flavor
 Flavor::get_reverse () const
 {
@@ -275,6 +281,9 @@ THIEF_FIELD_PROXY_ARRAY (LinkField, Type, Name, Count, )
 
 #define THIEF_LINK_FIELD_CONST(Type, Name) \
 THIEF_FIELD_PROXY (LinkField, Type, Name, const)
+
+#define THIEF_LINK_FIELD_ARRAY_CONST(Type, Name, Count) \
+THIEF_FIELD_PROXY_ARRAY (LinkField, Type, Name, Count, const)
 
 
 

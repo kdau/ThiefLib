@@ -97,6 +97,10 @@ protected:
 
 	template <typename _Script>
 	void listen_timer (const CIString& timer,
+		Message::Result (_Script::*handler) (Message&));
+
+	template <typename _Script>
+	void listen_timer (const CIString& timer,
 		Message::Result (_Script::*handler) (TimerMessage&));
 
 	Timer start_timer (const char* timer, Time delay, bool repeating);

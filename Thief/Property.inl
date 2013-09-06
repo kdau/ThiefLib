@@ -332,6 +332,9 @@ THIEF_FIELD_PROXY_ARRAY (PropField, Type, Name, Count, )
 #define THIEF_PROP_FIELD_CONST(Type, Name) \
 THIEF_FIELD_PROXY (PropField, Type, Name, const)
 
+#define THIEF_PROP_FIELD_ARRAY_CONST(Type, Name, Count) \
+THIEF_FIELD_PROXY_ARRAY (PropField, Type, Name, Count, const)
+
 
 
 } // namespace Thief

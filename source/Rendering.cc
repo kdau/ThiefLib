@@ -234,10 +234,6 @@ ParticleGroup::set_particles_active (bool active) //TODO Replace with PropField?
 
 
 
-//TODO wrap link: DetailAttachement - sDetailAttachLinkData
-
-
-
 // TextureSwapper
 
 PROXY_CONFIG (TextureSwapper, old_texture, "TerrRepOff", nullptr, String, "");

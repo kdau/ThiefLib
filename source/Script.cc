@@ -480,7 +480,7 @@ Transition::handle (Script&, sScrMsg* _message, sMultiParm* reply)
 	TimerMessage message (_message, reply);
 
 	if (message.get_data (Message::DATA1, String ()) != name)
-		return Message::HALT;
+		return Message::CONTINUE;
 
 	if (step_method () && remaining.exists () && Time (remaining) > 0ul)
 	{
@@ -495,7 +495,7 @@ Transition::handle (Script&, sScrMsg* _message, sMultiParm* reply)
 		remaining.remove ();
 	}
 
-	return Message::CONTINUE;
+	return Message::HALT;
 }
 
 

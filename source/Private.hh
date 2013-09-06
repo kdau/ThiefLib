@@ -149,9 +149,13 @@ PROXY_CONFIG_ (Class, Member, Major, Minor, Type, Default, 0u, negate, negate)
 #define PROXY_NEG_BIT_CONFIG(Class, Member, Major, Minor, Mask, Default) \
 PROXY_CONFIG_ (Class, Member, Major, Minor, bool, Default, Mask, negate, negate)
 
-#define PROXY_ARRAY_CONFIG(Class, Member, Count, Type, Default, ...) \
+#define PROXY_ARRAY_CONFIG_(Class, Member, Count, Type, Default, Get, Set, ...) \
 const FieldProxyConfig<Type, Count> \
-Class::F_##Member = { { __VA_ARGS__ }, Default, 0u, nullptr, nullptr }
+Class::F_##Member = { { __VA_ARGS__ }, Default, 0u, Get, Set }
+
+#define PROXY_ARRAY_CONFIG(Class, Member, Count, Type, Default, ...) \
+PROXY_ARRAY_CONFIG_ (Class, Member, Count, Type, Default, nullptr, nullptr, \
+	__VA_ARGS__)
 
 #define PROXY_ARRAY_ITEM(Major, Minor) { Major, Minor }
 

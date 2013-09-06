@@ -83,6 +83,15 @@ Script::listen_message (const CIString& message,
 template <typename _Script>
 inline void
 Script::listen_timer (const CIString& timer,
+	Message::Result (_Script::*handler) (Message&))
+{
+	timer_handlers.insert (std::make_pair (timer,
+		new ScriptMessageHandler<_Script, Message> (handler)));
+}
+
+template <typename _Script>
+inline void
+Script::listen_timer (const CIString& timer,
 	Message::Result (_Script::*handler) (TimerMessage&))
 {
 	timer_handlers.insert (std::make_pair (timer,

@@ -156,6 +156,15 @@ public:
 	THIEF_PROP_FIELD (float, creature_scale); //TESTME
 	THIEF_PROP_FIELD (bool, is_small_creature); //TESTME
 
+	enum class Joint
+	{
+		NONE, HEAD, NECK, ABDOMEN, BUTT,
+		LEFT_SHOULDER, RIGHT_SHOULDER, LEFT_ELBOW, RIGHT_ELBOW,
+		LEFT_WRIST, RIGHT_WRIST, LEFT_FINGERS, RIGHT_FINGERS,
+		LEFT_HIP, RIGHT_HIP, LEFT_KNEE, RIGHT_KNEE,
+		LEFT_ANKLE, RIGHT_ANKLE, LEFT_TOE, RIGHT_TOE, TAIL
+	};
+
 	// Motions
 
 	THIEF_PROP_FIELD (String, motion_tags); //TESTME
@@ -264,19 +273,35 @@ THIEF_FLAVORED_LINK (CreatureAttachment)
 {
 	THIEF_FLAVORED_LINK_COMMON (CreatureAttachment)
 
-	enum class Joint
-	{
-		NONE, HEAD, NECK, ABDOMEN, BUTT,
-		LEFT_SHOULDER, RIGHT_SHOULDER, LEFT_ELBOW, RIGHT_ELBOW,
-		LEFT_WRIST, RIGHT_WRIST, LEFT_FINGERS, RIGHT_FINGERS,
-		LEFT_HIP, RIGHT_HIP, LEFT_KNEE, RIGHT_KNEE,
-		LEFT_ANKLE, RIGHT_ANKLE, LEFT_TOE, RIGHT_TOE, TAIL
-	};
-
 	static CreatureAttachmentLink create (const Object& source,
-		const Object& dest, Joint = Joint::NONE);
+		const Object& dest, AI::Joint = AI::Joint::NONE);
 
-	THIEF_LINK_FIELD (Joint, joint);
+	THIEF_LINK_FIELD (AI::Joint, joint);
+};
+
+
+
+THIEF_FLAVORED_LINK (DetailAttachement)
+{
+	THIEF_FLAVORED_LINK_COMMON (DetailAttachement)
+
+	enum class Type { OBJECT, VHOT, JOINT, SUBMODEL, SUBOBJECT, DECAL };
+
+	static DetailAttachementLink create (const Object& source,
+		const Object& dest, Type, int vhot_submodel = 0,
+		AI::Joint = AI::Joint::NONE, Vector rel_location = Vector (),
+		Vector rel_rotation = Vector (), Vector decal_normal = Vector (),
+		float decal_dist = 0.0f);
+
+	THIEF_LINK_FIELD (Type, type);
+	THIEF_LINK_FIELD (int, vhot_submodel);
+	THIEF_LINK_FIELD (AI::Joint, joint);
+
+	THIEF_LINK_FIELD (Vector, rel_location);
+	THIEF_LINK_FIELD (Vector, rel_rotation);
+
+	THIEF_LINK_FIELD (Vector, decal_normal);
+	THIEF_LINK_FIELD (float, decal_dist);
 };
 
 

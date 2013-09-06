@@ -304,6 +304,8 @@ MESSAGE_ACCESSOR (Object, PropertyChangeMessage, get_object,
  * CSProjectile
  * CSProperty
  * (Dark GameSys\Stats = DarkStat): "Enemy"
+ * (Door\Translating): "Status"
+ * (Door\Translating): "Hard Limits?"
  * Editor\Auto-Multibrush = AutoVBR
  * Editor\Brush Name = Brush
  * Editor\Editor Comments = EdComment

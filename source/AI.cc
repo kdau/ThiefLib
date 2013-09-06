@@ -531,7 +531,7 @@ AIAwarenessLink::update (Time time, bool _have_los)
 // CreatureAttachmentLink
 
 PROXY_CONFIG (CreatureAttachmentLink, joint, "Joint", nullptr,
-	CreatureAttachmentLink::Joint, Joint::NONE);
+	AI::Joint, AI::Joint::NONE);
 
 FLAVORED_LINK_IMPL_ (CreatureAttachment,
 	PROXY_INIT (joint)
@@ -539,10 +539,55 @@ FLAVORED_LINK_IMPL_ (CreatureAttachment,
 
 CreatureAttachmentLink
 CreatureAttachmentLink::create (const Object& source, const Object& dest,
-	Joint joint)
+	AI::Joint joint)
 {
 	CreatureAttachmentLink link = Link::create (flavor (), source, dest);
 	link.joint = joint;
+	return link;
+}
+
+
+
+// DetailAttachementLink
+
+PROXY_CONFIG (DetailAttachementLink, type, "Type", nullptr,
+	DetailAttachementLink::Type, Type::OBJECT);
+PROXY_CONFIG (DetailAttachementLink, vhot_submodel, "vhot/sub #", nullptr,
+	int, 0);
+PROXY_CONFIG (DetailAttachementLink, joint, "joint", nullptr,
+	AI::Joint, AI::Joint::NONE);
+PROXY_CONFIG (DetailAttachementLink, rel_location, "rel pos", nullptr,
+	Vector, Vector ());
+PROXY_CONFIG (DetailAttachementLink, rel_rotation, "rel rot", nullptr,
+	Vector, Vector ());
+PROXY_CONFIG (DetailAttachementLink, decal_normal, "decal plane norm", nullptr,
+	Vector, Vector ());
+PROXY_CONFIG (DetailAttachementLink, decal_dist, "decal plane dist", nullptr,
+	float, 0.0f);
+
+FLAVORED_LINK_IMPL_ (DetailAttachement,
+	PROXY_INIT (type),
+	PROXY_INIT (vhot_submodel),
+	PROXY_INIT (joint),
+	PROXY_INIT (rel_location),
+	PROXY_INIT (rel_rotation),
+	PROXY_INIT (decal_normal),
+	PROXY_INIT (decal_dist)
+)
+
+DetailAttachementLink
+DetailAttachementLink::create (const Object& source, const Object& dest,
+	Type type, int vhot_submodel, AI::Joint joint, Vector rel_location,
+	Vector rel_rotation, Vector decal_normal, float decal_dist)
+{
+	DetailAttachementLink link = Link::create (flavor (), source, dest);
+	link.type = type;
+	link.vhot_submodel = vhot_submodel;
+	link.joint = joint;
+	link.rel_location = rel_location;
+	link.rel_rotation = rel_rotation;
+	link.decal_normal = decal_normal;
+	link.decal_dist = decal_dist;
 	return link;
 }
 

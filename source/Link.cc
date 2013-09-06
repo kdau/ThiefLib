@@ -148,8 +148,9 @@ Link::any_exist (Flavor flavor, const Object& source, const Object& dest)
 Link
 Link::get_one (Flavor flavor, const Object& source, const Object& dest)
 {
-	return SInterface<ILinkManager> (LG)->GetSingleLink
+	Number number = SInterface<ILinkManager> (LG)->GetSingleLink
 		(flavor.number, source.number, dest.number);
+	return flavor.is_reverse () ? Link (number).get_reverse () : number;
 }
 
 Link

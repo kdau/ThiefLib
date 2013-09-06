@@ -109,7 +109,9 @@ public:
 	bool get_blocks_sound () const;
 	void set_blocks_sound (bool);
 
-	THIEF_PROP_FIELD_CONST (bool, static_light_position);
+	THIEF_PROP_FIELD_CONST (bool, static_light_position); //TESTME not const?
+
+	enum class Axis { X, Y, Z };
 };
 
 class DoorMessage : public Message
@@ -120,6 +122,29 @@ public:
 
 	Door::State get_new_state () const;
 	Door::State get_old_state () const;
+};
+
+
+
+// TranslatingDoor
+
+class TranslatingDoor : public Door
+{
+public:
+	THIEF_OBJECT_TYPE (TranslatingDoor)
+	bool is_translating_door () const;
+
+	THIEF_PROP_FIELD (Axis, axis); //TESTME
+	THIEF_PROP_FIELD_CONST (float, initial_position); //TESTME
+	THIEF_PROP_FIELD (float, open_position); //TESTME
+
+	THIEF_PROP_FIELD (float, base_speed);
+	THIEF_PROP_FIELD (float, push_mass); //TESTME
+
+	THIEF_PROP_FIELD (bool, blocks_vision); //TESTME needs rebuild?
+	THIEF_PROP_FIELD (float, blocks_sound_pct); //TESTME
+
+	THIEF_PROP_FIELD_ARRAY_CONST (Room, room, 2); //TESTME
 };
 
 
