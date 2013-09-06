@@ -673,11 +673,11 @@ MESSAGE_ACCESSOR (AI::Alert, AIAlertnessMessage, get_old_level,
 
 
 
-// AIModeChangeMessage
+// AIModeMessage
 
-MESSAGE_WRAPPER_IMPL (AIModeChangeMessage, sAIModeChangeMsg)
+MESSAGE_WRAPPER_IMPL (AIModeMessage, sAIModeChangeMsg)
 
-AIModeChangeMessage::AIModeChangeMessage (AI::Mode new_mode, AI::Mode old_mode)
+AIModeMessage::AIModeMessage (AI::Mode new_mode, AI::Mode old_mode)
 	: Message (new sAIModeChangeMsg ())
 {
 	message->message = "AIModeChange";
@@ -685,9 +685,8 @@ AIModeChangeMessage::AIModeChangeMessage (AI::Mode new_mode, AI::Mode old_mode)
 	MESSAGE_AS (sAIModeChangeMsg)->previous_mode = eAIMode (old_mode);
 }
 
-MESSAGE_ACCESSOR (AI::Mode, AIModeChangeMessage, get_new_mode,
-	sAIModeChangeMsg, mode)
-MESSAGE_ACCESSOR (AI::Mode, AIModeChangeMessage, get_old_mode,
+MESSAGE_ACCESSOR (AI::Mode, AIModeMessage, get_new_mode, sAIModeChangeMsg, mode)
+MESSAGE_ACCESSOR (AI::Mode, AIModeMessage, get_old_mode,
 	sAIModeChangeMsg, previous_mode)
 
 

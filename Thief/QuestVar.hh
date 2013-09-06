@@ -50,11 +50,11 @@ public:
 
 
 
-class QuestChangeMessage : public Message
+class QuestMessage : public Message // "QuestChange"
 {
 public:
-	QuestChangeMessage (const char* quest_var, int new_value, int old_value);
-	THIEF_MESSAGE_WRAP (QuestChangeMessage);
+	QuestMessage (const char* quest_var, int new_value, int old_value);
+	THIEF_MESSAGE_WRAP (QuestMessage);
 
 	QuestVar get_quest_var () const;
 	int get_new_value () const;

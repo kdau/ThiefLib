@@ -146,21 +146,18 @@ Object::destroy ()
 }
 
 void
-Object::schedule_destruction (Time lifespan) //TODO Use DeleteTweq once created.
+Object::schedule_destruction (Time lifespan)
 {
 	if (lifespan == 0ul)
-	{
 		destroy ();
-		return;
+	else
+	{
+		DeleteTweq tweq (*this);
+		tweq.simulate_always = true;
+		tweq.duration = lifespan;
+		tweq.halt_action = Tweq::Halt::DESTROY_OBJECT;
+		tweq.active = true;
 	}
-
-	ObjectProperty config ("CfgTweqDelete", *this, true);
-	config.set_field ("Halt", 0); // Destroy Obj
-	config.set_field ("AnimC", 2); // Sim
-	config.set_field ("Rate", lifespan);
-
-	ObjectProperty state ("StTweqDelete", *this, true);
-	state.set_field ("AnimS", 1); // On
 }
 
 

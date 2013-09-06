@@ -138,6 +138,7 @@ public:
 
 	static int random_int (int minimum, int maximum);
 	static float random_float ();
+	static float random_float (float minimum, float maximum);
 
 	static void run_command (const String& command,
 		const String& arguments = String ());
@@ -151,13 +152,13 @@ template<> String Engine::get_config (const String& variable);
 
 
 
-// GameModeChangeMessage
+// GameModeMessage: "DarkGameModeChange"
 
-class GameModeChangeMessage : public Message
+class GameModeMessage : public Message
 {
 public:
-	GameModeChangeMessage (bool resuming, bool suspending);
-	THIEF_MESSAGE_WRAP (GameModeChangeMessage);
+	GameModeMessage (bool resuming, bool suspending);
+	THIEF_MESSAGE_WRAP (GameModeMessage);
 
 	bool is_resuming () const;
 	bool is_suspending () const;
@@ -165,7 +166,7 @@ public:
 
 
 
-// SimMessage
+// SimMessage: "Sim"
 
 class SimMessage : public Message
 {

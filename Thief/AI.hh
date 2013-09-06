@@ -306,7 +306,7 @@ THIEF_FLAVORED_LINK (DetailAttachement)
 
 
 
-class AIActionResultMessage : public Message //TESTME
+class AIActionResultMessage : public Message // "ObjActResult" //TESTME
 {
 public:
 	enum Action { NONE, GOTO, FROB, MANEUVER };
@@ -327,7 +327,7 @@ private:
 
 
 
-class AIAlertnessMessage : public Message //TESTME HighAlert only
+class AIAlertnessMessage : public Message // "Alertness", "HighAlert" //TESTME HighAlert only
 {
 public:
 	AIAlertnessMessage (AI::Alert new_level, AI::Alert old_level,
@@ -341,11 +341,11 @@ public:
 
 
 
-class AIModeChangeMessage : public Message
+class AIModeMessage : public Message // "AIModeChange"
 {
 public:
-	AIModeChangeMessage (AI::Mode new_mode, AI::Mode old_mode);
-	THIEF_MESSAGE_WRAP (AIModeChangeMessage);
+	AIModeMessage (AI::Mode new_mode, AI::Mode old_mode);
+	THIEF_MESSAGE_WRAP (AIModeMessage);
 
 	AI::Mode get_new_mode () const;
 	AI::Mode get_old_mode () const;
@@ -353,7 +353,7 @@ public:
 
 
 
-class AIMotionMessage : public Message //TESTME
+class AIMotionMessage : public Message // "Motion{Start,FlagReached,End}" //TESTME
 {
 public:
 	enum Event { START, END, FLAG_REACHED };
@@ -369,7 +369,7 @@ public:
 
 
 
-class AIPatrolPointMessage : public Message //TESTME
+class AIPatrolPointMessage : public Message // "PatrolPoint" //TESTME
 {
 public:
 	AIPatrolPointMessage (const Object& patrol_point);
@@ -380,7 +380,7 @@ public:
 
 
 
-class AISignalMessage : public Message //TESTME
+class AISignalMessage : public Message // "SignalAI" //TESTME
 {
 public:
 	AISignalMessage (const char* signal);

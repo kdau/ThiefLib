@@ -41,6 +41,7 @@
 #include <Thief/Script.hh>
 #include <Thief/Security.hh>
 #include <Thief/Sound.hh>
+#include <Thief/Tweq.hh>
 #include <Thief/Types.hh>
 
 #endif // THIEF_THIEF_HH

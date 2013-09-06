@@ -137,7 +137,7 @@ public:
 
 
 
-// SchemaDoneMessage
+// SchemaDoneMessage: "SchemaDone"
 
 class SchemaDoneMessage : public Message //TESTME
 {

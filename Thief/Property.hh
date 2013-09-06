@@ -94,7 +94,7 @@ public:
 
 private:
 	friend class PropFieldBase;
-	friend class PropertyChangeMessage;
+	friend class PropertyMessage;
 
 	void _get (LGMultiBase& value) const;
 	bool _set (const LGMultiBase& value);
@@ -152,16 +152,16 @@ std::ostream& operator << (std::ostream&, const PropField<T, count, config>&);
 
 
 
-// PropertyChangeMessage
+// PropertyMessage
 
-class PropertyChangeMessage : public Message
+class PropertyMessage : public Message // "PropertyChange"
 {
 public:
 	enum Event { CHANGE, ADD, REMOVE };
 
-	PropertyChangeMessage (Event, bool inherited, const Property&,
+	PropertyMessage (Event, bool inherited, const Property&,
 		const Object&);
-	THIEF_MESSAGE_WRAP (PropertyChangeMessage);
+	THIEF_MESSAGE_WRAP (PropertyMessage);
 
 	Event get_event () const; //TESTME
 	bool is_inherited () const; //TESTME

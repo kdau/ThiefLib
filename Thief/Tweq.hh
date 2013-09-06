@@ -1,5 +1,5 @@
 /******************************************************************************
- *  Combat.hh
+ *  Tweq.hh
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
  *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
@@ -21,78 +21,70 @@
  *
  *****************************************************************************/
 
-#ifndef THIEF_COMBAT_HH
-#define THIEF_COMBAT_HH
+#ifndef THIEF_TWEQ_HH
+#define THIEF_TWEQ_HH
 
 #include <Thief/Base.hh>
-#include <Thief/AI.hh>
-#include <Thief/Rendering.hh>
-#include <Thief/Types.hh>
+#include <Thief/Message.hh>
+#include <Thief/Object.hh>
 
 namespace Thief {
 
 
 
-// Blood
-
-class Blood : public virtual Rendered, public virtual Damageable
+class Tweq : public virtual Object
 {
 public:
-	THIEF_OBJECT_TYPE (Blood)
-	THIEF_PROP_FIELD (bool, is_blood); //TESTME
+	enum class Type { NONE = -1,
+		SCALE, ROTATE, JOINTS, MODELS, DELETE, EMIT, FLICKER, LOCK };
 
-	static void cleanse (const Vector& center, float radius = 5.0f);
+	enum class Direction { FORWARD, REVERSE };
+
+	enum class Halt
+		{ DESTROY_OBJECT, REMOVE, HALT, CONTINUE, SLAY_OBJECT };
+
+protected:
+	THIEF_OBJECT_TYPE (Tweq)
 };
 
 
 
-// Weapon
-
-class Weapon : public virtual Interactive, public virtual Combinable
+class TweqMessage : public Message // "TweqComplete" //TESTME
 {
 public:
-	THIEF_OBJECT_TYPE (Weapon)
-	bool is_weapon () const;
+	enum Event { DESTROY, REMOVE, HALT, CONTINUE, SLAY, FRAME };
 
-	THIEF_PROP_FIELD (int, exposure_drawn);
-	THIEF_PROP_FIELD (int, exposure_swung);
-
-	THIEF_PROP_FIELD (bool, collides_with_terrain);
-};
-
-
-
-// AIAttackLink
-
-THIEF_FLAVORED_LINK (AIAttack) //TESTME
-{
-	THIEF_FLAVORED_LINK_COMMON (AIAttack)
-
-	static AIAttackLink create (const Object& source, const Object& dest,
-		AI::Priority = AI::Priority::DEFAULT);
-
-	THIEF_LINK_FIELD (AI::Priority, priority);
-};
-
-
-
-// AIAttackMessage: "StartWindup", "StartAttack", "EndAttack"
-
-class AIAttackMessage : public Message //TESTME
-{
-public:
-	enum Event { WINDUP, START, END };
-
-	AIAttackMessage (Event, const Object& weapon);
-	THIEF_MESSAGE_WRAP (AIAttackMessage);
+	TweqMessage (Event, Tweq::Type, Tweq::Direction);
+	THIEF_MESSAGE_WRAP (TweqMessage);
 
 	Event get_event () const;
-	Weapon get_weapon () const;
+	Tweq::Type get_tweq_type () const;
+	Tweq::Direction get_direction () const;
+};
+
+
+
+class DeleteTweq : public virtual Tweq
+{
+public:
+	THIEF_OBJECT_TYPE (DeleteTweq)
+	bool has_delete_tweq () const;
+
+	THIEF_PROP_FIELD (bool, simulate_always);
+	THIEF_PROP_FIELD (bool, simulate_far); //TESTME
+	THIEF_PROP_FIELD (bool, simulate_near); //TESTME
+	THIEF_PROP_FIELD (bool, simulate_onscreen); //TESTME
+
+	THIEF_PROP_FIELD (Time, duration);
+	THIEF_PROP_FIELD (Halt, halt_action);
+
+	THIEF_PROP_FIELD (bool, active);
+	THIEF_PROP_FIELD (Time, current_time); //TESTME
 };
 
 
 
 } // namespace Thief
 
-#endif // THIEF_COMBAT_HH
+#endif // THIEF_TWEQ_HH
 

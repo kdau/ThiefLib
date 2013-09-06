@@ -126,6 +126,7 @@ COMMON_SOURCES = \
 	Rendering.cc \
 	Security.cc \
 	Sound.cc \
+	Tweq.cc \
 	Types.cc
 
 SOURCES = $(COMMON_SOURCES) \

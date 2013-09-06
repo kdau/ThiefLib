@@ -253,7 +253,7 @@ OSL::on_sim (const sDispatchMsg* message, const sDispatchListenerDesc*)
 
 
 
-// OSL: LinkChange Message
+// OSL: LinkChange, LinkAdd, and LinkRemove messages
 
 OSL::ListenedFlavors
 OSL::listened_flavors;
@@ -311,20 +311,20 @@ OSL::on_link_event (sRelationListenMsg* _message, void*)
 		return;
 
 	// Translate the event type.
-	LinkChangeMessage::Event event;
+	LinkMessage::Event event;
 	switch (_message->event & 0xF)
 	{
 	case 0:
 	case kRelationChange:
-		event = LinkChangeMessage::CHANGE; break;
+		event = LinkMessage::CHANGE; break;
 	case kRelationAdd:
 	case kRelationAdd | kRelationChange:
-		event = LinkChangeMessage::ADD; break;
+		event = LinkMessage::ADD; break;
 	default:
-		event = LinkChangeMessage::REMOVE; break;
+		event = LinkMessage::REMOVE; break;
 	}
 
-	LinkChangeMessage message (event, _message->flavor, _message->lLink,
+	LinkMessage message (event, _message->flavor, _message->lLink,
 		_message->source, _message->dest);
 
 	// Send message to object-specific subscribers.
@@ -410,21 +410,20 @@ OSL::on_property_event (sPropertyListenMsg* _message, PropListenerData)
 		return;
 
 	// Translate the event type.
-	PropertyChangeMessage::Event event;
+	PropertyMessage::Event event;
 	switch (_message->event & 0x7)
 	{
 	case 0:
 	case kPropertyChange:
-		event = PropertyChangeMessage::CHANGE; break;
+		event = PropertyMessage::CHANGE; break;
 	case kPropertyAdd:
 	case kPropertyAdd | kPropertyChange:
-		event = PropertyChangeMessage::ADD; break;
+		event = PropertyMessage::ADD; break;
 	default:
-		event = PropertyChangeMessage::REMOVE; break;
+		event = PropertyMessage::REMOVE; break;
 	}
 
-	PropertyChangeMessage message (event,
-		_message->event & kPropertyInherited,
+	PropertyMessage message (event, _message->event & kPropertyInherited,
 		_message->iPropId, _message->iObjId);
 
 	// Send message to object-specific subscribers.

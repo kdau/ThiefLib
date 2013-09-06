@@ -276,37 +276,34 @@ LinkFieldBase::set_bit (const FieldProxyConfig<bool, 1u>& config, Link& link,
 
 
 
-// LinkChangeMessage
+// LinkMessage
 
-MESSAGE_WRAPPER_IMPL_ (LinkChangeMessage,
-	MESSAGE_TYPENAME_TEST ("LinkChangeMessageImpl"))
+MESSAGE_WRAPPER_IMPL_ (LinkMessage,
+	MESSAGE_TYPENAME_TEST ("LinkMessageImpl"))
 
-LinkChangeMessage::LinkChangeMessage (Event event, Flavor flavor,
+LinkMessage::LinkMessage (Event event, Flavor flavor,
 		Link::Number link, const Object& source, const Object& dest)
-	: Message (new LinkChangeMessageImpl ())
+	: Message (new LinkMessageImpl ())
 {
-	message->message = "LinkChangeMessage";
-	MESSAGE_AS (LinkChangeMessageImpl)->event = event;
-	MESSAGE_AS (LinkChangeMessageImpl)->flavor = flavor;
-	MESSAGE_AS (LinkChangeMessageImpl)->link = link;
-	MESSAGE_AS (LinkChangeMessageImpl)->source = source;
-	MESSAGE_AS (LinkChangeMessageImpl)->dest = dest;
+	switch (event)
+	{
+	case ADD: message->message = "LinkAdd"; break;
+	case REMOVE: message->message = "LinkRemove"; break;
+	case CHANGE: default: message->message = "LinkChange"; break;
+	}
+	MESSAGE_AS (LinkMessageImpl)->event = event;
+	MESSAGE_AS (LinkMessageImpl)->flavor = flavor;
+	MESSAGE_AS (LinkMessageImpl)->link = link;
+	MESSAGE_AS (LinkMessageImpl)->source = source;
+	MESSAGE_AS (LinkMessageImpl)->dest = dest;
 }
 
-MESSAGE_ACCESSOR (LinkChangeMessage::Event, LinkChangeMessage, get_event,
-	LinkChangeMessageImpl, event)
-
-MESSAGE_ACCESSOR (Flavor, LinkChangeMessage, get_flavor,
-	LinkChangeMessageImpl, flavor)
-
-MESSAGE_ACCESSOR (Link::Number, LinkChangeMessage, get_link,
-	LinkChangeMessageImpl, link)
-
-MESSAGE_ACCESSOR (Object, LinkChangeMessage, get_source,
-	LinkChangeMessageImpl, source)
-
-MESSAGE_ACCESSOR (Object, LinkChangeMessage, get_dest,
-	LinkChangeMessageImpl, dest)
+MESSAGE_ACCESSOR (LinkMessage::Event, LinkMessage, get_event,
+	LinkMessageImpl, event)
+MESSAGE_ACCESSOR (Flavor, LinkMessage, get_flavor, LinkMessageImpl, flavor)
+MESSAGE_ACCESSOR (Link::Number, LinkMessage, get_link, LinkMessageImpl, link)
+MESSAGE_ACCESSOR (Object, LinkMessage, get_source, LinkMessageImpl, source)
+MESSAGE_ACCESSOR (Object, LinkMessage, get_dest, LinkMessageImpl, dest)
 
 
 

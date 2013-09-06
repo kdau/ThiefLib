@@ -76,11 +76,11 @@ QuestVar::unsubscribe (const Object& host) const
 
 
 
-// QuestChangeMessage
+// QuestMessage
 
-MESSAGE_WRAPPER_IMPL (QuestChangeMessage, sQuestMsg)
+MESSAGE_WRAPPER_IMPL (QuestMessage, sQuestMsg)
 
-QuestChangeMessage::QuestChangeMessage
+QuestMessage::QuestMessage
 		(const char* quest_var, int new_value, int old_value)
 	: Message (new sQuestMsg ())
 {
@@ -90,10 +90,9 @@ QuestChangeMessage::QuestChangeMessage
 	MESSAGE_AS (sQuestMsg)->m_oldValue = old_value;
 }
 
-MESSAGE_ACCESSOR (QuestVar, QuestChangeMessage, get_quest_var,
-	sQuestMsg, m_pName)
-MESSAGE_ACCESSOR (int, QuestChangeMessage, get_new_value, sQuestMsg, m_newValue)
-MESSAGE_ACCESSOR (int, QuestChangeMessage, get_old_value, sQuestMsg, m_oldValue)
+MESSAGE_ACCESSOR (QuestVar, QuestMessage, get_quest_var, sQuestMsg, m_pName)
+MESSAGE_ACCESSOR (int, QuestMessage, get_new_value, sQuestMsg, m_newValue)
+MESSAGE_ACCESSOR (int, QuestMessage, get_old_value, sQuestMsg, m_oldValue)
 
 
 

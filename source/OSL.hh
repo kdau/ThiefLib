@@ -87,55 +87,55 @@ extern "C" const GUID IID_IOSLService;
 
 
 
-// LinkChangeMessageImpl
+// LinkMessageImpl
 
-struct LinkChangeMessageImpl : public sScrMsg
+struct LinkMessageImpl : public sScrMsg
 {
-	typedef LinkChangeMessage::Event Event;
+	typedef LinkMessage::Event Event;
 
 	Event event;
 	Flavor flavor;
 	Link::Number link;
 	Object source, dest;
 
-	LinkChangeMessageImpl ()
+	LinkMessageImpl ()
 		: sScrMsg (),
 		  event (Event::CHANGE),
 		  flavor (Flavor::ANY), link (Link::NONE),
 		  source (), dest ()
 	{}
 
-	virtual ~LinkChangeMessageImpl ()
+	virtual ~LinkMessageImpl ()
 	{}
 
 	virtual const char* __thiscall GetName () const
-		{ return "LinkChangeMessageImpl"; }
+		{ return "LinkMessageImpl"; }
 };
 
 
 
-// PropertyChangeMessageImpl
+// PropertyMessageImpl
 
-struct PropertyChangeMessageImpl : public sScrMsg
+struct PropertyMessageImpl : public sScrMsg
 {
-	typedef PropertyChangeMessage::Event Event;
+	typedef PropertyMessage::Event Event;
 
 	Event event;
 	bool inherited;
 	Property property;
 	Object object;
 
-	PropertyChangeMessageImpl ()
+	PropertyMessageImpl ()
 		: sScrMsg (),
 		  event (Event::CHANGE), inherited (false),
 		  property (Property::NONE), object ()
 	{}
 
-	virtual ~PropertyChangeMessageImpl ()
+	virtual ~PropertyMessageImpl ()
 	{}
 
 	virtual const char* __thiscall GetName () const
-		{ return "PropertyChangeMessageImpl"; }
+		{ return "PropertyMessageImpl"; }
 };
 
 
@@ -251,7 +251,7 @@ private:
 	std::unique_ptr<HUDImpl> hud;
 	std::unique_ptr<ParameterCache> param_cache;
 
-	// LinkChange message
+	// LinkChange, LinkAdd, and LinkRemove messages
 
 	static void __stdcall on_link_event (sRelationListenMsg*, void*);
 

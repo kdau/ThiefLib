@@ -185,7 +185,7 @@ THIEF_FLAVORED_LINK (TPath) //TESTME
 	THIEF_LINK_FIELD (bool, path_limit);
 };
 
-class MovingTerrainMessage : public Message //TESTME
+class MovingTerrainMessage : public Message // "MovingTerrainWaypoint" //TESTME
 {
 public:
 	MovingTerrainMessage (const Object& waypoint);
@@ -194,7 +194,7 @@ public:
 	Marker get_waypoint () const;
 };
 
-class WaypointMessage : public Message //TESTME
+class WaypointMessage : public Message // "WaypointReached" //TESTME
 {
 public:
 	WaypointMessage (const MovingTerrain& moving_terrain);
@@ -264,8 +264,9 @@ public:
 		TELL_AI = 512,
 		NO_PHYSICS = 1024
 	};
-	Projectile launch (const Object& launcher, float velocity_mult = 1.0f,
-		const Vector& velocity_add = Vector (), unsigned flags = NONE); //TESTME
+	static Projectile launch (const Object& archetype,
+		const Object& launcher, float velocity_mult = 1.0f,
+		const Vector& velocity_add = Vector (), unsigned flags = NONE);
 
 	THIEF_PROP_FIELD_CONST (Being, launcher);
 };

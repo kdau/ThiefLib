@@ -49,7 +49,7 @@ public:
 	int adjust_stack_count (int by, bool destroy_if_zero = true);
 };
 
-class CombineMessage : public Message //TESTME
+class CombineMessage : public Message // "Combine" //TESTME
 {
 public:
 	CombineMessage (const Object& stack);
@@ -80,7 +80,7 @@ public:
 	void resurrect (const Object& culprit);
 };
 
-class DamageMessage : public Message //TESTME
+class DamageMessage : public Message // "Damage" //TESTME
 {
 public:
 	DamageMessage (const Object& culprit, const Object& stimulus,
@@ -92,7 +92,7 @@ public:
 	int get_hit_points () const;
 };
 
-class SlayMessage : public Message
+class SlayMessage : public Message // "Slain"
 {
 public:
 	SlayMessage (const Object& culprit, const Object& stimulus);
@@ -145,7 +145,7 @@ public:
 	THIEF_PROP_FIELD (int, store_price); //TESTME
 };
 
-class FrobMessage : public Message //TESTME details only
+class FrobMessage : public Message // "Frob{World,Inv,Tool}{Begin,End}" //TESTME details only
 {
 public:
 	enum Event { BEGIN, END };
@@ -237,7 +237,7 @@ THIEF_FLAVORED_LINK (Contains)
 	THIEF_LINK_FIELD (Container::Type, type);
 };
 
-class ContainmentMessage : public Message
+class ContainmentMessage : public Message // "Contained", "Container"
 {
 public:
 	enum Subject { CONTAINER, CONTENTS };
@@ -316,6 +316,7 @@ public:
 };
 
 class RoomMessage : public Message
+// "{Player,Creature,Object}Room{Enter,Exit}", "ObjRoomTransit"
 {
 public:
 	enum Event { ENTER, EXIT, TRANSIT };

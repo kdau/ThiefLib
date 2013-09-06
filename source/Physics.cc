@@ -374,13 +374,11 @@ Projectile::is_projectile () const
 }
 
 Projectile
-Projectile::launch (const Object& _launcher, float velocity_mult,
-	const Vector& velocity_add, unsigned flags)
+Projectile::launch (const Object& archetype, const Object& launcher,
+	float velocity_mult, const Vector& velocity_add, unsigned flags)
 {
-	Projectile archetype = (get_type () == Type::ARCHETYPE)
-		? *this : get_archetype ();
 	LGObject projectile;
-	SService<IPhysSrv> (LG)->LaunchProjectile (projectile, _launcher.number,
+	SService<IPhysSrv> (LG)->LaunchProjectile (projectile, launcher.number,
 		archetype.number, velocity_mult, flags, LGVector (velocity_add));
 	return projectile.id;
 }

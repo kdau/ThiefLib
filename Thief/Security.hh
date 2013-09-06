@@ -114,7 +114,7 @@ public:
 	enum class Axis { X, Y, Z };
 };
 
-class DoorMessage : public Message
+class DoorMessage : public Message // "Door{Close,Open,Closing,Opening,Halt}"
 {
 public:
 	DoorMessage (Door::State new_state, Door::State old_state);
@@ -171,7 +171,7 @@ public:
 	enum class Stage { S0, S1, S2, S3, S4, S5, S6, S7, UNLOCKED };
 };
 
-class PickMessage : public Message
+class PickMessage : public Message // "PickStateChange"
 {
 public:
 	PickMessage (AdvPickable::Stage new_stage, AdvPickable::Stage old_stage);

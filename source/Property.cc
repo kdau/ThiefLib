@@ -232,33 +232,33 @@ PropFieldBase::set_bit (const FieldProxyConfig<bool, 1u>& config,
 
 
 
-// PropertyChangeMessage
+// PropertyMessage
 
-MESSAGE_WRAPPER_IMPL_ (PropertyChangeMessage,
-	MESSAGE_TYPENAME_TEST ("PropertyChangeMessageImpl"))
+MESSAGE_WRAPPER_IMPL_ (PropertyMessage,
+	MESSAGE_TYPENAME_TEST ("PropertyMessageImpl"))
 
-PropertyChangeMessage::PropertyChangeMessage (Event event, bool inherited,
+PropertyMessage::PropertyMessage (Event event, bool inherited,
 		const Property& property, const Object& object)
-	: Message (new PropertyChangeMessageImpl ())
+	: Message (new PropertyMessageImpl ())
 {
 	message->message = "PropertyChange";
-	MESSAGE_AS (PropertyChangeMessageImpl)->event = event;
-	MESSAGE_AS (PropertyChangeMessageImpl)->inherited = inherited;
-	MESSAGE_AS (PropertyChangeMessageImpl)->property = property;
-	MESSAGE_AS (PropertyChangeMessageImpl)->object = object;
+	MESSAGE_AS (PropertyMessageImpl)->event = event;
+	MESSAGE_AS (PropertyMessageImpl)->inherited = inherited;
+	MESSAGE_AS (PropertyMessageImpl)->property = property;
+	MESSAGE_AS (PropertyMessageImpl)->object = object;
 }
 
-MESSAGE_ACCESSOR (PropertyChangeMessage::Event, PropertyChangeMessage, get_event,
-	PropertyChangeMessageImpl, event)
+MESSAGE_ACCESSOR (PropertyMessage::Event, PropertyMessage, get_event,
+	PropertyMessageImpl, event)
 
-MESSAGE_ACCESSOR (bool, PropertyChangeMessage, is_inherited,
-	PropertyChangeMessageImpl, inherited)
+MESSAGE_ACCESSOR (bool, PropertyMessage, is_inherited,
+	PropertyMessageImpl, inherited)
 
-MESSAGE_ACCESSOR (Property, PropertyChangeMessage, get_property,
-	PropertyChangeMessageImpl, property)
+MESSAGE_ACCESSOR (Property, PropertyMessage, get_property,
+	PropertyMessageImpl, property)
 
-MESSAGE_ACCESSOR (Object, PropertyChangeMessage, get_object,
-	PropertyChangeMessageImpl, object)
+MESSAGE_ACCESSOR (Object, PropertyMessage, get_object,
+	PropertyMessageImpl, object)
 
 
 

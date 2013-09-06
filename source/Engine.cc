@@ -410,6 +410,13 @@ Engine::random_float ()
 	return SService<IDataSrv> (LG)->RandFlt0to1 ();
 }
 
+float
+Engine::random_float (float minimum, float maximum)
+{
+	return minimum + (maximum - minimum) *
+		SService<IDataSrv> (LG)->RandFlt0to1 ();
+}
+
 void
 Engine::run_command (const String& command, const String& arguments)
 {
@@ -426,13 +433,13 @@ Engine::write_to_game_log (const String& message)
 
 
 
-// GameModeChangeMessage
+// GameModeMessage
 
 // "DarkGameModeChange" reports as "sScrMsg", so it can't be tested by type.
-MESSAGE_WRAPPER_IMPL_ (GameModeChangeMessage,
+MESSAGE_WRAPPER_IMPL_ (GameModeMessage,
 	MESSAGE_NAME_TEST ("DarkGameModeChange"))
 
-GameModeChangeMessage::GameModeChangeMessage (bool resuming, bool suspending)
+GameModeMessage::GameModeMessage (bool resuming, bool suspending)
 	: Message (new sDarkGameModeScrMsg ())
 {
 	message->message = "DarkGameModeChange";
@@ -440,9 +447,9 @@ GameModeChangeMessage::GameModeChangeMessage (bool resuming, bool suspending)
 	MESSAGE_AS (sDarkGameModeScrMsg)->fSuspending = suspending;
 }
 
-MESSAGE_ACCESSOR (bool, GameModeChangeMessage, is_resuming,
+MESSAGE_ACCESSOR (bool, GameModeMessage, is_resuming,
 	sDarkGameModeScrMsg, fResuming)
-MESSAGE_ACCESSOR (bool, GameModeChangeMessage, is_suspending,
+MESSAGE_ACCESSOR (bool, GameModeMessage, is_suspending,
 	sDarkGameModeScrMsg, fSuspending)
 
 

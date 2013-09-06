@@ -19,46 +19,11 @@ ActReact.hh
 		* Game: Dark\BloodCause = BloodCause
 		* Game: Dark\BloodMaxDamage = BloodMaxDmg
 
-Tweq.hh
-	messages:
-		* sTweqMsg ("TweqComplete")
-	enums:
-		* eTweqAction
-		* eTweqFlag
-		* eTweqType
-		* eTweqOperation
-		* eTweqDirection
-	properties:
-		* Tweq\Delete = CfgTweqDelete
-		* Tweq\DeleteState = StTweqDelete
-		* Tweq\Emit = CfgTweqEmit
-		* Tweq\Emit2 = CfgTweq2Emit
-		* Tweq\Emit3 = CfgTweq3Emit
-		* Tweq\Emit4 = CfgTweq4Emit
-		* Tweq\Emit5 = CfgTweq5Emit
-		* Tweq\Emitter2State = StTweq2Emit
-		* Tweq\Emitter3State = StTweq3Emit
-		* Tweq\Emitter4State = StTweq4Emit
-		* Tweq\Emitter5State = StTweq5Emit
-		* Tweq\EmitterState = StTweqEmit
-		* Tweq\Flicker = CfgTweqBlink
-		* Tweq\FlickerState = StTweqBlink
-		* Tweq\Joints = CfgTweqJoints
-		* Tweq\JointsState = StTweqJoints
-		* Tweq\Lock = CfgTweqLock
-		* Tweq\LockState = StTweqLock
-		* Tweq\Models = CfgTweqModels
-		* Tweq\ModelsState = StTweqModels
-		* Tweq\Rotate = CfgTweqRotate
-		* Tweq\RotateState = StTweqRotate
-		* Tweq\Scale = CfgTweqScale
-		* Tweq\ScaleState = StTweqScale
-
 Novel messages/wrappers
-	* HierarchyChangeMessage: ITraitManager::Listen (per DH2)
-	* ObjectChangeMessage: IObjectSystem::Listen (per DH2)
-	* ObjectiveChangeMessage: from appropriate QuestChange messages
-	* ParameterChangeMessage: from ParameterCache activity
+	* HierarchyMessage: ITraitManager::Listen (per DH2)
+	* ObjectMessage: IObjectSystem::Listen (per DH2)
+	* ObjectiveMessage: from appropriate QuestChange messages
+	* ParameterMessage: from ParameterCache activity
 
 TNH/NV/TW features
 	* ParameterCache: NVScript-style syntax (script name prefix, object targetting)

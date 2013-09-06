@@ -164,16 +164,16 @@ std::ostream& operator << (std::ostream&, const LinkField<T, count, config>&);
 
 
 
-// LinkChangeMessage
+// LinkMessage
 
-class LinkChangeMessage : public Message //TESTME
+class LinkMessage : public Message // "LinkChange", "LinkAdd", "LinkRemove" //TESTME
 {
 public:
 	enum Event { CHANGE, ADD, REMOVE };
 
-	LinkChangeMessage (Event, Flavor, Link::Number,
+	LinkMessage (Event, Flavor, Link::Number,
 		const Object& source, const Object& dest);
-	THIEF_MESSAGE_WRAP (LinkChangeMessage);
+	THIEF_MESSAGE_WRAP (LinkMessage);
 
 	Event get_event () const;
 	Flavor get_flavor () const;

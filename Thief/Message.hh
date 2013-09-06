@@ -137,7 +137,7 @@ public:
 
 
 
-class TimerMessage : public Message
+class TimerMessage : public Message // "Timer"
 {
 public:
 	TimerMessage (const char* timer_name);

@@ -41,7 +41,7 @@ enum class Difficulty
 	EXPERT = 2
 };
 
-class DifficultyMessage : public Message //TESTME
+class DifficultyMessage : public Message // "Difficulty" //TESTME
 {
 public:
 	DifficultyMessage (Difficulty);
