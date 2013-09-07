@@ -152,8 +152,8 @@ LabColor::LabColor (Component _L, Component _a, Component _b)
 // Time
 
 inline
-Time::Time (Value _value)
-	: value (_value)
+Time::Time (Value _value, Value unit)
+	: value (_value * unit)
 {}
 
 inline Time&
@@ -166,13 +166,13 @@ Time::operator = (Value _value)
 inline Time::Value
 Time::seconds () const
 {
-	return value / 1000ul;
+	return value / SECONDS;
 }
 
 inline Time::Value
 Time::minutes () const
 {
-	return value / 60000ul;
+	return value / MINUTES;
 }
 
 inline

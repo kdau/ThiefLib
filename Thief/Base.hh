@@ -141,10 +141,13 @@ struct LabColor
 struct Time
 {
 	typedef unsigned long Value;
+	static constexpr Value MILLISECONDS = 1ul,
+		SECONDS = 1000ul * MILLISECONDS,
+		MINUTES = 60ul * SECONDS;
 
 	Value value; // milliseconds
 
-	Time (Value value = 0ul);
+	Time (Value value = 0ul, Value unit = MILLISECONDS);
 	Time& operator = (Value);
 
 	operator Value () const { return value; }

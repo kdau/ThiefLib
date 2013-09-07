@@ -157,10 +157,10 @@ Time::operator = (const String& code)
 		switch (*end)
 		{
 		case 'm': case 'M':
-			units *= 60000.0; // milliseconds per minute
+			units *= MINUTES;
 			break;
 		case 's': case 'S':
-			units *= 1000.0; // milliseconds per second
+			units *= SECONDS;
 			break;
 		case '\0':
 			break;
