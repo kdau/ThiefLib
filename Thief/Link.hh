@@ -238,7 +238,7 @@ THIEF_FLAVORED_LINK (ScriptParams)
 		const CIString& data, bool reverse = false);
 
 	static ScriptParamsLink create (const Object& source,
-		const Object& dest, const String& data = String ());
+		const Object& dest, const CIString& data = CIString ());
 
 	THIEF_LINK_FIELD (String, data);
 };

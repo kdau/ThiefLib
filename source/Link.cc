@@ -391,10 +391,10 @@ ScriptParamsLink::get_one_by_data (const Object& source, const CIString& data,
 
 ScriptParamsLink
 ScriptParamsLink::create (const Object& source, const Object& dest,
-	const String& data)
+	const CIString& data)
 {
 	ScriptParamsLink link = Link::create (flavor (), source, dest);
-	link.data = data;
+	link.data = data.data ();
 	return link;
 }
 

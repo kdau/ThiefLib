@@ -263,9 +263,9 @@ XYZColor::operator LabColor () const
 
 XYZColor::XYZColor (const LabColor& lab)
 {
-	double  _Y = (lab.L + 16.0) / 116.0,
-		_X = _Y + lab.a / 500.0,
-		_Z = _Y - lab.b / 200.0;
+	double  _Y = (std::max (0.0, std::min (100.0, lab.L)) + 16.0) / 116.0,
+		_X = _Y + std::max (-110.0, std::min (110.0, lab.a)) / 500.0,
+		_Z = _Y - std::max (-110.0, std::min (110.0, lab.b)) / 200.0;
 
 	X = std::max (0.0, std::min (1.0, D65_WHITE.X * Lab_invf (_X)));
 	Y = std::max (0.0, std::min (1.0, D65_WHITE.Y * Lab_invf (_Y)));
