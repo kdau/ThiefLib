@@ -163,6 +163,50 @@ DynamicLight::is_dynamic_light () const
 
 
 
+// Bitmapped
+
+PROXY_CONFIG (Bitmapped, bitmap_size_x, "BitmapWorld", "x size (feet)",
+	float, 0.0f);
+PROXY_CONFIG (Bitmapped, bitmap_size_y, "BitmapWorld", "y size (feet)",
+	float, 0.0f);
+PROXY_NEG_BIT_CONFIG (Bitmapped, uv_tiling, "BitmapWorld", "Flags", 16u, false);
+PROXY_CONFIG (Bitmapped, tile_size_x, "BitmapWorld", "x feet per tile",
+	float, 0.0f);
+PROXY_CONFIG (Bitmapped, tile_size_y, "BitmapWorld", "y feet per tile",
+	float, 0.0f);
+PROXY_BIT_CONFIG (Bitmapped, apply_lighting, "BitmapWorld", "Flags", 4u, false);
+PROXY_CONFIG (Bitmapped, bitmap_color, "BitmapColor", nullptr, Color,
+	Color (0xffffff)); //FIXME This is not setting correctly (only the red channel is taking effect).
+PROXY_BIT_CONFIG (Bitmapped, double_sided, "BitmapWorld", "Flags", 1u, false);
+PROXY_BIT_CONFIG (Bitmapped, flip_backside_uv, "BitmapWorld", "Flags", 2u, false);
+PROXY_BIT_CONFIG (Bitmapped, face_camera, "BitmapWorld", "Flags", 8u, false);
+PROXY_CONFIG (Bitmapped, axial_fade, "BitmapWorld", "Axial Fade", float, 0.0f);
+PROXY_NEG_BIT_CONFIG (Bitmapped, animation_loop, "BitmapAnimation", "Flags",
+	1u, false);
+
+OBJECT_TYPE_IMPL_ (Bitmapped, Rendered (),
+	PROXY_INIT (bitmap_size_x),
+	PROXY_INIT (bitmap_size_y),
+	PROXY_INIT (uv_tiling),
+	PROXY_INIT (tile_size_x),
+	PROXY_INIT (tile_size_y),
+	PROXY_INIT (apply_lighting),
+	PROXY_INIT (bitmap_color),
+	PROXY_INIT (double_sided),
+	PROXY_INIT (flip_backside_uv),
+	PROXY_INIT (face_camera),
+	PROXY_INIT (axial_fade),
+	PROXY_INIT (animation_loop)
+)
+
+bool
+Bitmapped::is_bitmapped () const
+{
+	return bitmap_size_x.exists ();
+}
+
+
+
 // Flash
 //TODO wrap rest of property: SFX\FlashBombInfo = RenderFlash
 
@@ -276,10 +320,7 @@ TextureSwapper::swap_textures (const Vector& _center, float radius,
 
 
 
-/*TODO wrap the following properties, perhaps creating {Bitmapped,Camera,Corona,Distortion}
- * Renderer\Bitmap Animation = BitmapAnimation
- * Renderer\Bitmap Color = BitmapColor
- * Renderer\Bitmap Worldspace = BitmapWorld
+/*TODO wrap the following properties, perhaps creating {Camera,Corona,Distortion}:
  * Renderer\Camera Overlay = CameraOverlay
  * Renderer\Corona = Corona
  * SFX\Heat Disks = HeatDisks

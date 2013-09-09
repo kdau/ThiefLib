@@ -163,6 +163,20 @@ PropField<T, count, config>::operator = (const T& value)
 }
 
 template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
+inline bool
+PropField<T, count, config>::operator == (const T& rhs) const
+{
+	return operator T () == rhs;
+}
+
+template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
+inline bool
+PropField<T, count, config>::operator != (const T& rhs) const
+{
+	return operator T () != rhs;
+}
+
+template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
 inline std::ostream&
 operator << (std::ostream& out, const PropField<T, count, config>& field)
 {
@@ -187,6 +201,9 @@ public:
 
 	operator T () const;
 	PropField& operator = (const T&);
+
+	bool operator == (const T&) const;
+	bool operator != (const T&) const;
 
 private:
 	Object& object;
@@ -242,6 +259,20 @@ PropField<T, 1u, config>::operator = (const T& value)
 	return *this;
 }
 
+template <typename T, const FieldProxyConfig<T, 1u>& config>
+inline bool
+PropField<T, 1u, config>::operator == (const T& rhs) const
+{
+	return operator T () == rhs;
+}
+
+template <typename T, const FieldProxyConfig<T, 1u>& config>
+inline bool
+PropField<T, 1u, config>::operator != (const T& rhs) const
+{
+	return operator T () != rhs;
+}
+
 
 
 // PropField<bool, 1u>
@@ -258,6 +289,9 @@ public:
 
 	operator bool () const;
 	PropField& operator = (bool);
+
+	bool operator == (bool) const;
+	bool operator != (bool) const;
 
 private:
 	Object& object;
@@ -318,6 +352,20 @@ PropField<bool, 1u, config>::operator = (bool value)
 			LGMulti<bool> (raw));
 
 	return *this;
+}
+
+template <const FieldProxyConfig<bool, 1u>& config>
+inline bool
+PropField<bool, 1u, config>::operator == (bool rhs) const
+{
+	return operator bool () == rhs;
+}
+
+template <const FieldProxyConfig<bool, 1u>& config>
+inline bool
+PropField<bool, 1u, config>::operator != (bool rhs) const
+{
+	return operator bool () != rhs;
 }
 
 

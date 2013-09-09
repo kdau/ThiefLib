@@ -68,7 +68,7 @@ RC = windres
 DLLTOOL = dlltool
 endif # TARGET
 
-CXXFLAGS = -Wall -Wextra -Woverloaded-virtual -Wsign-promo -Wshadow -masm=intel -std=gnu++0x
+CXXFLAGS = -Wall -Wextra -Woverloaded-virtual -Wsign-promo -Wshadow -std=gnu++0x
 CXXFLAGSN = -O2
 CXXFLAGSD = -g -O0
 

@@ -593,9 +593,6 @@ DetailAttachementLink::create (const Object& source, const Object& dest,
 
 
 
-//TODO wrap link: AIFleeDest - sAIFleeDest
-//TODO wrap link: AINoFlee - sAINoFleeLink
-
 //TODO wrap link: AIWatchObj - sAIWatchPoint (propdefs.h: sAIWatchPoint - link data same as property?)
 //TODO wrap link: AIDefendObj - sAIDefendPoint
 //TODO wrap link: AIFollowObj - sAIFollowLink,
@@ -798,14 +795,6 @@ MESSAGE_ACCESSOR (Conversation, ConversationMessage, get_conversation,
  * AI: Ability Settings\Inform: Response options = AI_InfRsp
  * AI: Utility\inform from last seen = AI_InfFrm
  * AI: Utility\Immediate inform = AI_InfNow
- *
- * AI: Ability Settings\Combat: Non-hostile = AI_NonHst
- * AI: Ability Settings\Combat: Timing = AI_CbtTiming
- * AI: Ability Settings\Non-combat: Dmg Response Params = AI_NCDmgRsp
- * AI: Ability Settings\Non-combat: Respond to damage = AI_NCDmRsp
- *
- * AI: Ability Settings\Flee: Condition for flee = AI_FleeConds
- * AI: Ability Settings\Flee: If Aware of AI/Player = AI_FleeAwr
  *
  * AI: Ability Settings\Idle: Returns to origin = AI_IdlRetOrg
  * AI: Ability Settings\Idling: Directions = AI_IdleDirs

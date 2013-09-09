@@ -86,37 +86,6 @@ AIAttackLink::create (const Object& source, const Object& dest,
 
 
 
-/*TODO Create MeleeCombatant : AI and wrap these properties:
- * AI: Ability Settings\HtoHCombat: Audio Response = HTHAudioResp
- * AI: Ability Settings\HtoHCombat: Distances = HTHCombatDist
- * AI: Ability Settings\HtoHCombat: Grunt Always = HTHGruntAlways
- * AI: Ability Settings\HtoHCombat: Motion Response = HTHMotionResp
- */
-
-
-
-/*TODO Create RangedCombatant : AI and wrap these properties:
- * AI: Ability Settings\RangedCombat: Audio Response = RangedAudioResp
- * AI: Ability Settings\RangedCombat: Grunt Always = RngdGruntAlways
- * AI: Ranged Combat\Ranged Combat = AIRCProp
- * AI: Ranged Combat\Ranged Combat Applicabilities = AI_RngApps
- * AI: Ranged Combat\Ranged Combat Flee = AI_RngFlee
- * AI: Ranged Combat\Ranged Combat Ranges = AIRCRanges
- * AI: Ranged Combat\Ranged Combat Shoot = AI_RngShoot
- * AI: Ranged Combat\Ranged Combat Wound Motion = AIRCWound
- * AI: Ranged Combat\Ranged Combat Wound Sound = AIRCWndSnd
- */
-
-
-
-//TODO wrap link: AIProjectile - sAIProjectileRel
-
-
-
-//TODO Create SuicideCombatant : AI and wrap property: AI: Ability Settings\Frog-beast: Explode range = DAI_FrogExpl
-
-
-
 // AIAttackMessage
 
 MESSAGE_WRAPPER_IMPL (AIAttackMessage, sAttackMsg)
@@ -145,6 +114,158 @@ AIAttackMessage::get_event () const
 }
 
 MESSAGE_ACCESSOR (Weapon, AIAttackMessage, get_weapon, sAttackMsg, weapon)
+
+
+
+// Combatant
+//TODO wrap property: AI: Ability Settings\Combat: Timing = AI_CbtTiming
+//TODO wrap property: AI: Ability Settings\Non-combat: Dmg Response Params = AI_NCDmgRsp
+//TODO wrap property: AI: Ability Settings\Non-combat: Respond to damage = AI_NCDmRsp
+//TODO wrap property: AI: Ability Settings\Flee: Condition for flee = AI_FleeConds
+//TODO wrap property: AI: Ability Settings\Flee: If Aware of AI/Player = AI_FleeAwr
+
+PROXY_CONFIG (Combatant, non_hostile, "AI_NonHst", nullptr,
+	Combatant::NonHostile, NonHostile::NEVER);
+
+OBJECT_TYPE_IMPL_ (Combatant, Rendered (), Interactive (), Physical (),
+	SpherePhysical (), Damageable (), AI (),
+	PROXY_INIT (non_hostile)
+)
+
+
+
+//TODO wrap link: AIFleeDest - sAIFleeDest
+
+
+
+//TODO wrap link: AINoFlee - sAINoFleeLink
+
+
+
+/*TODO Create MeleeCombatant : Combatant and wrap these properties:
+ * AI: Ability Settings\HtoHCombat: Audio Response = HTHAudioResp
+ * AI: Ability Settings\HtoHCombat: Distances = HTHCombatDist
+ * AI: Ability Settings\HtoHCombat: Grunt Always = HTHGruntAlways
+ * AI: Ability Settings\HtoHCombat: Motion Response = HTHMotionResp
+ */
+
+
+
+// RangedCombatant
+//TODO wrap property: AI: Ability Settings\RangedCombat: Audio Response = RangedAudioResp
+//TODO wrap property: AI: Ability Settings\RangedCombat: Grunt Always = RngdGruntAlways
+//TODO wrap property: AI: Ranged Combat\Ranged Combat Applicabilities = AI_RngApps
+//TODO wrap property: AI: Ranged Combat\Ranged Combat Flee = AI_RngFlee
+//TODO wrap property: AI: Ranged Combat\Ranged Combat Ranges = AIRCRanges
+//TODO wrap property: AI: Ranged Combat\Ranged Combat Shoot = AI_RngShoot
+//TODO wrap property: AI: Ranged Combat\Ranged Combat Wound Motion = AIRCWound
+//TODO wrap property: AI: Ranged Combat\Ranged Combat Wound Sound = AIRCWndSnd
+
+PROXY_CONFIG (RangedCombatant, minimum_distance, "AIRCProp", "Minimum Distance",
+	int, 10); //TODO Should be a float.
+PROXY_CONFIG (RangedCombatant, ideal_distance, "AIRCProp", "Ideal Distance",
+	int, 40); //TODO Should be a float.
+PROXY_CONFIG (RangedCombatant, fire_while_moving, "AIRCProp", "Fire While Moving",
+	RangedCombatant::RCFrequency, RCFrequency::NEVER);
+PROXY_CONFIG (RangedCombatant, firing_delay, "AIRCProp", "Firing Delay",
+	float, 0.0f); //TODO Should be a Time.
+PROXY_CONFIG (RangedCombatant, cover_desire, "AIRCProp", "Cover Desire",
+	RangedCombatant::RCPriority, RCPriority::MODERATE);
+PROXY_CONFIG (RangedCombatant, decay_speed, "AIRCProp", "Decay Speed",
+	float, 0.8f); //TODO Should be a Time?
+PROXY_CONFIG (RangedCombatant, contain_projectile,
+	"AIRCProp", "Contain Projectile", bool, false);
+
+OBJECT_TYPE_IMPL_ (RangedCombatant, Rendered (), Interactive (), Physical (),
+	SpherePhysical (), Damageable (), Combatant (),
+	PROXY_INIT (minimum_distance),
+	PROXY_INIT (ideal_distance),
+	PROXY_INIT (fire_while_moving),
+	PROXY_INIT (firing_delay),
+	PROXY_INIT (cover_desire),
+	PROXY_INIT (decay_speed),
+	PROXY_INIT (contain_projectile)
+)
+
+bool
+RangedCombatant::is_ranged_combatant () const
+{
+	return minimum_distance.exists ();
+}
+
+
+
+// AIProjectileLink
+
+const int
+AIProjectileLink::INFINITE_STACK = INT_MAX;
+
+PROXY_CONFIG (AIProjectileLink, selection_desire, "Selection Desire", nullptr,
+	RangedCombatant::RCPriority, RangedCombatant::RCPriority::VERY_LOW);
+PROXY_BIT_CONFIG (AIProjectileLink, ignore_if_enough_friends,
+	"Constraint Type", nullptr, 1u, false);
+PROXY_CONFIG (AIProjectileLink, min_friends_nearby, "Constraint Data", nullptr,
+	int, 0);
+PROXY_CONFIG_ (AIProjectileLink, stack_count, "Ammo", nullptr, int, 0, 0u,
+	[] (const int& ammo) { return ammo ? (ammo - 1) : INFINITE_STACK; },
+	[] (const int& stack) { return (stack == INFINITE_STACK)
+		? 0 : (stack + 1); });
+PROXY_CONFIG (AIProjectileLink, burst_count, "Burst Count", nullptr, int, 0);
+PROXY_CONFIG (AIProjectileLink, firing_delay, "Firing Delay", nullptr,
+	float, 0.0f); //TODO Should be a Time.
+PROXY_CONFIG (AIProjectileLink, targeting_method, "Targeting Method", nullptr,
+	AIProjectileLink::Method, Method::STRAIGHT_LINE);
+PROXY_CONFIG (AIProjectileLink, accuracy, "Accuracy", nullptr,
+	RangedCombatant::RCPriority, RangedCombatant::RCPriority::VERY_LOW);
+PROXY_CONFIG (AIProjectileLink, leads_target, "Leads Target", nullptr,
+	bool, false);
+PROXY_CONFIG (AIProjectileLink, launch_joint, "Launch Joint", nullptr,
+	AI::Joint, AI::Joint::NONE);
+
+
+FLAVORED_LINK_IMPL_ (AIProjectile,
+	PROXY_INIT (selection_desire),
+	PROXY_INIT (ignore_if_enough_friends),
+	PROXY_INIT (min_friends_nearby),
+	PROXY_INIT (stack_count),
+	PROXY_INIT (burst_count),
+	PROXY_INIT (firing_delay),
+	PROXY_INIT (targeting_method),
+	PROXY_INIT (accuracy),
+	PROXY_INIT (leads_target),
+	PROXY_INIT (launch_joint)
+)
+
+AIProjectileLink
+AIProjectileLink::create (const Object& source, const Object& dest,
+	RangedCombatant::RCPriority selection_desire, Method targeting_method,
+	RangedCombatant::RCPriority accuracy, AI::Joint launch_joint)
+{
+	AIProjectileLink link = Link::create (flavor (), source, dest);
+	link.selection_desire = selection_desire;
+	link.targeting_method = targeting_method;
+	link.accuracy = accuracy;
+	link.launch_joint = launch_joint;
+	return link;
+}
+
+
+
+// SuicideCombatant
+
+PROXY_CONFIG (SuicideCombatant, detonate_range, "DAI_FrogExpl", nullptr,
+	float, 0.0f);
+
+OBJECT_TYPE_IMPL_ (SuicideCombatant, Rendered (), Interactive (), Physical (),
+	SpherePhysical (), Damageable (), Combatant (),
+	PROXY_INIT (detonate_range)
+)
+
+bool
+SuicideCombatant::is_suicide_combatant () const
+{
+	return behavior_set == "Frog" && detonate_range.exists ();
+}
 
 
 

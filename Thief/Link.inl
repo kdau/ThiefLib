@@ -147,6 +147,20 @@ LinkField<T, count, config>::operator = (const T& value)
 }
 
 template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
+inline bool
+LinkField<T, count, config>::operator == (const T& rhs) const
+{
+	return operator T () == rhs;
+}
+
+template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
+inline bool
+LinkField<T, count, config>::operator != (const T& rhs) const
+{
+	return operator T () != rhs;
+}
+
+template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
 inline std::ostream&
 operator << (std::ostream& out, const LinkField<T, count, config>& field)
 {
@@ -166,6 +180,9 @@ public:
 
 	operator T () const;
 	LinkField& operator = (const T&);
+
+	bool operator == (const T&) const;
+	bool operator != (const T&) const;
 
 private:
 	Link& link;
@@ -196,6 +213,20 @@ LinkField<T, 1u, config>::operator = (const T& value)
 }
 
 template <typename T, const FieldProxyConfig<T, 1u>& config>
+inline bool
+LinkField<T, 1u, config>::operator == (const T& rhs) const
+{
+	return operator T () == rhs;
+}
+
+template <typename T, const FieldProxyConfig<T, 1u>& config>
+inline bool
+LinkField<T, 1u, config>::operator != (const T& rhs) const
+{
+	return operator T () != rhs;
+}
+
+template <typename T, const FieldProxyConfig<T, 1u>& config>
 inline std::ostream&
 operator << (std::ostream& out, const LinkField<T, 1u, config>& field)
 {
@@ -215,6 +246,9 @@ public:
 
 	operator bool () const;
 	LinkField& operator = (bool);
+
+	bool operator == (bool) const;
+	bool operator != (bool) const;
 
 private:
 	Link& link;
@@ -248,6 +282,20 @@ LinkField<bool, 1u, config>::operator = (bool value)
 	else
 		link._set_data_field (config.id [0u].major, raw);
 	return *this;
+}
+
+template <const FieldProxyConfig<bool, 1u>& config>
+inline bool
+LinkField<bool, 1u, config>::operator == (bool rhs) const
+{
+	return operator bool () == rhs;
+}
+
+template <const FieldProxyConfig<bool, 1u>& config>
+inline bool
+LinkField<bool, 1u, config>::operator != (bool rhs) const
+{
+	return operator bool () != rhs;
 }
 
 

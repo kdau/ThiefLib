@@ -92,6 +92,99 @@ public:
 
 
 
+// Combatant
+
+class Combatant : public AI
+{
+public:
+	THIEF_OBJECT_TYPE (Combatant)
+
+	enum NonHostile
+	{
+		NEVER,
+		PLAYER_ALWAYS, PLAYER_UNTIL_DAMAGED, PLAYER_UNTIL_THREATENED,
+		UNTIL_DAMAGED, UNTIL_THREATENED, ALWAYS
+	};
+	THIEF_PROP_FIELD (NonHostile, non_hostile);
+};
+
+
+
+// RangedCombatant
+
+class RangedCombatant : public Combatant
+{
+public:
+	THIEF_OBJECT_TYPE (RangedCombatant)
+	bool is_ranged_combatant () const;
+
+	enum class RCPriority
+		{ VERY_LOW, LOW, MODERATE, HIGH, VERY_HIGH };
+
+	enum class RCFrequency
+		{ NEVER, VERY_RARELY, RARELY, SOMETIMES, OFTEN, VERY_OFTEN };
+
+	THIEF_PROP_FIELD (int, minimum_distance); //TESTME
+	THIEF_PROP_FIELD (int, ideal_distance); //TESTME
+	THIEF_PROP_FIELD (RCFrequency, fire_while_moving); //TESTME
+
+	THIEF_PROP_FIELD (float, firing_delay); //TESTME
+
+	THIEF_PROP_FIELD (RCPriority, cover_desire); //TESTME
+	THIEF_PROP_FIELD (float, decay_speed); //TESTME
+
+	THIEF_PROP_FIELD (bool, contain_projectile); //TESTME
+};
+
+
+
+// AIProjectileLink
+
+THIEF_FLAVORED_LINK (AIProjectile) //TESTME
+{
+	THIEF_FLAVORED_LINK_COMMON (AIProjectile)
+
+	enum class Method { STRAIGHT_LINE, ARCING, REFLECTING, OVERHEAD };
+
+	static const int INFINITE_STACK;
+
+	static AIProjectileLink create (const Object& source, const Object& dest,
+		RangedCombatant::RCPriority selection_desire =
+			RangedCombatant::RCPriority::VERY_LOW,
+		Method targeting_method = Method::STRAIGHT_LINE,
+		RangedCombatant::RCPriority accuracy =
+			RangedCombatant::RCPriority::VERY_LOW,
+		AI::Joint launch_joint = AI::Joint::NONE);
+
+	THIEF_LINK_FIELD (RangedCombatant::RCPriority, selection_desire);
+	THIEF_LINK_FIELD (bool, ignore_if_enough_friends);
+	THIEF_LINK_FIELD (int, min_friends_nearby);
+
+	THIEF_LINK_FIELD (int, stack_count);
+	THIEF_LINK_FIELD (int, burst_count);
+	THIEF_LINK_FIELD (float, firing_delay);
+
+	THIEF_LINK_FIELD (Method, targeting_method);
+	THIEF_LINK_FIELD (RangedCombatant::RCPriority, accuracy);
+	THIEF_LINK_FIELD (bool, leads_target);
+	THIEF_LINK_FIELD (AI::Joint, launch_joint);
+};
+
+
+
+// SuicideCombatant
+
+class SuicideCombatant : public Combatant
+{
+public:
+	THIEF_OBJECT_TYPE (SuicideCombatant)
+	bool is_suicide_combatant () const; //TESTME
+
+	THIEF_PROP_FIELD (float, detonate_range); //TESTME
+};
+
+
+
 } // namespace Thief
 
 #endif // THIEF_COMBAT_HH

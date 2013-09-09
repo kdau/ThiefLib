@@ -136,6 +136,9 @@ public:
 	operator T () const;
 	PropField& operator = (const T&);
 
+	bool operator == (const T&) const;
+	bool operator != (const T&) const;
+
 private:
 	Object& object;
 	size_t index;

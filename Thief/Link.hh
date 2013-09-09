@@ -148,6 +148,9 @@ public:
 	operator T () const;
 	LinkField& operator = (const T&);
 
+	bool operator == (const T&) const;
+	bool operator != (const T&) const;
+
 private:
 	Link& link;
 	size_t index;

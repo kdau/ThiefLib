@@ -222,7 +222,7 @@ Script::dispatch (sScrMsg& message, sMultiParm* reply, unsigned trace)
 			<< (trace == kBreak ? ". Breaking." : ".") << std::endl;
 
 	if (trace == kBreak)
-		asm ("int 3");
+		asm ("int $0x3");
 
 	if (!initialized)
 	{

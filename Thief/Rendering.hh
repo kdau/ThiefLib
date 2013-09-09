@@ -118,6 +118,35 @@ public:
 
 
 
+// Bitmapped
+
+class Bitmapped : public virtual Rendered
+{
+public:
+	THIEF_OBJECT_TYPE (Bitmapped)
+	bool is_bitmapped () const;
+
+	THIEF_PROP_FIELD (float, bitmap_size_x); //TESTME
+	THIEF_PROP_FIELD (float, bitmap_size_y); //TESTME
+
+	THIEF_PROP_FIELD (bool, uv_tiling); //TESTME
+	THIEF_PROP_FIELD (float, tile_size_x); //TESTME
+	THIEF_PROP_FIELD (float, tile_size_y); //TESTME
+
+	THIEF_PROP_FIELD (bool, apply_lighting);
+	THIEF_PROP_FIELD (Color, bitmap_color); //TESTME
+
+	THIEF_PROP_FIELD (bool, double_sided); //TESTME
+	THIEF_PROP_FIELD (bool, flip_backside_uv); //TESTME
+
+	THIEF_PROP_FIELD (bool, face_camera); //TESTME
+	THIEF_PROP_FIELD (float, axial_fade); //TESTME
+
+	THIEF_PROP_FIELD (bool, animation_loop); //TESTME
+};
+
+
+
 // Flash
 
 class Flash : public virtual Object

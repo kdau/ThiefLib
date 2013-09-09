@@ -52,7 +52,7 @@ DEFINES2 = -D_DARKGAME=2
 INCLUDES = -I. -I$(THIEFLIBDIR)
 LIBDIRS = -L. -L$(THIEFLIBDIR)
 
-CXXFLAGS = -Wall -Wextra -Woverloaded-virtual -Wsign-promo -Wshadow -masm=intel -std=gnu++0x
+CXXFLAGS = -Wall -Wextra -Woverloaded-virtual -Wsign-promo -Wshadow -std=gnu++0x
 LDFLAGS = -mwindows -mdll -Wl,--enable-auto-image-base -static-libgcc -static-libstdc++
 
 LIBS = -luuid
