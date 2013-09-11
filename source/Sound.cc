@@ -40,12 +40,12 @@ PROXY_BIT_CONFIG (SoundSchema, retrigger, "SchPlayParams", "Flags", 1u, false);
 PROXY_BIT_CONFIG (SoundSchema, pan_position, "SchPlayParams", "Flags",
 	2u, false);
 PROXY_BIT_CONFIG (SoundSchema, pan_range, "SchPlayParams", "Flags", 4u, false);
-PROXY_NEG_BIT_CONFIG (SoundSchema, repeat, "SchPlayParams", "Flags", 8u, false);
-PROXY_NEG_BIT_CONFIG (SoundSchema, cache, "SchPlayParams", "Flags", 16u, false);
+PROXY_NEG_BIT_CONFIG (SoundSchema, repeat, "SchPlayParams", "Flags", 8u, true);
+PROXY_NEG_BIT_CONFIG (SoundSchema, cache, "SchPlayParams", "Flags", 16u, true);
 PROXY_BIT_CONFIG (SoundSchema, stream, "SchPlayParams", "Flags", 32u, false);
-PROXY_BIT_CONFIG (SoundSchema, play_once, "SchPlayParams", "Flags", 64u, false);
+PROXY_BIT_CONFIG (SoundSchema, play_once, "SchPlayParams", "Flags", 64u, true);
 PROXY_NEG_BIT_CONFIG (SoundSchema, combat, "SchPlayParams", "Flags",
-	128u, false);
+	128u, true);
 PROXY_BIT_CONFIG (SoundSchema, net_ambient, "SchPlayParams", "Flags",
 	256u, false);
 PROXY_BIT_CONFIG (SoundSchema, local_spatial, "SchPlayParams", "Flags",
@@ -199,11 +199,11 @@ SoundSchema::play_by_tags (const String& tags, Tagged location,
 // AmbientHacked
 
 PROXY_NEG_BIT_CONFIG (AmbientHacked, active, "AmbientHacked", "Flags",
-	4u, false);
-PROXY_ARRAY_CONFIG (AmbientHacked, ambient_schema, 3u, String, "",
-	PROXY_ARRAY_ITEM ("AmbientHacked", "Schema Name"),
-	PROXY_ARRAY_ITEM ("AmbientHacked", "Aux Schema 1"),
-	PROXY_ARRAY_ITEM ("AmbientHacked", "Aux Schema 2"));
+	4u, true);
+PROXY_ARRAY_CONFIG (AmbientHacked, ambient_schema, 3u, String,
+	PROXY_ARRAY_ITEM ("AmbientHacked", "Schema Name", ""),
+	PROXY_ARRAY_ITEM ("AmbientHacked", "Aux Schema 1", ""),
+	PROXY_ARRAY_ITEM ("AmbientHacked", "Aux Schema 2", ""));
 PROXY_CONFIG (AmbientHacked, ambient_radius, "AmbientHacked", "Radius", int, 0);
 PROXY_CONFIG (AmbientHacked, ambient_volume, "AmbientHacked", "Override Volume",
 	int, 0);

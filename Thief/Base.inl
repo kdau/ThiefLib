@@ -341,6 +341,7 @@ public:
 
 	enum Type { EMPTY, INT, FLOAT, STRING, VECTOR };
 	Type get_type () const { return type; }
+	bool empty () const { return type == EMPTY; }
 
 protected:
 	LGMultiBase ();
@@ -362,6 +363,7 @@ class LGMulti<Type> : public Parent \
 public: \
 	LGMulti (const Type& value = Default); \
 	operator Type () const; \
+	LGMulti& operator = (const Type& value); \
 };
 
 #define THIEF_LGMULTI_SPECIALIZE(Type, Default) \
@@ -488,37 +490,75 @@ Method (const T& value) \
 
 
 
-// FieldProxyConfig: common base for PropField and LinkField proxy objects
+// FieldProxyConfig: common configuration for PropField and LinkField proxies
 
-template <typename T, size_t count>
+template <typename Type>
 struct FieldProxyConfig
 {
-	struct Identity
+	typedef typename std::conditional<std::is_same<Type, String>::value,
+		const char*, Type>::type DefaultValue;
+
+	struct Item
 	{
 		const char* major;
 		const char* minor;
-	} id [count];
+		int detail;
+		DefaultValue default_value;
+	} const *items;
+	size_t count;
 
-	typedef typename std::conditional<std::is_same<T, String>::value,
-		const char*, T>::type DefaultValue;
-	DefaultValue default_value;
+	typedef Type (*Getter) (const Item&, const LGMultiBase&);
+	Getter getter;
 
-	unsigned bitmask; // for T==bool only
+	typedef void (*Setter) (const Item&, LGMultiBase&, const Type&);
+	Setter setter;
 
-	typedef T (*GetFilter) (const T&);
-	GetFilter get_filter;
+	template <typename StorageType>
+	static Type default_getter (const Item&, const LGMultiBase&);
 
-	typedef T (*SetFilter) (const T&);
-	SetFilter set_filter;
+	template <typename StorageType>
+	static void default_setter (const Item&, LGMultiBase&, const Type&);
+
+	// These are defined for Type = bool only.
+	static Type bitmask_getter (const Item&, const LGMultiBase&);
+	static void bitmask_setter (const Item&, LGMultiBase&, const Type&);
 };
 
-#define THIEF_FIELD_PROXY_ARRAY(ProxyType, Type, Name, Count, Specifiers) \
-static const FieldProxyConfig<Type, Count> F_##Name; \
-Specifiers ProxyType<Type, Count, F_##Name> Name [Count];
+template <typename Type> template <typename StorageType>
+inline Type
+FieldProxyConfig<Type>::default_getter (const Item& item,
+	const LGMultiBase& multi)
+{
+	return multi.empty () ? item.default_value
+		: Type (reinterpret_cast<const LGMulti<StorageType>&> (multi));
+}
 
-#define THIEF_FIELD_PROXY(ProxyType, Type, Name, Specifiers) \
-static const FieldProxyConfig<Type, 1u> F_##Name; \
-Specifiers ProxyType<Type, 1u, F_##Name> Name;
+template <typename Type> template <typename StorageType>
+inline void
+FieldProxyConfig<Type>::default_setter (const Item&, LGMultiBase& multi,
+	const Type& value)
+{
+	reinterpret_cast<LGMulti<StorageType>&> (multi) = StorageType (value);
+}
+
+
+
+// Base macros for proxy type convenience macros
+
+#define THIEF_FIELD_PROXY(ProxyType, Type, Specifiers, Name) \
+static const FieldProxyConfig<Type>::Item I_##Name; \
+static const FieldProxyConfig<Type> F_##Name; \
+Specifiers ProxyType<Type, F_##Name> Name;
+
+#define THIEF_FIELD_PROXY_ARRAY(ProxyType, Type, Count, Specifiers, Name) \
+static const FieldProxyConfig<Type>::Item I_##Name [Count]; \
+static const FieldProxyConfig<Type> F_##Name; \
+Specifiers ProxyType<Type, F_##Name> Name [Count];
+
+#define THIEF_FIELD_PROXY_TEMPLATE \
+template <typename Type, const FieldProxyConfig<Type>& config>
+
+#define THIEF_FIELD_PROXY_CLASS(Name) Name<Type, config>
 
 
 

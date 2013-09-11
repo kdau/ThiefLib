@@ -62,7 +62,7 @@ PROXY_BIT_CONFIG (DeleteTweq, simulate_far, "CfgTweqDelete", "AnimC",
 PROXY_BIT_CONFIG (DeleteTweq, simulate_near, "CfgTweqDelete", "AnimC",
 	16u, false);
 PROXY_NEG_BIT_CONFIG (DeleteTweq, simulate_onscreen, "CfgTweqDelete", "AnimC",
-	64u, false);
+	64u, true);
 PROXY_CONFIG (DeleteTweq, duration, "CfgTweqDelete", "Rate", Time, 0ul);
 PROXY_CONFIG (DeleteTweq, halt_action, "CfgTweqDelete", "Halt",
 	Tweq::Halt, Halt::DESTROY_OBJECT);

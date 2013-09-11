@@ -200,16 +200,32 @@ RangedCombatant::is_ranged_combatant () const
 const int
 AIProjectileLink::INFINITE_STACK = INT_MAX;
 
+static int
+AIProjectileLink_stack_count_getter (const FieldProxyConfig<int>::Item& item,
+	const LGMultiBase& multi)
+{
+	if (multi.empty ()) return item.default_value;
+	int value = reinterpret_cast<const LGMulti<int>&> (multi);
+	return value ? (value - 1) : AIProjectileLink::INFINITE_STACK;
+}
+
+static void
+AIProjectileLink_stack_count_setter (const FieldProxyConfig<int>::Item&,
+	LGMultiBase& multi, const int& value)
+{
+	reinterpret_cast<LGMulti<int>&> (multi) =
+		(value == AIProjectileLink::INFINITE_STACK) ? 0 : (value + 1);
+}
+
 PROXY_CONFIG (AIProjectileLink, selection_desire, "Selection Desire", nullptr,
 	RangedCombatant::RCPriority, RangedCombatant::RCPriority::VERY_LOW);
 PROXY_BIT_CONFIG (AIProjectileLink, ignore_if_enough_friends,
 	"Constraint Type", nullptr, 1u, false);
 PROXY_CONFIG (AIProjectileLink, min_friends_nearby, "Constraint Data", nullptr,
 	int, 0);
-PROXY_CONFIG_ (AIProjectileLink, stack_count, "Ammo", nullptr, int, 0, 0u,
-	[] (const int& ammo) { return ammo ? (ammo - 1) : INFINITE_STACK; },
-	[] (const int& stack) { return (stack == INFINITE_STACK)
-		? 0 : (stack + 1); });
+PROXY_CONFIG_ (AIProjectileLink, stack_count, "Ammo", nullptr,
+	int, INFINITE_STACK, 0, AIProjectileLink_stack_count_getter,
+	AIProjectileLink_stack_count_setter);
 PROXY_CONFIG (AIProjectileLink, burst_count, "Burst Count", nullptr, int, 0);
 PROXY_CONFIG (AIProjectileLink, firing_delay, "Firing Delay", nullptr,
 	float, 0.0f); //TODO Should be a Time.

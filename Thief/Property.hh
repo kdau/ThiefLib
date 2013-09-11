@@ -118,12 +118,9 @@ class PropFieldBase
 protected:
 	void get (const Object&, const char*, const char*, LGMultiBase&) const;
 	void set (Object&, const char*, const char*, const LGMultiBase&);
-
-	bool get_bit (const FieldProxyConfig<bool, 1u>&, const Object&) const;
-	void set_bit (const FieldProxyConfig<bool, 1u>&, Object&, bool);
 };
 
-template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
+THIEF_FIELD_PROXY_TEMPLATE
 class PropField : public PropFieldBase
 {
 public:
@@ -133,25 +130,20 @@ public:
 	bool instantiate (); // Affects the entire property, not just this field.
 	bool remove (); // Affects the entire property, not just this field.
 
-	operator T () const;
-	PropField& operator = (const T&);
+	operator Type () const;
+	PropField& operator = (const Type&);
 
-	bool operator == (const T&) const;
-	bool operator != (const T&) const;
+	bool operator == (const Type&) const;
+	bool operator != (const Type&) const;
 
 private:
 	Object& object;
 	size_t index;
 };
 
-template <typename T, const FieldProxyConfig<T, 1u>& config>
-class PropField<T, 1u, config>;
-
-template <const FieldProxyConfig<bool, 1u>& config>
-class PropField<bool, 1u, config>;
-
-template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
-std::ostream& operator << (std::ostream&, const PropField<T, count, config>&);
+THIEF_FIELD_PROXY_TEMPLATE
+std::ostream& operator << (std::ostream&,
+	const THIEF_FIELD_PROXY_CLASS (PropField)&);
 
 
 

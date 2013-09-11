@@ -90,12 +90,6 @@ operator delete [] (void* ptr, const std::nothrow_t&) noexcept
 
 namespace Thief {
 
-bool
-negate (const bool& value)
-{
-	return !value;
-}
-
 
 
 // Allocator

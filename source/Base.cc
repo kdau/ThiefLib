@@ -413,11 +413,19 @@ LGMultiTypeError::LGMultiTypeError (LGMultiBase::Type got, const char* expected)
 
 // LGMulti specializations
 
-#define LGMULTI_SPECIALIZE_SET(Type, MultiType, Member) \
+#define LGMULTI_SPECIALIZE_CTOR(Type) \
 LGMulti<Type>::LGMulti (const Type& value) \
+{ \
+	*this = value; \
+}
+
+#define LGMULTI_SPECIALIZE_SET(Type, MultiType, Member) \
+LGMulti<Type>& \
+LGMulti<Type>::operator = (const Type& value) \
 { \
 	data.Member = value; \
 	type = MultiType; \
+	return *this; \
 }
 
 #define LGMULTI_SPECIALIZE_GET(Type, MultiType, Member) \
@@ -429,6 +437,7 @@ LGMulti<Type>::operator Type () const \
 }
 
 #define LGMULTI_SPECIALIZE_IMPL(Type, MultiType, Member) \
+LGMULTI_SPECIALIZE_CTOR (Type) \
 LGMULTI_SPECIALIZE_SET (Type, MultiType, Member) \
 LGMULTI_SPECIALIZE_GET (Type, MultiType, Member)
 
@@ -445,6 +454,7 @@ LGMULTI_SPECIALIZE_IMPL (Time, INT, i)
 
 
 
+LGMULTI_SPECIALIZE_CTOR (Color)
 LGMULTI_SPECIALIZE_SET (Color, INT, i)
 
 LGMulti<Color>::operator Color () const
@@ -459,11 +469,15 @@ LGMulti<Color>::operator Color () const
 
 
 
-LGMulti<String>::LGMulti (const String& value)
+LGMULTI_SPECIALIZE_CTOR (String)
+
+LGMulti<String>&
+LGMulti<String>::operator = (const String& value)
 {
 	data.p = alloc.alloc (value.size () + 1);
 	strcpy (static_cast<char*> (data.p), value.data ());
 	type = STRING;
+	return *this;
 }
 
 LGMulti<String>::operator String () const
@@ -475,10 +489,14 @@ LGMulti<String>::operator String () const
 
 
 
-LGMulti<Timer>::LGMulti (const Timer& value)
+LGMULTI_SPECIALIZE_CTOR (Timer)
+
+LGMulti<Timer>&
+LGMulti<Timer>::operator = (const Timer& value)
 {
 	data.p = value.id;
 	type = INT;
+	return *this;
 }
 
 LGMulti<Timer>::operator Timer () const
@@ -490,11 +508,15 @@ LGMulti<Timer>::operator Timer () const
 
 
 
-LGMulti<Vector>::LGMulti (const Vector& value)
+LGMULTI_SPECIALIZE_CTOR (Vector)
+
+LGMulti<Vector>&
+LGMulti<Vector>::operator = (const Vector& value)
 {
 	data.p = alloc.alloc (sizeof (mxs_vector));
 	memcpy (data.p, &value, sizeof (mxs_vector));
 	type = VECTOR;
+	return *this;
 }
 
 LGMulti<Vector>::operator Vector () const
@@ -518,6 +540,44 @@ LGMulti<sMultiParm>::LGMulti (const sMultiParm& value)
 
 LGMulti<Empty>::LGMulti (const Empty&)
 {}
+
+
+
+// FieldProxyConfigBase
+
+template<>
+bool
+FieldProxyConfig<bool>::bitmask_getter (const Item& _item,
+	const LGMultiBase& _multi)
+{
+	auto& item = reinterpret_cast<const FieldProxyConfig<bool>::Item&>
+		(_item);
+	auto& multi = reinterpret_cast<const LGMulti<unsigned>&> (_multi);
+
+	if (multi.empty ()) return item.default_value;
+
+	bool negate = item.detail < 0;
+	unsigned bitmask = std::abs (item.detail);
+	bool raw_bit = unsigned (multi) & bitmask;
+	return negate ? !raw_bit : raw_bit;
+}
+
+template<>
+void
+FieldProxyConfig<bool>::bitmask_setter (const Item& _item, LGMultiBase& _multi,
+	const bool& value)
+{
+	auto& item = reinterpret_cast<const FieldProxyConfig<bool>::Item&>
+		(_item);
+	auto& multi = reinterpret_cast<LGMulti<unsigned>&> (_multi);
+
+	bool negate = item.detail < 0;
+	unsigned bitmask = std::abs (item.detail);
+
+	unsigned raw_field = !multi.empty () ? unsigned (multi) : 0u;
+	bool raw_bit = negate ? !value : value;
+	multi = raw_bit ? (raw_field | bitmask) : (raw_field & ~bitmask);
+}
 
 
 

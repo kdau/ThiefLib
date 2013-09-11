@@ -159,7 +159,7 @@ PROXY_CONFIG (Interactive, frob_tool_action, "FrobInfo", "Tool Action",
 PROXY_CONFIG (Interactive, pick_distance, "PickDist", nullptr, float, 0.0f);
 PROXY_CONFIG (Interactive, pick_bias, "PickBias", nullptr, float, 0.0f);
 PROXY_CONFIG (Interactive, tool_reach, "ToolReach", nullptr, float, 0.0f);
-PROXY_NEG_CONFIG (Interactive, droppable, "NoDrop", nullptr, bool, false);
+PROXY_NEG_CONFIG (Interactive, droppable, "NoDrop", nullptr, bool, true);
 PROXY_CONFIG (Interactive, limb_model, "InvLimbModel", nullptr, String, "");
 PROXY_CONFIG (Interactive, loot_value_gold, "Loot", "Gold", int, 0);
 PROXY_CONFIG (Interactive, loot_value_gems, "Loot", "Gems", int, 0);
@@ -511,15 +511,30 @@ Readable::show_book (bool use_art, Time duration, bool reload)
 //TODO wrap property (if useful): Room\Ambient = Ambient
 //TODO wrap property (if useful): Room\Loud Room = LoudRoom
 
+static Fog::Zone
+Room_fog_zone_getter (const FieldProxyConfig<Fog::Zone>::Item& item,
+	const LGMultiBase& multi)
+{
+	if (multi.empty ()) return item.default_value;
+	int value = reinterpret_cast<const LGMulti<int>&> (multi);
+	return Fog::Zone (value - 1);
+}
+
+static void
+Room_fog_zone_setter (const FieldProxyConfig<Fog::Zone>::Item&,
+	LGMultiBase& multi, const Fog::Zone& value)
+{
+	reinterpret_cast<LGMulti<int>&> (multi) = int (value) + 1;
+}
+
 PROXY_CONFIG (Room, ambient_light_zone, "Weather", "ambient lighting",
 	AmbientLightZone, AmbientLightZone::GLOBAL);
 PROXY_CONFIG (Room, automap_page, "Automap", "Page", int, 0);
 PROXY_CONFIG (Room, automap_location, "Automap", "Location", int, 0);
 PROXY_CONFIG (Room, environment_map_zone, "RoomRend", "Env Zone",
 	EnvironmentMapZone, EnvironmentMapZone::GLOBAL);
-PROXY_CONFIG_ (Room, fog_zone, "Weather", "fog", Fog::Zone, Fog::Zone (0), 0u,
-	[] (const Fog::Zone& zone) { return Fog::Zone (zone - 1); },
-	[] (const Fog::Zone& zone) { return Fog::Zone (zone + 1); });
+PROXY_CONFIG_ (Room, fog_zone, "Weather", "fog", Fog::Zone, Fog::Zone::DISABLED,
+	0, Room_fog_zone_getter, Room_fog_zone_setter);
 PROXY_CONFIG (Room, gravity, "RoomGrav", nullptr, int, 100);
 PROXY_CONFIG (Room, precipitation, "Weather", "precipitation", bool, false);
 PROXY_BIT_CONFIG (Room, see_through, "RoomRend", "Flags", 1u, false);

@@ -242,18 +242,32 @@ DoorMessage::get_old_state () const
 
 // TranslatingDoor
 
+static Room
+TranslatingDoor_room_getter (const FieldProxyConfig<Room>::Item& item,
+	const LGMultiBase& multi)
+{
+	if (multi.empty ()) return item.default_value;
+	Object value = reinterpret_cast<const LGMulti<Object>&> (multi);
+	return (value == -1) ? Object::NONE : value;
+}
+
 PROXY_CONFIG (TranslatingDoor, axis, "TransDoor", "Axis", Door::Axis, Axis::X);
-PROXY_CONFIG (TranslatingDoor, initial_position, "TransDoor", "Closed Position", float, 0.0f);
-PROXY_CONFIG (TranslatingDoor, open_position, "TransDoor", "Open Position", float, 0.0f);
-PROXY_CONFIG (TranslatingDoor, base_speed, "TransDoor", "Base Speed", float, 0.0f);
-PROXY_CONFIG (TranslatingDoor, push_mass, "TransDoor", "Push Mass", float, 25.0f);
-PROXY_CONFIG (TranslatingDoor, blocks_vision, "TransDoor", "Blocks Vision?", bool, true);
-PROXY_CONFIG (TranslatingDoor, blocks_sound_pct, "TransDoor", "Blocks Sound %", float, 60.0f);
-PROXY_ARRAY_CONFIG_ (TranslatingDoor, room, 2u, Room, Object::NONE,
-	[] (const Room& room) { return room == -1 ? Object::NONE : room; },
-	nullptr,
-	PROXY_ARRAY_ITEM ("TransDoor", "Room ID #1"),
-	PROXY_ARRAY_ITEM ("TransDoor", "Room ID #2")
+PROXY_CONFIG (TranslatingDoor, initial_position, "TransDoor", "Closed Position",
+	float, 0.0f);
+PROXY_CONFIG (TranslatingDoor, open_position, "TransDoor", "Open Position",
+	float, 0.0f);
+PROXY_CONFIG (TranslatingDoor, base_speed, "TransDoor", "Base Speed",
+	float, 0.0f);
+PROXY_CONFIG (TranslatingDoor, push_mass, "TransDoor", "Push Mass",
+	float, 25.0f);
+PROXY_CONFIG (TranslatingDoor, blocks_vision, "TransDoor", "Blocks Vision?",
+	bool, true);
+PROXY_CONFIG (TranslatingDoor, blocks_sound_pct, "TransDoor", "Blocks Sound %",
+	float, 60.0f);
+PROXY_ARRAY_CONFIG_ (TranslatingDoor, room, 2u, Room,
+	TranslatingDoor_room_getter, nullptr,
+	PROXY_ARRAY_ITEM ("TransDoor", "Room ID #1", Object::NONE),
+	PROXY_ARRAY_ITEM ("TransDoor", "Room ID #2", Object::NONE)
 );
 
 OBJECT_TYPE_IMPL_ (TranslatingDoor, Physical (), OBBPhysical (), Rendered (),

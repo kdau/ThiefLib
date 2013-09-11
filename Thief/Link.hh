@@ -118,9 +118,7 @@ public:
 private:
 	friend class LinkFieldBase;
 
-	template <typename T, size_t count,
-		const FieldProxyConfig<T, count>& config>
-	friend class LinkField;
+	THIEF_FIELD_PROXY_TEMPLATE friend class LinkField;
 
 	void _get_data_field (const String& field, LGMultiBase& multi) const;
 	void _get_data_field (const char* field, LGMultiBase& multi) const;
@@ -132,38 +130,26 @@ private:
 
 // LinkField: interpreted access to fields of flavor-specific Link subclasses
 
-class LinkFieldBase
-{
-protected:
-	bool get_bit (const FieldProxyConfig<bool, 1u>&, const Link&) const;
-	void set_bit (const FieldProxyConfig<bool, 1u>&, Link&, bool);
-};
-
-template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
-class LinkField : public LinkFieldBase
+THIEF_FIELD_PROXY_TEMPLATE
+class LinkField
 {
 public:
 	LinkField (Link&, size_t index);
 
-	operator T () const;
-	LinkField& operator = (const T&);
+	operator Type () const;
+	LinkField& operator = (const Type&);
 
-	bool operator == (const T&) const;
-	bool operator != (const T&) const;
+	bool operator == (const Type&) const;
+	bool operator != (const Type&) const;
 
 private:
 	Link& link;
 	size_t index;
 };
 
-template <typename T, const FieldProxyConfig<T, 1u>& config>
-class LinkField<T, 1u, config>;
-
-template <const FieldProxyConfig<bool, 1u>& config>
-class LinkField<bool, 1u, config>;
-
-template <typename T, size_t count, const FieldProxyConfig<T, count>& config>
-std::ostream& operator << (std::ostream&, const LinkField<T, count, config>&);
+THIEF_FIELD_PROXY_TEMPLATE
+std::ostream& operator << (std::ostream&,
+	const THIEF_FIELD_PROXY_CLASS (LinkField)&);
 
 
 

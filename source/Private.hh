@@ -131,35 +131,55 @@ public:
 
 // Field proxy convenience macros
 
-#define PROXY_CONFIG_(Class, Member, Major, Minor, Type, ...) \
-const FieldProxyConfig<Type, 1u> \
-Class::F_##Member = { { { Major, Minor } }, __VA_ARGS__ }
+#define PROXY_CONFIG_(Class, Member, Major, Minor, Type, Default, Detail, Getter, Setter) \
+const FieldProxyConfig<Type>::Item \
+Class::I_##Member { Major, Minor, Detail, Default }; \
+const FieldProxyConfig<Type> \
+Class::F_##Member { &I_##Member, 1u, Getter, Setter }
 
 #define PROXY_CONFIG(Class, Member, Major, Minor, Type, Default) \
-PROXY_CONFIG_ (Class, Member, Major, Minor, Type, Default, 0u, nullptr, nullptr)
+PROXY_CONFIG_ (Class, Member, Major, Minor, Type, Default, 0, \
+	FieldProxyConfig<Type>::default_getter<Type>, \
+	FieldProxyConfig<Type>::default_setter<Type>)
 
 #define PROXY_BIT_CONFIG(Class, Member, Major, Minor, Mask, Default) \
-PROXY_CONFIG_ (Class, Member, Major, Minor, bool, Default, Mask, nullptr, nullptr)
+PROXY_CONFIG_ (Class, Member, Major, Minor, bool, Default, Mask, \
+	FieldProxyConfig<bool>::bitmask_getter, \
+	FieldProxyConfig<bool>::bitmask_setter)
 
-bool negate (const bool&);
-
-#define PROXY_NEG_CONFIG(Class, Member, Major, Minor, Type, Default) \
-PROXY_CONFIG_ (Class, Member, Major, Minor, Type, Default, 0u, negate, negate)
+#define PROXY_NEG_CONFIG(Class, Member, Major, Minor, TypeIsBool, Default) \
+PROXY_CONFIG_ (Class, Member, Major, Minor, bool, Default, -1, \
+	FieldProxyConfig<bool>::bitmask_getter, \
+	FieldProxyConfig<bool>::bitmask_setter)
 
 #define PROXY_NEG_BIT_CONFIG(Class, Member, Major, Minor, Mask, Default) \
-PROXY_CONFIG_ (Class, Member, Major, Minor, bool, Default, Mask, negate, negate)
+PROXY_BIT_CONFIG (Class, Member, Major, Minor, -Mask, Default)
 
-#define PROXY_ARRAY_CONFIG_(Class, Member, Count, Type, Default, Get, Set, ...) \
-const FieldProxyConfig<Type, Count> \
-Class::F_##Member = { { __VA_ARGS__ }, Default, 0u, Get, Set }
+#define PROXY_ARRAY_CONFIG_(Class, Member, Count, Type, Getter, Setter, ...) \
+const FieldProxyConfig<Type>::Item \
+Class::I_##Member [] { __VA_ARGS__ }; \
+const FieldProxyConfig<Type> \
+Class::F_##Member { I_##Member, Count, Getter, Setter }
 
-#define PROXY_ARRAY_CONFIG(Class, Member, Count, Type, Default, ...) \
-PROXY_ARRAY_CONFIG_ (Class, Member, Count, Type, Default, nullptr, nullptr, \
+#define PROXY_ARRAY_CONFIG(Class, Member, Count, Type, ...) \
+PROXY_ARRAY_CONFIG_ (Class, Member, Count, Type, \
+	FieldProxyConfig<Type>::default_getter<Type>, \
+	FieldProxyConfig<Type>::default_setter<Type>, \
 	__VA_ARGS__)
 
-#define PROXY_ARRAY_ITEM(Major, Minor) { Major, Minor }
+#define PROXY_BIT_ARRAY_CONFIG(Class, Member, Count, TypeIsBool, ...) \
+PROXY_ARRAY_CONFIG_ (Class, Member, Count, bool, \
+	FieldProxyConfig<bool>::bitmask_getter, \
+	FieldProxyConfig<bool>::bitmask_setter, \
+	__VA_ARGS__)
 
-#define PROXY_INIT(Member) Member (*this)
+#define PROXY_ARRAY_ITEM(Major, Minor, Default) \
+{ Major, Minor, 0, Default }
+
+#define PROXY_BIT_ARRAY_ITEM(Major, Minor, Default, Mask) \
+{ Major, Minor, Mask, Default }
+
+#define PROXY_INIT(Member) Member (*this, 0u)
 
 #define PROXY_ARRAY_INIT_ONE(z, n, text) { *this, n##u },
 #define PROXY_ARRAY_INIT(Member, Count) \

@@ -301,12 +301,12 @@ MESSAGE_ACCESSOR (MovingTerrain, WaypointMessage, get_moving_terrain,
 
 // SpherePhysical
 
-PROXY_ARRAY_CONFIG (SpherePhysical, physics_radius, 2u, float, 0.0f, //TODO Support more than two submodels.
-	PROXY_ARRAY_ITEM ("PhysDims", "Radius 1"),
-	PROXY_ARRAY_ITEM ("PhysDims", "Radius 2"));
-PROXY_ARRAY_CONFIG (SpherePhysical, physics_offset, 2u, Vector, Vector (), //TODO Support more than two submodels.
-	PROXY_ARRAY_ITEM ("PhysDims", "Offset 1"),
-	PROXY_ARRAY_ITEM ("PhysDims", "Offset 2"));
+PROXY_ARRAY_CONFIG (SpherePhysical, physics_radius, 2u, float, //TODO Support more than two submodels.
+	PROXY_ARRAY_ITEM ("PhysDims", "Radius 1", 0.0f),
+	PROXY_ARRAY_ITEM ("PhysDims", "Radius 2", 0.0f));
+PROXY_ARRAY_CONFIG (SpherePhysical, physics_offset, 2u, Vector, //TODO Support more than two submodels.
+	PROXY_ARRAY_ITEM ("PhysDims", "Offset 1", Vector ()),
+	PROXY_ARRAY_ITEM ("PhysDims", "Offset 2", Vector ()));
 PROXY_CONFIG (SpherePhysical, rotation_axes, "PhysAttr", "Rotation Axes",
 	unsigned, Physical::ALL_POS_AXES);
 PROXY_CONFIG (SpherePhysical, rest_axes, "PhysAttr", "Rest Axes",
@@ -323,10 +323,23 @@ OBJECT_TYPE_IMPL_ (SpherePhysical, Physical (),
 
 // Explosion
 
+static float
+Explosion_radius_getter (const FieldProxyConfig<float>::Item& item,
+	const LGMultiBase& multi)
+{
+	return multi.empty () ? item.default_value
+		: std::sqrt (reinterpret_cast<const LGMulti<float>&> (multi));
+}
+
+static void
+Explosion_radius_setter (const FieldProxyConfig<float>::Item&,
+	LGMultiBase& multi, const float& value)
+{
+	reinterpret_cast<LGMulti<float>&> (multi) = value * value;
+}
+
 PROXY_CONFIG_ (Explosion, radius, "PhysExplode", "Radius (squared)",
-	float, 0.0f, 0u,
-	[] (const float& squared) { return std::sqrt (squared); },
-	[] (const float& radius) { return radius * radius; });
+	float, 0.0f, 0, Explosion_radius_getter, Explosion_radius_setter);
 PROXY_CONFIG (Explosion, magnitude, "PhysExplode", "Magnitude", int, 0);
 
 OBJECT_TYPE_IMPL_ (Explosion,

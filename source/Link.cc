@@ -248,34 +248,6 @@ Link::unsubscribe (Flavor flavor, const Object& source, const Object& host)
 
 
 
-// LinkFieldBase
-
-bool
-LinkFieldBase::get_bit (const FieldProxyConfig<bool, 1u>& config,
-	const Link& link) const
-{
-	LGMulti<unsigned> raw (config.default_value ? config.bitmask : 0u);
-	link._get_data_field (config.id [0u].major, raw);
-	return raw & config.bitmask;
-}
-
-void
-LinkFieldBase::set_bit (const FieldProxyConfig<bool, 1u>& config, Link& link,
-	bool value)
-{
-	LGMulti<unsigned> field (0u);
-	link._get_data_field (config.id [0u].major, field);
-
-	if (value)
-		field = field | config.bitmask;
-	else
-		field = field & ~config.bitmask;
-
-	link._set_data_field (config.id [0u].major, field);
-}
-
-
-
 // LinkMessage
 
 MESSAGE_WRAPPER_IMPL_ (LinkMessage,

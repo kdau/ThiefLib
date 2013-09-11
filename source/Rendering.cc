@@ -40,18 +40,18 @@ PROXY_CONFIG (Rendered, opacity, "RenderAlpha", nullptr, float, 1.0f);
 PROXY_CONFIG (Rendered, model, "ModelName", "", String, "");
 PROXY_CONFIG (Rendered, model_scale, "Scale", "",
 	Vector, Vector (1.0f, 1.0f, 1.0f));
-PROXY_ARRAY_CONFIG (Rendered, replacement_texture, 4u, String, "",
-	PROXY_ARRAY_ITEM ("OTxtRepr0", nullptr),
-	PROXY_ARRAY_ITEM ("OTxtRepr1", nullptr),
-	PROXY_ARRAY_ITEM ("OTxtRepr2", nullptr),
-	PROXY_ARRAY_ITEM ("OTxtRepr3", nullptr));
-PROXY_ARRAY_CONFIG (Rendered, joint_position, 6u, float, 0.0f,
-	PROXY_ARRAY_ITEM ("JointPos", "Joint 1"),
-	PROXY_ARRAY_ITEM ("JointPos", "Joint 2"),
-	PROXY_ARRAY_ITEM ("JointPos", "Joint 3"),
-	PROXY_ARRAY_ITEM ("JointPos", "Joint 4"),
-	PROXY_ARRAY_ITEM ("JointPos", "Joint 5"),
-	PROXY_ARRAY_ITEM ("JointPos", "Joint 6"));
+PROXY_ARRAY_CONFIG (Rendered, replacement_texture, 4u, String,
+	PROXY_ARRAY_ITEM ("OTxtRepr0", nullptr, ""),
+	PROXY_ARRAY_ITEM ("OTxtRepr1", nullptr, ""),
+	PROXY_ARRAY_ITEM ("OTxtRepr2", nullptr, ""),
+	PROXY_ARRAY_ITEM ("OTxtRepr3", nullptr, ""));
+PROXY_ARRAY_CONFIG (Rendered, joint_position, 6u, float,
+	PROXY_ARRAY_ITEM ("JointPos", "Joint 1", 0.0f),
+	PROXY_ARRAY_ITEM ("JointPos", "Joint 2", 0.0f),
+	PROXY_ARRAY_ITEM ("JointPos", "Joint 3", 0.0f),
+	PROXY_ARRAY_ITEM ("JointPos", "Joint 4", 0.0f),
+	PROXY_ARRAY_ITEM ("JointPos", "Joint 5", 0.0f),
+	PROXY_ARRAY_ITEM ("JointPos", "Joint 6", 0.0f));
 PROXY_CONFIG (Rendered, extra_light, "ExtraLight", "Amount (-1..1)",
 	float, 0.0f);
 PROXY_CONFIG (Rendered, extra_light_additive, "ExtraLight", "Additive?",
@@ -98,7 +98,7 @@ OBJECT_TYPE_IMPL_ (Light,
 // AnimLight
 //TODO wrap rest of property: Renderer\Anim Light = AnimLight
 
-PROXY_NEG_CONFIG (AnimLight, initially_on, "AnimLight", "inactive", bool, true);
+PROXY_NEG_CONFIG (AnimLight, initially_on, "AnimLight", "inactive", bool, false);
 
 OBJECT_TYPE_IMPL_ (AnimLight, Light (),
 	PROXY_INIT (initially_on)
@@ -169,7 +169,7 @@ PROXY_CONFIG (Bitmapped, bitmap_size_x, "BitmapWorld", "x size (feet)",
 	float, 0.0f);
 PROXY_CONFIG (Bitmapped, bitmap_size_y, "BitmapWorld", "y size (feet)",
 	float, 0.0f);
-PROXY_NEG_BIT_CONFIG (Bitmapped, uv_tiling, "BitmapWorld", "Flags", 16u, false);
+PROXY_NEG_BIT_CONFIG (Bitmapped, uv_tiling, "BitmapWorld", "Flags", 16u, true);
 PROXY_CONFIG (Bitmapped, tile_size_x, "BitmapWorld", "x feet per tile",
 	float, 0.0f);
 PROXY_CONFIG (Bitmapped, tile_size_y, "BitmapWorld", "y feet per tile",
@@ -182,7 +182,7 @@ PROXY_BIT_CONFIG (Bitmapped, flip_backside_uv, "BitmapWorld", "Flags", 2u, false
 PROXY_BIT_CONFIG (Bitmapped, face_camera, "BitmapWorld", "Flags", 8u, false);
 PROXY_CONFIG (Bitmapped, axial_fade, "BitmapWorld", "Axial Fade", float, 0.0f);
 PROXY_NEG_BIT_CONFIG (Bitmapped, animation_loop, "BitmapAnimation", "Flags",
-	1u, false);
+	1u, true);
 
 OBJECT_TYPE_IMPL_ (Bitmapped, Rendered (),
 	PROXY_INIT (bitmap_size_x),
