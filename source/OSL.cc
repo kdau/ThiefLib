@@ -33,7 +33,6 @@ IScriptMan*
 LG = nullptr;
 
 extern "C" const GUID IID_IHUD = THIEF_IHUD_GUID;
-extern "C" const GUID IID_IParameterCache = THIEF_IParameterCache_GUID;
 extern "C" const GUID IID_IOSLService = THIEF_IOSLService_GUID;
 
 
@@ -195,11 +194,11 @@ OSL::get_hud ()
 	return hud.get ();
 }
 
-STDMETHODIMP_ (SInterface<IParameterCache>)
+STDMETHODIMP_ (ParameterCache*)
 OSL::get_param_cache ()
 {
 	if (!param_cache)
-		try { param_cache.reset (new ParameterCache ()); }
+		try { param_cache.reset (new ParameterCacheImpl ()); }
 		catch (...) {}
 	return param_cache.get ();
 }

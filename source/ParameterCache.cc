@@ -182,9 +182,9 @@ DesignNoteReader::DesignNoteReader (const char* dn, RawValues& _raw_values)
 
 
 
-// ParameterCache
+// ParameterCacheImpl
 
-ParameterCache::ParameterCache ()
+ParameterCacheImpl::ParameterCacheImpl ()
 	: dn_prop (static_cast<IStringProperty*> (SInterface<IPropertyManager>
 		(LG)->GetPropertyNamed ("DesignNote"))),
 	  listen_handle (nullptr),
@@ -196,7 +196,7 @@ ParameterCache::ParameterCache ()
 	SInterface<ITraitManager> (LG)->Listen (on_trait_change, this);
 }
 
-ParameterCache::~ParameterCache ()
+ParameterCacheImpl::~ParameterCacheImpl ()
 {
 	dn_prop->Unlisten (listen_handle);
 	// It is not possible to unlisten from ITraitManager, so this dtor
@@ -204,7 +204,7 @@ ParameterCache::~ParameterCache ()
 }
 
 bool
-ParameterCache::exists (const Object& object, const CIString& parameter,
+ParameterCacheImpl::exists (const Object& object, const CIString& parameter,
 	bool inherit)
 {
 	DesignNote* dn = update_object (object.number);
@@ -233,7 +233,7 @@ ParameterCache::exists (const Object& object, const CIString& parameter,
 }
 
 const String*
-ParameterCache::get (const Object& object, const CIString& parameter,
+ParameterCacheImpl::get (const Object& object, const CIString& parameter,
 	bool inherit)
 {
 	DesignNote* dn = update_object (object.number);
@@ -262,7 +262,7 @@ ParameterCache::get (const Object& object, const CIString& parameter,
 }
 
 bool
-ParameterCache::set (const Object& object, const CIString& parameter,
+ParameterCacheImpl::set (const Object& object, const CIString& parameter,
 	const String& value)
 {
 	DesignNote* dn = update_object (object.number);
@@ -273,7 +273,7 @@ ParameterCache::set (const Object& object, const CIString& parameter,
 }
 
 bool
-ParameterCache::copy (const Object& _source, const Object& _dest,
+ParameterCacheImpl::copy (const Object& _source, const Object& _dest,
 	const CIString& parameter)
 {
 	ParameterBase watch_dest (_dest, parameter, { false });
@@ -294,7 +294,7 @@ ParameterCache::copy (const Object& _source, const Object& _dest,
 }
 
 bool
-ParameterCache::remove (const Object& object, const CIString& parameter)
+ParameterCacheImpl::remove (const Object& object, const CIString& parameter)
 {
 	DesignNote* dn = update_object (object.number);
 	if (!dn || !(dn->state & DesignNote::RELEVANT)) return false;
@@ -303,7 +303,7 @@ ParameterCache::remove (const Object& object, const CIString& parameter)
 }
 
 void
-ParameterCache::watch_object (const Object& object,
+ParameterCacheImpl::watch_object (const Object& object,
 	const ParameterBase& watcher)
 {
 	data [object.number].direct_watchers.insert (&watcher);
@@ -312,7 +312,7 @@ ParameterCache::watch_object (const Object& object,
 }
 
 void
-ParameterCache::unwatch_object (const Object& object,
+ParameterCacheImpl::unwatch_object (const Object& object,
 	const ParameterBase& watcher)
 {
 	auto dn_iter = data.find (object.number);
@@ -331,20 +331,20 @@ ParameterCache::unwatch_object (const Object& object,
 }
 
 void
-ParameterCache::reset ()
+ParameterCacheImpl::reset ()
 {
 	data.clear ();
 }
 
 STDMETHODIMP_ (void)
-ParameterCache::on_dn_change (sPropertyListenMsg* message,
+ParameterCacheImpl::on_dn_change (sPropertyListenMsg* message,
 	PropListenerData _self)
 {
 	// Filter out an unidentified event type known to be irrelevant.
 	if (!message || !_self || message->event & 8) return;
 
 	Object object = message->iObjId;
-	auto self = reinterpret_cast<ParameterCache*> (_self);
+	auto self = reinterpret_cast<ParameterCacheImpl*> (_self);
 	if (object.number == self->current) return;
 
 	auto dn_iter = self->data.find (object.number);
@@ -361,10 +361,10 @@ ParameterCache::on_dn_change (sPropertyListenMsg* message,
 }
 
 STDMETHODIMP_ (void)
-ParameterCache::on_trait_change (const sHierarchyMsg* message, void* _self)
+ParameterCacheImpl::on_trait_change (const sHierarchyMsg* message, void* _self)
 {
 	if (!message || !_self) return;
-	auto self = reinterpret_cast<ParameterCache*> (_self);
+	auto self = reinterpret_cast<ParameterCacheImpl*> (_self);
 
 	auto iter = self->data.find (message->iSubjId);
 	if (iter != self->data.end ())
@@ -372,7 +372,7 @@ ParameterCache::on_trait_change (const sHierarchyMsg* message, void* _self)
 }
 
 DesignNote*
-ParameterCache::update_object (Object::Number number)
+ParameterCacheImpl::update_object (Object::Number number)
 {
 	auto dn_iter = data.find (number);
 	if (dn_iter == data.end ()) return nullptr;
@@ -403,7 +403,7 @@ ParameterCache::update_object (Object::Number number)
 }
 
 void
-ParameterCache::update_ancestors (const Object& object, DesignNote& dn)
+ParameterCacheImpl::update_ancestors (const Object& object, DesignNote& dn)
 {
 	// Keep old ancestors for unwatching afterward.
 	DesignNote::Ancestors old_ancestors (std::move (dn.ancestors));
@@ -424,7 +424,7 @@ ParameterCache::update_ancestors (const Object& object, DesignNote& dn)
 }
 
 void
-ParameterCache::unwatch_ancestor (Object::Number number)
+ParameterCacheImpl::unwatch_ancestor (Object::Number number)
 {
 	if (--data [number].indirect_watchers == 0 &&
 	    data [number].direct_watchers.empty ())
@@ -432,7 +432,7 @@ ParameterCache::unwatch_ancestor (Object::Number number)
 }
 
 void
-ParameterCache::read_dn (Object::Number number)
+ParameterCacheImpl::read_dn (Object::Number number)
 {
 	const char* dn = nullptr;
 	dn_prop->GetSimple (number, &dn);
@@ -440,7 +440,7 @@ ParameterCache::read_dn (Object::Number number)
 }
 
 bool
-ParameterCache::write_dn (Object::Number number)
+ParameterCacheImpl::write_dn (Object::Number number)
 {
 	current = number;
 	try

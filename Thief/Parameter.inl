@@ -118,8 +118,7 @@ Parameter<T, THIEF_NOT_ENUM>::reparse () const //TODO Refactor most of this meth
 	catch (std::exception& e)
 	{
 		mono.log (boost::format ("WARNING: Could not parse parameter "
-			"\"%||\" on %||: %||.") % name % object.get_editor_name ()
-			% e.what ());
+			"\"%||\" on %||: %||.") % name % object % e.what ());
 	}
 	catch (...)
 	{}
@@ -180,6 +179,13 @@ Parameter<T, THIEF_IS_ENUM>::operator T () const
 {
 	initialize ();
 	return T (value);
+}
+
+template <typename T>
+Parameter<T, THIEF_IS_ENUM>::operator int () const
+{
+	initialize ();
+	return value;
 }
 
 template <typename T>

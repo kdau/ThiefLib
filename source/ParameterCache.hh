@@ -30,30 +30,27 @@ namespace Thief {
 
 
 
-// IParameterCache
+// ParameterCache
 
-interface IParameterCache : IUnknown
+class ParameterCache
 {
-	STDMETHOD_ (bool, exists) (const Object& object,
-		const CIString& parameter, bool inherit) PURE;
-	STDMETHOD_ (const String*, get) (const Object& object,
-		const CIString& parameter, bool inherit) PURE;
-	STDMETHOD_ (bool, set) (const Object& object,
-		const CIString& parameter, const String& value) PURE;
-	STDMETHOD_ (bool, copy) (const Object& source, const Object& dest,
-		const CIString& parameter) PURE;
-	STDMETHOD_ (bool, remove) (const Object& object,
-		const CIString& parameter) PURE;
+public:
+	virtual bool exists (const Object& object,
+		const CIString& parameter, bool inherit) = 0;
+	virtual const String* get (const Object& object,
+		const CIString& parameter, bool inherit) = 0;
+	virtual bool set (const Object& object,
+		const CIString& parameter, const String& value) = 0;
+	virtual bool copy (const Object& source, const Object& dest,
+		const CIString& parameter) = 0;
+	virtual bool remove (const Object& object,
+		const CIString& parameter) = 0;
 
-	STDMETHOD_ (void, watch_object) (const Object&,
-		const ParameterBase&) PURE;
-	STDMETHOD_ (void, unwatch_object) (const Object&,
-		const ParameterBase&) PURE;
+	virtual void watch_object (const Object&,
+		const ParameterBase&) = 0;
+	virtual void unwatch_object (const Object&,
+		const ParameterBase&) = 0;
 };
-
-extern "C" const GUID IID_IParameterCache;
-#define THIEF_IParameterCache_GUID { 0x709a2033, 0x3d7e, 0x4424, \
-		{ 0x97, 0x1d, 0xed, 0xf5, 0x55, 0x45, 0x2b, 0x02 } }
 
 
 
@@ -108,29 +105,28 @@ private:
 
 
 
-class ParameterCache : public cInterfaceImp<IParameterCache,
-	IID_Def<IParameterCache>, kInterfaceImpStatic>
+class ParameterCacheImpl : public ParameterCache
 {
 public:
-	virtual ~ParameterCache ();
+	virtual ~ParameterCacheImpl ();
 
-	STDMETHOD_ (bool, exists) (const Object& object,
+	virtual bool exists (const Object& object,
 		const CIString& parameter, bool inherit);
-	STDMETHOD_ (const String*, get) (const Object& object,
+	virtual const String* get (const Object& object,
 		const CIString& parameter, bool inherit);
-	STDMETHOD_ (bool, set) (const Object& object,
+	virtual bool set (const Object& object,
 		const CIString& parameter, const String& value);
-	STDMETHOD_ (bool, copy) (const Object& source, const Object& dest,
+	virtual bool copy (const Object& source, const Object& dest,
 		const CIString& parameter);
-	STDMETHOD_ (bool, remove) (const Object& object,
+	virtual bool remove (const Object& object,
 		const CIString& parameter);
 
-	STDMETHOD_ (void, watch_object) (const Object&, const ParameterBase&);
-	STDMETHOD_ (void, unwatch_object) (const Object&, const ParameterBase&);
+	virtual void watch_object (const Object&, const ParameterBase&);
+	virtual void unwatch_object (const Object&, const ParameterBase&);
 
 private:
 	friend class OSL;
-	ParameterCache ();
+	ParameterCacheImpl ();
 	void reset ();
 
 	SInterface<IStringProperty> dn_prop;
@@ -159,8 +155,6 @@ private:
 #endif // IS_OSL
 
 } // namespace Thief
-
-DEFINE_IIDSTRUCT (Thief::IParameterCache, Thief::IID_IParameterCache);
 
 #endif // PARAMETERCACHE_HH
 

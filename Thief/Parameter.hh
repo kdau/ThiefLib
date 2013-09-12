@@ -30,7 +30,7 @@
 
 namespace Thief {
 
-struct IParameterCache;
+class ParameterCache;
 
 
 
@@ -65,7 +65,7 @@ protected:
 
 	static int decode_quest_ref (const String& raw);
 
-	mutable IParameterCache* cache;
+	mutable ParameterCache* cache;
 	mutable bool does_exist;
 
 	const Object object;
@@ -179,6 +179,7 @@ public:
 		const Config& config);
 
 	operator T () const;
+	explicit operator int () const;
 	Parameter& operator = (T);
 };
 

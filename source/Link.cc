@@ -206,13 +206,13 @@ Link::dump_links (Flavor flavor, const Object& source, const Object& dest,
 	mono << " links";
 	if (source != Object::ANY)
 	{
-		mono << " from " << source.get_editor_name ();
+		mono << " from " << source;
 		if (inheritance == Inheritance::SOURCE)
 			mono << " and its ancestors";
 	}
 	if (dest != Object::ANY)
 	{
-		mono << " to " << source.get_editor_name ();
+		mono << " to " << source;
 		if (inheritance == Inheritance::DEST)
 			mono << " and its ancestors";
 	}
@@ -225,8 +225,7 @@ Link::dump_links (Flavor flavor, const Object& source, const Object& dest,
 	for (auto& link : get_all (flavor, source, dest, inheritance))
 		mono << boost::format (format) % link.number
 			% link.get_flavor ().get_name ()
-			% link.get_source ().get_editor_name ()
-			% link.get_dest ().get_editor_name ();
+			% link.get_source () % link.get_dest ();
 
 	mono << std::flush << std::internal;
 }

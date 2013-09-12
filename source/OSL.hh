@@ -63,7 +63,7 @@ extern "C" const GUID IID_IHUD;
 interface IOSLService : IScriptServiceBase
 {
 	STDMETHOD_ (SInterface<IHUD>, get_hud) () PURE;
-	STDMETHOD_ (SInterface<IParameterCache>, get_param_cache) () PURE;
+	STDMETHOD_ (ParameterCache*, get_param_cache) () PURE;
 
 	STDMETHOD_ (bool, subscribe_links) (const Flavor&,
 		const Object& source, const Object& host) PURE;
@@ -221,7 +221,7 @@ public:
 	STDMETHOD_ (void, End) ();
 
 	STDMETHOD_ (SInterface<IHUD>, get_hud) ();
-	STDMETHOD_ (SInterface<IParameterCache>, get_param_cache) ();
+	STDMETHOD_ (ParameterCache*, get_param_cache) ();
 
 	STDMETHOD_ (bool, subscribe_links) (const Flavor&,
 		const Object& source, const Object& host);
@@ -249,7 +249,7 @@ private:
 		const sDispatchListenerDesc*);
 
 	std::unique_ptr<HUDImpl> hud;
-	std::unique_ptr<ParameterCache> param_cache;
+	std::unique_ptr<ParameterCacheImpl> param_cache;
 
 	// LinkChange, LinkAdd, and LinkRemove messages
 

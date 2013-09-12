@@ -35,7 +35,6 @@ IScriptMan*
 LG = nullptr;
 
 extern "C" const GUID IID_IHUD = THIEF_IHUD_GUID;
-extern "C" const GUID IID_IParameterCache = THIEF_IParameterCache_GUID;
 extern "C" const GUID IID_IOSLService = THIEF_IOSLService_GUID;
 
 

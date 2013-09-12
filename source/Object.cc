@@ -430,6 +430,13 @@ Object::find (const String& name)
 	return Object (number).exists () ? number : NONE;
 }
 
+std::ostream&
+operator << (std::ostream& out, const Object& object)
+{
+	out << object.get_editor_name ();
+	return out;
+}
+
 
 
 } // namespace Thief

@@ -128,6 +128,9 @@ private:
 	static Number find (const String& name);
 };
 
+std::ostream& operator << (std::ostream&, const Object&);
+
+
 
 
 // LGMulti specialization

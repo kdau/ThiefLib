@@ -278,8 +278,7 @@ EnumParameterBase::reparse () const
 	catch (std::exception& e)
 	{
 		mono.log (boost::format ("WARNING: Could not parse parameter "
-			"\"%||\" on %||: %||.") % name % object.get_editor_name ()
-			% e.what ());
+			"\"%||\" on %||: %||.") % name % object % e.what ());
 	}
 	catch (...)
 	{}
