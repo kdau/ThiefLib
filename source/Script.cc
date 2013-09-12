@@ -105,7 +105,7 @@ Script::Impl::ReceiveMessage (sScrMsg* message, sMultiParm* reply,
 	{
 		try
 		{
-			script.mono () << "Error: " << e.what () << std::endl;
+			script.log (Log::ERROR, e.what ());
 		}
 		catch (...) {}
 		return S_FALSE;
@@ -114,8 +114,7 @@ Script::Impl::ReceiveMessage (sScrMsg* message, sMultiParm* reply,
 	{
 		try
 		{
-			script.mono () << "Error: an unknown error occurred."
-				<< std::endl;
+			script.log (Log::ERROR, "An unknown error occurred.");
 		}
 		catch (...) {}
 		return S_FALSE;
@@ -126,10 +125,11 @@ Script::Impl::ReceiveMessage (sScrMsg* message, sMultiParm* reply,
 
 // Script
 
-Script::Script (const String& _name, const Object& _host)
+Script::Script (const String& _name, const Object& _host, Log _min_level)
 	: impl (*new Impl (*this)),
 	  script_name (_name),
 	  host_obj (_host.number),
+	  min_level (_min_level),
 	  initialized (false),
 	  sim (Engine::is_sim ()),
 	  post_sim (false)
@@ -145,40 +145,52 @@ Script::get_interface ()
 }
 
 Monolog&
-Script::mono () const
+Script::mono (Log level) const
 {
-	Thief::mono << '[' << std::setw (4) << (sim_time / 1000);
-	char fill = Thief::mono.fill ('0');
-	Thief::mono << '.' << std::setw (3) << (sim_time % 1000) << "] ";
-	Thief::mono.fill (fill);
-	Thief::mono << script_name << " [" << host_obj << "]: ";
+	// If the level is too low, send the output to the circular file.
+	if (int (level) < int (min_level))
+		return null_mono;
+
+	const char* prefix = "";
+	switch (level)
+	{
+	case Log::INFO: prefix = "INFO"; break;
+	case Log::WARNING: prefix = "WARNING"; break;
+	case Log::ERROR: prefix = "ERROR"; break;
+	default: break;
+	}
+
+	static const boost::format format ("%|-7| [%|4|.%|03|] %|| [%||]: ");
+	Thief::mono << boost::format (format) % prefix % (sim_time / 1000ul)
+		% (sim_time % 1000ul) % script_name % host_obj;
+
 	return Thief::mono;
 }
 
 bool
-Script::has_datum (const String& datum) const
+Script::has_persistent (const String& datum) const
 {
 	sScrDatumTag tag { host_obj, script_name.data (), datum.data () };
 	return LG->IsScriptDataSet (&tag);
 }
 
 void
-Script::_get_datum (const String& datum, LGMultiBase& value) const
+Script::_get_persistent (const String& datum, LGMultiBase& value) const
 {
 	sScrDatumTag tag { host_obj, script_name.data (), datum.data () };
 	if (LG->GetScriptData (&tag, &(sMultiParm&)value) != S_OK)
-		throw std::runtime_error ("could not get script datum");
+		throw std::runtime_error ("could not get persistent variable");
 }
 
 bool
-Script::_set_datum (const String& datum, const LGMultiBase& value)
+Script::_set_persistent (const String& datum, const LGMultiBase& value)
 {
 	sScrDatumTag tag { host_obj, script_name.data (), datum.data () };
 	return LG->SetScriptData (&tag, &(const sMultiParm&)value) == S_OK;
 }
 
 bool
-Script::unset_datum (const String& datum)
+Script::unset_persistent (const String& datum)
 {
 	LGMulti<Empty> junk;
 	sScrDatumTag tag { host_obj, script_name.data (), datum.data () };
@@ -212,14 +224,12 @@ Script::dispatch (sScrMsg& message, sMultiParm* reply, unsigned trace)
 	if (!sim && _stricmp (message.message, "PhysMadeNonPhysical") == 0)
 		return true; // Silently ignore these to avoid extra work.
 
-#ifndef DEBUG
-	if (trace != kNoAction)
-#endif
-		mono () << "Got message \"" << message.message << '\"'
+	mono ((trace != kNoAction) ? Log::NORMAL : Log::VERBOSE)
+		<< "Got message \"" << message.message << '\"'
 #ifdef DEBUG
-			<< " of type " << message.Persistent_GetName ()
+		<< " of type " << message.Persistent_GetName ()
 #endif
-			<< (trace == kBreak ? ". Breaking." : ".") << std::endl;
+		<< (trace == kBreak ? ". Breaking." : ".") << std::endl;
 
 	if (trace == kBreak)
 		asm ("int $0x3");
@@ -274,14 +284,9 @@ Script::dispatch_cycle (Handlers& candidates, const CIString& key,
 			result = match->second->handle (*this, &message, reply);
 		}
 		catch (std::exception& e)
-		{
-			mono () << "Error: " << e.what () << std::endl;
-		}
+			{ log (Log::ERROR, e.what ()); }
 		catch (...)
-		{
-			mono () << "Error: an unknown error occurred."
-				<< std::endl;
-		}
+			{ log (Log::ERROR, "An unknown error occurred."); }
 
 		switch (result)
 		{
@@ -598,8 +603,8 @@ ScriptModuleInit (const char* name, IScriptMan* manager, MPrintfProc mprintf,
 	catch (no_interface&)
 	{
 		if (mprintf)
-			mprintf ("%s cannot be used with this version of the "
-				"Dark Engine. Upgrade to NewDark.\n",
+			mprintf ("ERROR: %s cannot be used with this version of "
+				"the Dark Engine. Upgrade to NewDark.\n",
 				Thief::module.get_name ());
 		return false;
 	}
@@ -615,8 +620,8 @@ ScriptModuleInit (const char* name, IScriptMan* manager, MPrintfProc mprintf,
 	if (!osl)
 	{
 		if (mprintf)
-			mprintf ("Could not load the ThiefLib support library "
-				OSL_NAME ".\n");
+			mprintf ("ERROR: Could not load the ThiefLib support "
+				"library " OSL_NAME ".\n");
 		return false;
 	}
 

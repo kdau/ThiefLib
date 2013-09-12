@@ -207,12 +207,13 @@ Message::get_lg_typename () const
 MessageWrapError::MessageWrapError (const sScrMsg* message,
 	const std::type_info& wrap_type, const char* problem) noexcept
 {
-	std::ostringstream explain;
-	explain << "Can't wrap a \"" << (message ? message->message : "")
-		<< "\" message of engine type "
-		<< (message ? message->Persistent_GetName () : "null")
-		<< " as a " << wrap_type.name () << ": " << problem << ".";
-	explanation = explain.str ();
+	boost::format _explanation ("Can't wrap a \"%||\" message of engine "
+		"type %|| as a %||: %||.");
+	_explanation
+		% (message ? message->message : "")
+		% (message ? message->Persistent_GetName () : "null")
+		% wrap_type.name () % problem;
+	explanation = _explanation.str ();
 }
 
 

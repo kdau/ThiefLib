@@ -238,11 +238,10 @@ FlavorName##Link::check_valid () const \
 	if (*this != Link::NONE && \
 	    get_flavor () != flavor () && get_flavor () != flavor (true)) \
 	{ \
-		std::ostringstream err; \
-		err << "Link " << number << " is of flavor " \
-			<< get_flavor ().get_name () << " instead of expected " \
-			#FlavorName " or ~" #FlavorName "." << std::endl; \
-		throw std::runtime_error (err.str ()); \
+		boost::format error ("Link %|| is of flavor %|| instead of " \
+			"expected " #FlavorName " or ~" #FlavorName "."); \
+		error % number % get_flavor ().get_name (); \
+		throw std::runtime_error (error.str ()); \
 	} \
 } \
 \

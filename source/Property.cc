@@ -34,20 +34,23 @@ const Property::Number
 Property::NONE = -1;
 
 Property::Property (Number number)
-	: iface (SInterface<IPropertyManager> (LG)->GetProperty (number))
+	: iface (static_cast<IGenericProperty*>
+		(SInterface<IPropertyManager> (LG)->GetProperty (number)))
 {
 	if (iface) iface->AddRef ();
 }
 
 Property::Property (const String& name)
-	: iface (SInterface<IPropertyManager> (LG)->GetPropertyNamed
-		(name.data ()))
+	: iface (static_cast<IGenericProperty*>
+		(SInterface<IPropertyManager> (LG)->GetPropertyNamed
+			(name.data ())))
 {
 	if (iface) iface->AddRef ();
 }
 
 Property::Property (const char* name)
-	: iface (SInterface<IPropertyManager> (LG)->GetPropertyNamed (name))
+	: iface (static_cast<IGenericProperty*>
+		(SInterface<IPropertyManager> (LG)->GetPropertyNamed (name)))
 {
 	if (iface) iface->AddRef ();
 }
@@ -166,13 +169,32 @@ ObjectProperty::_get_field (const char* field, LGMultiBase& value) const
 
 bool
 ObjectProperty::_set_field (const char* field, const LGMultiBase& value,
-	bool instantiate_if_missing)
+	bool instantiate_if_missing) //TODO The MULTI_SET_ARG wrapper for this doesn't throw or return false on error.
 {
 	if (!object.exists () || !property.iface) return false;
 	if (!exists (false) && (!instantiate_if_missing || !instantiate ()))
 		return false;
 	return SService<IPropertySrv> (LG)->Set (object.number,
 		property.iface->Describe ()->szName, field, value) == S_OK;
+}
+
+const void*
+ObjectProperty::get_raw (bool inherited) const
+{
+	if (!object.exists () || !property.iface) return nullptr;
+	void* raw = nullptr; //FIXME FIXME Does this need to be freed?
+	long result = inherited
+		? property.iface->Get (object.number, &raw)
+		: property.iface->GetSimple (object.number, &raw);
+	return (result == S_OK) ? raw : nullptr;
+}
+
+bool
+ObjectProperty::set_raw (const void* raw)
+{
+	if (!object.exists () || !property.iface) return false;
+	return property.iface->Set (object.number, const_cast<void*> (raw)) //FIXME FIXME Is this const_cast safe?
+		== S_OK;
 }
 
 

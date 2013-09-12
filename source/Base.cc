@@ -386,6 +386,20 @@ LGMultiBase::operator = (const sMultiParm& copy)
 	return *this;
 }
 
+const char*
+LGMultiBase::get_type_name (Type type)
+{
+	switch (type)
+	{
+	case EMPTY: return "EMPTY";
+	case INT: return "INT";
+	case FLOAT: return "FLOAT";
+	case STRING: return "STRING";
+	case VECTOR: return "VECTOR";
+	default: return nullptr;
+	}
+}
+
 void
 LGMultiBase::clear ()
 {
@@ -426,18 +440,10 @@ LGMultiBase::as_object () const \
 LGMultiTypeError::LGMultiTypeError (LGMultiBase::Type got, const char* expected)
 	noexcept
 {
-	std::ostringstream explain;
-	explain << "Cannot translate an LGMulti of type ";
-	switch (got)
-	{
-	case LGMultiBase::Type::EMPTY: explain << "EMPTY"; break;
-	case LGMultiBase::Type::INT: explain << "INT"; break;
-	case LGMultiBase::Type::FLOAT: explain << "FLOAT"; break;
-	case LGMultiBase::Type::STRING: explain << "STRING"; break;
-	case LGMultiBase::Type::VECTOR: explain << "VECTOR"; break;
-	}
-	explain << " to a value of type " << expected << ".";
-	explanation = explain.str ();
+	boost::format _explanation ("Cannot translate an LGMulti of type %|| "
+		"to a value of type %||.");
+	_explanation % LGMultiBase::get_type_name (got) % expected;
+	explanation = _explanation.str ();
 }
 
 

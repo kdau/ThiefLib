@@ -56,7 +56,7 @@ public:
 private:
 	friend class ObjectProperty;
 	friend class OSL;
-	IProperty* iface;
+	IGenericProperty* iface;
 };
 
 
@@ -86,6 +86,9 @@ public:
 	MULTI_SET_ARG (set_field, String, field);
 	template <typename T>
 	T get_field (const String& field, const T& default_value) const;
+
+	const void* get_raw (bool inherited = true) const;
+	bool set_raw (const void*);
 
 	static bool subscribe (const Property&, const Object&,
 		const Object& host = Object::SELF);

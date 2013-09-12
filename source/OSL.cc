@@ -145,8 +145,8 @@ HUDImpl::load_bitmap (const String& path, bool animation)
 	}
 	catch (std::exception& e)
 	{
-		mono << "Warning: Could not load bitmap at \"" << path
-			<< "\": " << e.what () << "." << std::endl;
+		mono.log (boost::format ("WARNING: Could not load bitmap at "
+			"\"%||\": %||.") % path % e.what ());
 	}
 
 	return bitmap;
@@ -526,15 +526,16 @@ ThiefLibOSLInit (IScriptMan* manager, MPrintfProc mprintf, IMalloc* allocator)
 	}
 	catch (std::exception& e)
 	{
-		if (mprintf) mprintf
-			("Could not set up the ThiefLib support library: %s.\n",
-				e.what ());
+		if (mprintf)
+			mprintf ("ERROR: Could not set up the ThiefLib support "
+				"library: %s.\n", e.what ());
 		return false;
 	}
 	catch (...)
 	{
-		if (mprintf) mprintf
-			("Could not set up the ThiefLib support library.\n");
+		if (mprintf)
+			mprintf ("ERROR: Could not set up the ThiefLib support "
+				"library.\n");
 		return false;
 	}
 

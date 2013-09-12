@@ -71,6 +71,31 @@ Script::host_as () const
 	return host_obj;
 }
 
+template <typename... Args>
+inline void
+Script::log (Log level, const String& _format, const Args&... args) const
+{
+	if (int (level) >= int (min_level))
+	{
+		boost::format format { _format };
+		log_step (level, format, args...);
+	}
+}
+
+template <typename T, typename... Args>
+inline void
+Script::log_step (Log level, boost::format& format, const T& arg,
+	const Args&... args) const
+{
+	log_step (level, format % arg, args...);
+}
+
+inline void
+Script::log_step (Log level, boost::format& format) const
+{
+	mono (level) << format.str () << std::endl;
+}
+
 template <typename _Script, typename _Message>
 inline void
 Script::listen_message (const CIString& message,
@@ -133,7 +158,7 @@ template <typename T>
 inline bool
 Persistent<T>::exists () const
 {
-	return script.has_datum (name);
+	return script.has_persistent (name);
 }
 
 template <typename T>
@@ -181,7 +206,7 @@ inline Persistent<T>&
 Persistent<T>::operator = (const T& _value)
 {
 	value = _value;
-	if (!script._set_datum (name, LGMulti<T> (value)))
+	if (!script._set_persistent (name, LGMulti<T> (value)))
 		throw std::runtime_error ("could not set persistent variable");
 	return *this;
 }
@@ -190,7 +215,7 @@ template <typename T>
 inline bool
 Persistent<T>::remove ()
 {
-	return script.unset_datum (name);
+	return script.unset_persistent (name);
 }
 
 template <typename T>
@@ -208,7 +233,7 @@ Persistent<T>::get_value () const
 	if (exists ())
 	{
 		LGMulti<T> _value;
-		script._get_datum (name, _value);
+		script._get_persistent (name, _value);
 		value = _value;
 	}
 	else if (has_default_value)

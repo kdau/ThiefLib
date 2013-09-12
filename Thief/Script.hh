@@ -84,9 +84,19 @@ public:
 	IScript* get_interface ();
 
 protected:
-	Script (const String& name, const Object& host);
+	enum class Log { VERBOSE, NORMAL, INFO, WARNING, ERROR };
 
-	Monolog& mono () const;
+	Script (const String& name, const Object& host, Log min_level =
+#ifdef DEBUG
+		Log::NORMAL
+#else
+		Log::INFO
+#endif
+		);
+
+	Monolog& mono (Log level = Log::NORMAL) const;
+	template <typename... Args>
+	void log (Log level, const String& format, const Args&...) const;
 
 	bool is_sim () const { return sim; }
 	Time get_sim_time () const { return sim_time; }
@@ -109,14 +119,19 @@ protected:
 	Timer start_timer (const char* timer, Time delay, bool repeating,
 		const T& data);
 
-	bool has_datum (const String& datum) const;
-	MULTI_GET_ARG (get_datum, String, datum);
-	MULTI_SET_ARG_RET (bool, set_datum, String, datum);
-	bool unset_datum (const String& datum);
+	bool has_persistent (const String& datum) const;
+	MULTI_GET_ARG (get_persistent, String, datum);
+	MULTI_SET_ARG_RET (bool, set_persistent, String, datum);
+	bool unset_persistent (const String& datum);
 
 private:
 	virtual void initialize ();
 	void fix_player_links (); //TESTME
+
+	template <typename T, typename... Args>
+	void log_step (Log level, boost::format& format, const T& arg,
+		const Args&...) const;
+	void log_step (Log level, boost::format& format) const;
 
 	typedef std::multimap<CIString, MessageHandler::Ptr> Handlers;
 	Handlers message_handlers;
@@ -131,8 +146,8 @@ private:
 		const LGMultiBase& data);
 
 	template <typename T> friend class Persistent;
-	void _get_datum (const String& datum, LGMultiBase& value) const;
-	bool _set_datum (const String& datum, const LGMultiBase& value);
+	void _get_persistent (const String& datum, LGMultiBase& value) const;
+	bool _set_persistent (const String& datum, const LGMultiBase& value);
 
 	class Impl;
 	friend class Impl;
@@ -140,6 +155,8 @@ private:
 
 	const String script_name;
 	Object::Number host_obj;
+	Log min_level;
+
 	bool initialized, sim, post_sim;
 	Time sim_time;
 };

@@ -75,6 +75,12 @@
 
 
 
+// Boost headers used in ThiefLib
+
+#include <boost/format.hpp>
+
+
+
 namespace Thief {
 
 class Object;

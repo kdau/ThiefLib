@@ -407,9 +407,9 @@ Objective::dump_objectives ()
 			Loot loot = objective.get_loot ();
 			String specials = loot.specials.to_string ();
 			std::reverse (specials.begin (), specials.end ());
-			mono << "{ " << loot.gold << "g, " << loot.gems << "g, "
-				<< loot.goods << "g, " << loot.total << "g, "
-				<< specials << " }";
+			mono << boost::format ("{ %||g, %||g, %||g, %||g; %|| }")
+				% loot.gold % loot.gems % loot.goods
+				% loot.total % specials;
 		}
 		else
 			mono << objective.get_target ().get_editor_name ();

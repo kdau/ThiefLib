@@ -15,10 +15,11 @@ Particularly, the library is still almost entirely undocumented.
 
 The library requires the following to build:
  * a recent (GCC 4.6 or later) MinGW build environment
- * the Boost libraries (specifically Preprocessor, but others may be used later)
+ * the Boost libraries (currently Format and Preprocessor, but others too later)
  * my modified version of Telliamed's lg library
 
-Script modules built with the library require:
+Script modules based on this library require only MinGW (GCC 4.6+) and Boost to
+build. To run, they require:
  * either Windows (XP or later) or Linux (with a recent version of Wine)
  * TMA and/or TG/TDP, depending on build options
  * the NewDark patch (This requirement might be relaxed in the future.)

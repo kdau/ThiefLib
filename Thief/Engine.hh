@@ -41,12 +41,15 @@ public:
 
 	void attach (MPrintfProc proc);
 
+	void log (const String&);
+	void log (const boost::format&);
+
 private:
 	class Streambuf;
 	std::unique_ptr<Streambuf> buf;
 };
 
-extern Monolog mono;
+extern Monolog mono, null_mono;
 
 
 

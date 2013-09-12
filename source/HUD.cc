@@ -218,21 +218,15 @@ HUD::load_bitmap (const String& path, bool animation)
 
 // HUDElement
 
-#define CHECK_OVERLAY(retval) \
+#define CHECK_OVERLAY() \
 	if (!is_overlay ()) \
-	{ \
-		mono << "HUDElement::" << __func__ << "called for " \
-			"non-overlay element; ignoring." << std::endl; \
-		return retval; \
-	}
+		throw std::logic_error ("method only valid for overlay-type " \
+			"HUD elements");
 
-#define CHECK_DRAWING(retval) \
+#define CHECK_DRAWING() \
 	if (!drawing) \
-	{ \
-		mono << "HUDElement::" << __func__ << "called outside of " \
-			"draw cycle; ignoring." << std::endl; \
-		return retval; \
-	}
+		throw std::logic_error ("method only valid during HUD element " \
+			"drawing callbacks");
 
 HUDElement::HUDElement ()
 	: initialized (false), should_draw (false), needs_redraw (true),
@@ -300,7 +294,7 @@ HUDElement::create_overlay ()
 	}
 	else
 	{
-		mono << "Error: Could not create a HUD overlay." << std::endl;
+		mono << "ERROR: Could not create a HUD overlay." << std::endl;
 		return false;
 	}
 }
@@ -435,7 +429,7 @@ CanvasSize
 HUDElement::get_text_size (const String& text) const
 {
 	CanvasSize size;
-	CHECK_DRAWING (size);
+	CHECK_DRAWING ();
 	SService<IDarkOverlaySrv> (LG)->GetStringSize
 		(text.data (), size.w, size.h);
 	return size;
@@ -455,17 +449,15 @@ HUDElement::draw_bitmap (const HUDBitmap::Ptr& bitmap, HUDBitmap::Frame frame,
 	CanvasPoint position, CanvasRect clip)
 {
 	CHECK_DRAWING ();
+	if (!bitmap) throw std::logic_error ("bitmap is null");
 	do_offset (position);
-	if (bitmap)
-		bitmap->draw (frame, position, clip);
-	else
-		mono << "Error: Cannot draw a nonexistent bitmap." << std::endl;
+	bitmap->draw (frame, position, clip);
 }
 
 CanvasPoint
 HUDElement::location_to_canvas (const Vector& location) const
 {
-	CHECK_DRAWING (CanvasPoint::OFFSCREEN);
+	CHECK_DRAWING ();
 	CanvasPoint position;
 	bool onscreen = SService<IDarkOverlaySrv> (LG)->WorldToScreen
 		(LGVector (location), position.x, position.y);
@@ -475,7 +467,7 @@ HUDElement::location_to_canvas (const Vector& location) const
 CanvasRect
 HUDElement::object_to_canvas (const Object& object) const
 {
-	CHECK_DRAWING (CanvasRect::OFFSCREEN);
+	CHECK_DRAWING ();
 	int x1, y1, x2, y2;
 	bool onscreen = SService<IDarkOverlaySrv> (LG)->GetObjectScreenBounds
 		(object.number, x1, y1, x2, y2);

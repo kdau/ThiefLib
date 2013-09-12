@@ -28,7 +28,6 @@ Novel messages/wrappers
 TNH/NV/TW features
 	* ParameterCache: NVScript-style syntax (script name prefix, object targetting)
 	* QuestVariable: reference syntax parsing per cQVarText, cQVarProcessor, TWBaseScript, et al.
-	* Script: debug levels per TWScript
 	* TrapTrigger: requirement counting per cRequirement
 	* TrapTrigger: NVScript-style features (on, off, count, capacitor, falloff, failchance, dest)
 

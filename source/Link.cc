@@ -221,13 +221,12 @@ Link::dump_links (Flavor flavor, const Object& source, const Object& dest,
 	mono << "Number     Flavor                 Source                 Destination\n";
 	mono << "========   ====================   ====================   ====================\n";
 
-	mono << std::left;
+	static const boost::format format ("%|-8|   %|-20|   %|-20|   %|-20\n");
 	for (auto& link : get_all (flavor, source, dest, inheritance))
-		mono << std::setw (8) << link.number << "   "
-			<< std::setw (20) << link.get_flavor ().get_name () << "   "
-			<< std::setw (20) << link.get_source ().get_editor_name () << "   "
-			<< std::setw (20) << link.get_dest ().get_editor_name ()
-			<< '\n';
+		mono << boost::format (format) % link.number
+			% link.get_flavor ().get_name ()
+			% link.get_source ().get_editor_name ()
+			% link.get_dest ().get_editor_name ();
 
 	mono << std::flush << std::internal;
 }

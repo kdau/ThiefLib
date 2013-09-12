@@ -40,12 +40,14 @@ typename std::enable_if<std::is_base_of<Object, T>::value>::type
 
 // Forward declarations of LG types referenced in ThiefLib headers
 
-struct IProperty;
 struct IScript;
 struct sMultiParm;
 struct sScrClassDesc;
 struct sScrMsg;
 typedef int (__cdecl *MPrintfProc) (const char*, ...);
+
+template <typename T> struct IProperty_Type;
+typedef IProperty_Type<void*> IGenericProperty;
 
 
 
@@ -360,6 +362,7 @@ public:
 
 	enum Type { EMPTY, INT, FLOAT, STRING, VECTOR };
 	Type get_type () const { return type; }
+	static const char* get_type_name (Type);
 	bool empty () const { return type == EMPTY; }
 
 protected:

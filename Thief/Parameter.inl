@@ -106,7 +106,7 @@ Parameter<T, THIEF_NOT_ENUM>::operator != (const T& rhs) const
 
 template <typename T>
 void
-Parameter<T, THIEF_NOT_ENUM>::reparse () const
+Parameter<T, THIEF_NOT_ENUM>::reparse () const //TODO Refactor most of this method into ParameterBase.
 {
 	ParameterBase::reparse ();
 
@@ -117,9 +117,9 @@ Parameter<T, THIEF_NOT_ENUM>::reparse () const
 	}
 	catch (std::exception& e)
 	{
-		mono << "Could not parse parameter \"" << name << "\" on "
-			<< object.get_editor_name () << ": " << e.what ()
-			<< std::endl;
+		mono.log (boost::format ("WARNING: Could not parse parameter "
+			"\"%||\" on %||: %||.") % name % object.get_editor_name ()
+			% e.what ());
 	}
 	catch (...)
 	{}

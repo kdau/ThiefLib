@@ -34,13 +34,14 @@ class Monolog::Streambuf : public std::streambuf
 public:
 	Streambuf (MPrintfProc proc);
 
+	void write (const char* string);
+
 protected:
 	virtual int_type overflow (int_type ch = traits_type::eof ());
 	virtual int sync ();
 
 private:
 	bool flush_to_mono ();
-	void write (const char* string);
 
 	static const size_t BUFFER_SIZE = 1000u; // imposed by the engine
 	std::array<char_type, BUFFER_SIZE> buffer;
@@ -130,6 +131,9 @@ Monolog::Streambuf::write (const char* string)
 Monolog
 mono;
 
+Monolog
+null_mono;
+
 Monolog::Monolog ()
 	: std::ostream (), buf ()
 {}
@@ -142,6 +146,18 @@ Monolog::attach (MPrintfProc proc)
 {
 	buf.reset (new Streambuf (proc));
 	rdbuf (buf.get ());
+}
+
+void
+Monolog::log (const String& message)
+{
+	if (buf) buf->write (message.data ());
+}
+
+void
+Monolog::log (const boost::format& message)
+{
+	if (buf) buf->write (message.str ().data ());
 }
 
 
