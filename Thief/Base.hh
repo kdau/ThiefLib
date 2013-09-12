@@ -152,10 +152,14 @@ struct Time
 
 	operator Value () const { return value; }
 	explicit operator long () const { return value; }
-	explicit operator float () const { return value; }
 
 	Value seconds () const;
 	Value minutes () const;
+
+	Time (float value, Value unit);
+	explicit operator float () const { return value; }
+	float fseconds () const;
+	float fminutes () const;
 
 	explicit Time (const String&);
 	Time& operator = (const String&);
@@ -207,6 +211,10 @@ struct Vector
 	explicit operator String () const;
 
 	static const double EPSILON;
+
+	enum class Component { NONE = -1, X, Y, Z};
+	float& operator [] (Component);
+	const float& operator [] (Component) const;
 };
 
 std::ostream& operator << (std::ostream&, const Vector&);

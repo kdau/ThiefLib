@@ -96,6 +96,8 @@ public:
 
 	// Limb model (player arm)
 
+	THIEF_PROP_FIELD (bool, arm_visible);
+
 	bool show_arm ();
 	bool start_arm_use (); //TESTME
 	bool finish_arm_use (); //TESTME

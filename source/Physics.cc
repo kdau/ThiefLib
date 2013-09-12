@@ -181,6 +181,9 @@ PROXY_BIT_CONFIG (OBBPhysical, platform_friction, "PhysAttr", "Flags", 2u,
 PROXY_CONFIG (OBBPhysical, pore_size, "PhysAttr", "Pore Size", float, 0.0f);
 PROXY_CONFIG (OBBPhysical, ai_fires_through, "AIFiresThrough", nullptr,
 	bool, false);
+PROXY_CONFIG_ (OBBPhysical, conveyor_velocity, "ConveyorVel", nullptr, float,
+	0.0f, Vector::Component::X, FieldProxyConfig<float>::component_getter,
+	FieldProxyConfig<float>::component_setter);
 
 OBJECT_TYPE_IMPL_ (OBBPhysical, Physical (),
 	PROXY_INIT (physics_size),
@@ -191,7 +194,8 @@ OBJECT_TYPE_IMPL_ (OBBPhysical, Physical (),
 	PROXY_INIT (path_exact),
 	PROXY_INIT (platform_friction),
 	PROXY_INIT (pore_size),
-	PROXY_INIT (ai_fires_through)
+	PROXY_INIT (ai_fires_through),
+	PROXY_INIT (conveyor_velocity)
 )
 
 
@@ -212,10 +216,6 @@ PhysAttachLink::create (const Object& source, const Object& dest,
 	link.offset = offset;
 	return link;
 }
-
-
-
-//TODO Create Conveyor : OBBPhysical(/Rendered) and wrap property Physics: Model\ConveyorVelocity = ConveyorVel
 
 
 
@@ -371,7 +371,7 @@ PROXY_CONFIG (Projectile, initial_velocity, "PhysInitVel", nullptr,
 	Vector, Vector ());
 PROXY_CONFIG (Projectile, faces_velocity, "PhysFaceVel", nullptr, bool, false);
 PROXY_CONFIG (Projectile, whizzing_sound, "PrjSound", nullptr, String, "");
-PROXY_CONFIG (Projectile, launcher, "Firer", nullptr, Being, Object::NONE);
+PROXY_CONFIG (Projectile, launcher, "Firer", nullptr, Object, Object::NONE);
 
 OBJECT_TYPE_IMPL_ (Projectile, Physical (), SpherePhysical (),
 	PROXY_INIT (initial_velocity),

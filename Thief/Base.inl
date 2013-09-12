@@ -51,6 +51,8 @@ typedef int (__cdecl *MPrintfProc) (const char*, ...);
 
 namespace Thief {
 
+typedef Object Stimulus; //TODO Remove this once ActReact.hh is ready.
+
 
 
 // Case-insensitive string support
@@ -173,6 +175,23 @@ inline Time::Value
 Time::minutes () const
 {
 	return value / MINUTES;
+}
+
+inline
+Time::Time (float _value, Value unit)
+	: value (_value * unit)
+{}
+
+inline float
+Time::fseconds () const
+{
+	return float (value) / float (SECONDS);
+}
+
+inline float
+Time::fminutes () const
+{
+	return float (value) / float (MINUTES);
 }
 
 inline
@@ -495,8 +514,11 @@ Method (const T& value) \
 template <typename Type>
 struct FieldProxyConfig
 {
+	// Store default values as const char* for String fields, as Object for
+	// Object subclass fields, and as the field type for all others.
 	typedef typename std::conditional<std::is_same<Type, String>::value,
-		const char*, Type>::type DefaultValue;
+		const char*, typename std::conditional<std::is_base_of<Object,
+		Type>::value, Object, Type>::type>::type DefaultValue;
 
 	struct Item
 	{
@@ -515,13 +537,18 @@ struct FieldProxyConfig
 
 	template <typename StorageType>
 	static Type default_getter (const Item&, const LGMultiBase&);
-
 	template <typename StorageType>
 	static void default_setter (const Item&, LGMultiBase&, const Type&);
 
-	// These are defined for Type = bool only.
+	// These are defined for Type = bool only. The bitmask is
+	// std::abs (item.detail), and the value is negated if item.detail < 0.
 	static Type bitmask_getter (const Item&, const LGMultiBase&);
 	static void bitmask_setter (const Item&, LGMultiBase&, const Type&);
+
+	// These are defined for Type = float only. The vector component is
+	// Vector::Component (item.detail).
+	static Type component_getter (const Item&, const LGMultiBase&);
+	static void component_setter (const Item&, LGMultiBase&, const Type&);
 };
 
 template <typename Type> template <typename StorageType>

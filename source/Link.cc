@@ -372,16 +372,5 @@ ScriptParamsLink::create (const Object& source, const Object& dest,
 
 
 
-//TODO wrap link: MetaProp - tMetaPropertyPriority
-
-//TODO wrap link: CurWeapon - int (meaningful data??)
-//TODO wrap link: GunFlash - sFlashData
-//TODO wrap link: WeaponOffset - sWeaponOffset
-//TODO wrap link: WHBlock - sHaloBlockData
-
-//TODO wrap link: Projectile - sProjectileData
-
-
-
 } // namespace Thief
 

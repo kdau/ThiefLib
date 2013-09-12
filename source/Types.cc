@@ -84,10 +84,10 @@ OBJECT_TYPE_IMPL_ (Damageable,
 )
 
 void
-Damageable::damage (const Object& type, int intensity, const Object& culprit)
+Damageable::damage (const Object& stimulus, int intensity, const Object& culprit)
 {
 	SService<IDamageSrv> (LG)->Damage
-		(number, culprit.number, intensity, type.number);
+		(number, culprit.number, intensity, stimulus.number);
 }
 
 void
@@ -120,7 +120,7 @@ DamageMessage::DamageMessage (const Object& culprit, const Object& stimulus,
 
 MESSAGE_ACCESSOR (Being, DamageMessage, get_culprit, sDamageScrMsg, culprit)
 
-MESSAGE_ACCESSOR (Object, DamageMessage, get_stimulus, sDamageScrMsg, kind) //TODO Fix return type once ActReact.hh is ready.
+MESSAGE_ACCESSOR (Stimulus, DamageMessage, get_stimulus, sDamageScrMsg, kind)
 
 MESSAGE_ACCESSOR (int, DamageMessage, get_hit_points, sDamageScrMsg, damage)
 
@@ -140,26 +140,29 @@ SlayMessage::SlayMessage (const Object& culprit, const Object& stimulus)
 
 MESSAGE_ACCESSOR (Being, SlayMessage, get_culprit, sSlayMsg, culprit)
 
-MESSAGE_ACCESSOR (Object, SlayMessage, get_stimulus, sSlayMsg, kind) //TODO Fix return type once ActReact.hh is ready.
+MESSAGE_ACCESSOR (Stimulus, SlayMessage, get_stimulus, sSlayMsg, kind)
 
 
 
 // Interactive
-//TODO wrap property: Inventory\Cycle Order = InvCycleOrder
-//TODO wrap property: Inventory\Render Type = InvRendType
-//TODO wrap property: Inventory\Type = InvType
 //TODO wrap link: FrobProxy - FrobProxyInfo
 
 PROXY_CONFIG (Interactive, frob_world_action, "FrobInfo", "World Action",
-	Interactive::FrobAction, FrobAction::INERT);
+	unsigned, FrobAction::INERT);
 PROXY_CONFIG (Interactive, frob_inventory_action, "FrobInfo", "Inventory Action",
-	Interactive::FrobAction, FrobAction::INERT);
+	unsigned, FrobAction::INERT);
 PROXY_CONFIG (Interactive, frob_tool_action, "FrobInfo", "Tool Action",
-	Interactive::FrobAction, FrobAction::INERT);
+	unsigned, FrobAction::INERT);
 PROXY_CONFIG (Interactive, pick_distance, "PickDist", nullptr, float, 0.0f);
 PROXY_CONFIG (Interactive, pick_bias, "PickBias", nullptr, float, 0.0f);
 PROXY_CONFIG (Interactive, tool_reach, "ToolReach", nullptr, float, 0.0f);
+PROXY_CONFIG (Interactive, inventory_type, "InvType", nullptr,
+	Interactive::InventoryType, InventoryType::JUNK);
 PROXY_NEG_CONFIG (Interactive, droppable, "NoDrop", nullptr, bool, true);
+PROXY_CONFIG (Interactive, cycle_order, "InvCycleOrder", nullptr, String, "");
+PROXY_CONFIG (Interactive, inventory_display, "InvRendType", "Type",
+	Interactive::InventoryDisplay, InventoryDisplay::DEFAULT);
+PROXY_CONFIG (Interactive, alt_resource, "InvRendType", "Resource", String, "");
 PROXY_CONFIG (Interactive, limb_model, "InvLimbModel", nullptr, String, "");
 PROXY_CONFIG (Interactive, loot_value_gold, "Loot", "Gold", int, 0);
 PROXY_CONFIG (Interactive, loot_value_gems, "Loot", "Gems", int, 0);
@@ -174,7 +177,11 @@ OBJECT_TYPE_IMPL_ (Interactive, Rendered (),
 	PROXY_INIT (pick_distance),
 	PROXY_INIT (pick_bias),
 	PROXY_INIT (tool_reach),
+	PROXY_INIT (inventory_type),
 	PROXY_INIT (droppable),
+	PROXY_INIT (cycle_order),
+	PROXY_INIT (inventory_display),
+	PROXY_INIT (alt_resource),
 	PROXY_INIT (limb_model),
 	PROXY_INIT (loot_value_gold),
 	PROXY_INIT (loot_value_gems),
@@ -182,12 +189,6 @@ OBJECT_TYPE_IMPL_ (Interactive, Rendered (),
 	PROXY_INIT (loot_value_special),
 	PROXY_INIT (store_price)
 )
-
-Interactive::InventoryType
-Interactive::get_inventory_type () const
-{
-	return InventoryType (SInterface<IInventory> (LG)->GetType (number));
-}
 
 
 
@@ -323,12 +324,12 @@ OBJECT_TYPE_IMPL_ (Container,
 )
 
 bool
-Container::contains (const Object& maybe_contained, bool direct_only)
+Container::contains (const Object& maybe_contained, bool inherit)
 {
-	return direct_only
-		? get_contain_type (maybe_contained) != Type::NONE
-		: SInterface<IContainSys> (LG)->Contains
-			(number, maybe_contained.number);
+	return inherit
+		? SInterface<IContainSys> (LG)->Contains
+			(number, maybe_contained.number)
+		: get_contain_type (maybe_contained) != Type::NONE;
 }
 
 Container::Type
@@ -453,11 +454,11 @@ ContainmentMessage::get_contents () const
 PROXY_CONFIG (Marker, flee_value, "AI_FleePoint", nullptr, int, 0);
 PROXY_CONFIG (Marker, cover_value, "AICoverPt", "Value", int, 0);
 PROXY_CONFIG (Marker, cover_decay_speed, "AICoverPt", "Decay Speed",
-	float, 0.8f);
+	float, 0.8f); //TODO Should this be a Time?
 PROXY_CONFIG (Marker, cover_can_duck, "AICoverPt", "Can Duck", bool, false);
 PROXY_CONFIG (Marker, vantage_value, "AIVantagePt", "Value", int, 0);
 PROXY_CONFIG (Marker, vantage_decay_speed, "AIVantagePt", "Decay Speed",
-	float, 0.8f);
+	float, 0.8f); //TODO Should this be a Time?
 
 OBJECT_TYPE_IMPL_ (Marker,
 	PROXY_INIT (flee_value),

@@ -124,11 +124,11 @@ public:
 	enum class RCFrequency
 		{ NEVER, VERY_RARELY, RARELY, SOMETIMES, OFTEN, VERY_OFTEN };
 
-	THIEF_PROP_FIELD (int, minimum_distance); //TESTME
-	THIEF_PROP_FIELD (int, ideal_distance); //TESTME
+	THIEF_PROP_FIELD (float, minimum_distance); //TESTME
+	THIEF_PROP_FIELD (float, ideal_distance); //TESTME
 	THIEF_PROP_FIELD (RCFrequency, fire_while_moving); //TESTME
 
-	THIEF_PROP_FIELD (float, firing_delay); //TESTME
+	THIEF_PROP_FIELD (Time, firing_delay); //TESTME
 
 	THIEF_PROP_FIELD (RCPriority, cover_desire); //TESTME
 	THIEF_PROP_FIELD (float, decay_speed); //TESTME
@@ -162,7 +162,7 @@ THIEF_FLAVORED_LINK (AIProjectile) //TESTME
 
 	THIEF_LINK_FIELD (int, stack_count);
 	THIEF_LINK_FIELD (int, burst_count);
-	THIEF_LINK_FIELD (float, firing_delay);
+	THIEF_LINK_FIELD (Time, firing_delay);
 
 	THIEF_LINK_FIELD (Method, targeting_method);
 	THIEF_LINK_FIELD (RangedCombatant::RCPriority, accuracy);

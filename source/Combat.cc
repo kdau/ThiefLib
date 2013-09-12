@@ -61,7 +61,7 @@ OBJECT_TYPE_IMPL_ (Weapon, Rendered (), Interactive (), Combinable (),
 bool
 Weapon::is_weapon () const
 {
-	return get_inventory_type () == InventoryType::WEAPON;
+	return inventory_type == InventoryType::WEAPON;
 }
 
 
@@ -135,10 +135,12 @@ OBJECT_TYPE_IMPL_ (Combatant, Rendered (), Interactive (), Physical (),
 
 
 //TODO wrap link: AIFleeDest - sAIFleeDest
-
-
-
 //TODO wrap link: AINoFlee - sAINoFleeLink
+//TODO wrap link: CurWeapon - int (meaningful data??)
+//TODO wrap link: GunFlash - sFlashData
+//TODO wrap link: WeaponOffset - sWeaponOffset
+//TODO wrap link: WHBlock - sHaloBlockData
+//TODO wrap link: Projectile - sProjectileData
 
 
 
@@ -161,18 +163,35 @@ OBJECT_TYPE_IMPL_ (Combatant, Rendered (), Interactive (), Physical (),
 //TODO wrap property: AI: Ranged Combat\Ranged Combat Wound Motion = AIRCWound
 //TODO wrap property: AI: Ranged Combat\Ranged Combat Wound Sound = AIRCWndSnd
 
-PROXY_CONFIG (RangedCombatant, minimum_distance, "AIRCProp", "Minimum Distance",
-	int, 10); //TODO Should be a float.
-PROXY_CONFIG (RangedCombatant, ideal_distance, "AIRCProp", "Ideal Distance",
-	int, 40); //TODO Should be a float.
+static Time
+firing_delay_getter (const FieldProxyConfig<Time>::Item& item,
+	const LGMultiBase& multi)
+{
+	return multi.empty () ? item.default_value
+		: Time (reinterpret_cast<const LGMulti<float>&> (multi),
+			Time::SECONDS);
+
+}
+
+static void
+firing_delay_setter (const FieldProxyConfig<Time>::Item&,
+	LGMultiBase& multi, const Time& value)
+{
+	reinterpret_cast<LGMulti<float>&> (multi) = value.fseconds ();
+}
+
+PROXY_CONV_CONFIG (RangedCombatant, minimum_distance,
+	"AIRCProp", "Minimum Distance", float, 10.0, int);
+PROXY_CONV_CONFIG (RangedCombatant, ideal_distance,
+	"AIRCProp", "Ideal Distance", float, 40.0, int);
 PROXY_CONFIG (RangedCombatant, fire_while_moving, "AIRCProp", "Fire While Moving",
 	RangedCombatant::RCFrequency, RCFrequency::NEVER);
-PROXY_CONFIG (RangedCombatant, firing_delay, "AIRCProp", "Firing Delay",
-	float, 0.0f); //TODO Should be a Time.
+PROXY_CONFIG_ (RangedCombatant, firing_delay, "AIRCProp", "Firing Delay",
+	Time, 0ul, 0, firing_delay_getter, firing_delay_setter);
 PROXY_CONFIG (RangedCombatant, cover_desire, "AIRCProp", "Cover Desire",
 	RangedCombatant::RCPriority, RCPriority::MODERATE);
 PROXY_CONFIG (RangedCombatant, decay_speed, "AIRCProp", "Decay Speed",
-	float, 0.8f); //TODO Should be a Time?
+	float, 0.8f); //TODO Should this be a Time?
 PROXY_CONFIG (RangedCombatant, contain_projectile,
 	"AIRCProp", "Contain Projectile", bool, false);
 
@@ -227,8 +246,8 @@ PROXY_CONFIG_ (AIProjectileLink, stack_count, "Ammo", nullptr,
 	int, INFINITE_STACK, 0, AIProjectileLink_stack_count_getter,
 	AIProjectileLink_stack_count_setter);
 PROXY_CONFIG (AIProjectileLink, burst_count, "Burst Count", nullptr, int, 0);
-PROXY_CONFIG (AIProjectileLink, firing_delay, "Firing Delay", nullptr,
-	float, 0.0f); //TODO Should be a Time.
+PROXY_CONFIG_ (AIProjectileLink, firing_delay, "Firing Delay", nullptr,
+	Time, 0ul, 0, firing_delay_getter, firing_delay_setter);
 PROXY_CONFIG (AIProjectileLink, targeting_method, "Targeting Method", nullptr,
 	AIProjectileLink::Method, Method::STRAIGHT_LINE);
 PROXY_CONFIG (AIProjectileLink, accuracy, "Accuracy", nullptr,

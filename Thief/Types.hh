@@ -75,7 +75,8 @@ public:
 
 	THIEF_PROP_FIELD_CONST (int, death_stage);
 
-	void damage (const Object& type, int intensity, const Object& culprit);
+	void damage (const Object& stimulus, int intensity,
+		const Object& culprit);
 	void slay (const Object& culprit);
 	void resurrect (const Object& culprit);
 };
@@ -88,7 +89,7 @@ public:
 	THIEF_MESSAGE_WRAP (DamageMessage);
 
 	Being get_culprit () const;
-	Object get_stimulus () const;
+	Stimulus get_stimulus () const;
 	int get_hit_points () const;
 };
 
@@ -111,10 +112,7 @@ class Interactive : public virtual Rendered
 public:
 	THIEF_OBJECT_TYPE (Interactive)
 
-	enum class InventoryType { JUNK, ITEM, WEAPON };
-	InventoryType get_inventory_type () const;
-
-	enum class FrobAction
+	enum FrobAction
 	{
 		INERT = 0,
 		ADD_TO_INVENTORY = 1,
@@ -127,15 +125,23 @@ public:
 		STIMULATE = 128,
 		DESELECT = 256
 	};
-	THIEF_PROP_FIELD (FrobAction, frob_world_action); //TESTME
-	THIEF_PROP_FIELD (FrobAction, frob_inventory_action); //TESTME
-	THIEF_PROP_FIELD (FrobAction, frob_tool_action); //TESTME
+	THIEF_PROP_FIELD (unsigned, frob_world_action); //TESTME
+	THIEF_PROP_FIELD (unsigned, frob_inventory_action); //TESTME
+	THIEF_PROP_FIELD (unsigned, frob_tool_action); //TESTME
 
 	THIEF_PROP_FIELD (float, pick_distance); //TESTME
 	THIEF_PROP_FIELD (float, pick_bias); //TESTME
 	THIEF_PROP_FIELD (float, tool_reach); //TESTME
 
+	enum class InventoryType { JUNK, ITEM, WEAPON };
+	enum class InventoryDisplay { DEFAULT, ALT_MODEL, ALT_BITMAP };
+
+	THIEF_PROP_FIELD (InventoryType, inventory_type); //TESTME
 	THIEF_PROP_FIELD (bool, droppable); //TESTME
+	THIEF_PROP_FIELD (String, cycle_order); //TESTME
+
+	THIEF_PROP_FIELD (InventoryDisplay, inventory_display); //TESTME
+	THIEF_PROP_FIELD (String, alt_resource); //TESTME
 	THIEF_PROP_FIELD (String, limb_model); //TESTME
 
 	THIEF_PROP_FIELD (int, loot_value_gold); //TESTME
@@ -145,7 +151,7 @@ public:
 	THIEF_PROP_FIELD (int, store_price); //TESTME
 };
 
-class FrobMessage : public Message // "Frob{World,Inv,Tool}{Begin,End}" //TESTME details only
+class FrobMessage : public Message // "Frob{World,Inv,Tool}{Begin,End}"
 {
 public:
 	enum Event { BEGIN, END };
@@ -156,14 +162,14 @@ public:
 		Time duration, bool aborted);
 	THIEF_MESSAGE_WRAP (FrobMessage);
 
-	Event get_event () const;
-	Being get_frobber () const;
-	Interactive get_tool () const;
-	Interactive get_frobbed () const;
-	Location get_frob_loc () const;
-	Location get_obj_loc () const;
-	Time get_duration () const;
-	bool was_aborted () const;
+	Event get_event () const; //TESTME
+	Being get_frobber () const; //TESTME
+	Interactive get_tool () const; //TESTME
+	Interactive get_frobbed () const; //TESTME
+	Location get_frob_loc () const; //TESTME
+	Location get_obj_loc () const; //TESTME
+	Time get_duration () const; //TESTME
+	bool was_aborted () const; //TESTME
 };
 
 
@@ -207,7 +213,7 @@ public:
 		NONE = INT_MAX
 	};
 
-	bool contains (const Object& maybe_contained, bool direct_only = false); //TESTME +direct_only
+	bool contains (const Object& maybe_contained, bool inherit = true); //TESTME inherit==false
 	Type get_contain_type (const Object& maybe_contained);
 
 	struct Content
@@ -306,13 +312,13 @@ public:
 
 	THIEF_PROP_FIELD_CONST (EnvironmentMapZone, environment_map_zone); //TESTME
 
-	THIEF_PROP_FIELD_CONST (Fog::Zone, fog_zone);
+	THIEF_PROP_FIELD_CONST (Fog::Zone, fog_zone); //TESTME
 
-	THIEF_PROP_FIELD_CONST (int, gravity); //TESTME
+	THIEF_PROP_FIELD (int, gravity); //TESTME
 
 	THIEF_PROP_FIELD_CONST (bool, precipitation); //TESTME
 
-	THIEF_PROP_FIELD_CONST (bool, see_through); //TESTME
+	THIEF_PROP_FIELD_CONST (bool, see_through); //TESTME, not const?
 };
 
 class RoomMessage : public Message

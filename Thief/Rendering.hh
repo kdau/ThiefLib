@@ -47,8 +47,8 @@ public:
 
 	THIEF_PROP_FIELD (String, model);
 	THIEF_PROP_FIELD (Vector, model_scale);
-	THIEF_PROP_FIELD_ARRAY (String, replacement_texture, 4);
-	THIEF_PROP_FIELD_ARRAY (float, joint_position, 6);
+	THIEF_PROP_FIELD_ARRAY (String, replacement_texture, 4u);
+	THIEF_PROP_FIELD_ARRAY (float, joint_position, 6u);
 
 	THIEF_PROP_FIELD (float, extra_light);
 	THIEF_PROP_FIELD (bool, extra_light_additive);
@@ -142,6 +142,7 @@ public:
 	THIEF_PROP_FIELD (bool, face_camera); //TESTME
 	THIEF_PROP_FIELD (float, axial_fade); //TESTME
 
+	THIEF_PROP_FIELD (float, scroll_speed); //TESTME
 	THIEF_PROP_FIELD (bool, animation_loop); //TESTME
 };
 

@@ -181,6 +181,9 @@ PROXY_BIT_CONFIG (Bitmapped, double_sided, "BitmapWorld", "Flags", 1u, false);
 PROXY_BIT_CONFIG (Bitmapped, flip_backside_uv, "BitmapWorld", "Flags", 2u, false);
 PROXY_BIT_CONFIG (Bitmapped, face_camera, "BitmapWorld", "Flags", 8u, false);
 PROXY_CONFIG (Bitmapped, axial_fade, "BitmapWorld", "Axial Fade", float, 0.0f);
+PROXY_CONFIG_ (Bitmapped, scroll_speed, "ConveyorVel", nullptr, float, 0.0f,
+	Vector::Component::X, FieldProxyConfig<float>::component_getter,
+	FieldProxyConfig<float>::component_setter);
 PROXY_NEG_BIT_CONFIG (Bitmapped, animation_loop, "BitmapAnimation", "Flags",
 	1u, true);
 
@@ -196,6 +199,7 @@ OBJECT_TYPE_IMPL_ (Bitmapped, Rendered (),
 	PROXY_INIT (flip_backside_uv),
 	PROXY_INIT (face_camera),
 	PROXY_INIT (axial_fade),
+	PROXY_INIT (scroll_speed),
 	PROXY_INIT (animation_loop)
 )
 

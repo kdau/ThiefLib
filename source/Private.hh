@@ -133,7 +133,7 @@ public:
 
 #define PROXY_CONFIG_(Class, Member, Major, Minor, Type, Default, Detail, Getter, Setter) \
 const FieldProxyConfig<Type>::Item \
-Class::I_##Member { Major, Minor, Detail, Default }; \
+Class::I_##Member { Major, Minor, int (Detail), Default }; \
 const FieldProxyConfig<Type> \
 Class::F_##Member { &I_##Member, 1u, Getter, Setter }
 
@@ -141,6 +141,11 @@ Class::F_##Member { &I_##Member, 1u, Getter, Setter }
 PROXY_CONFIG_ (Class, Member, Major, Minor, Type, Default, 0, \
 	FieldProxyConfig<Type>::default_getter<Type>, \
 	FieldProxyConfig<Type>::default_setter<Type>)
+
+#define PROXY_CONV_CONFIG(Class, Member, Major, Minor, Type, Default, StorageType) \
+PROXY_CONFIG_ (Class, Member, Major, Minor, Type, Default, 0, \
+	FieldProxyConfig<Type>::default_getter<StorageType>, \
+	FieldProxyConfig<Type>::default_setter<StorageType>)
 
 #define PROXY_BIT_CONFIG(Class, Member, Major, Minor, Mask, Default) \
 PROXY_CONFIG_ (Class, Member, Major, Minor, bool, Default, Mask, \
@@ -167,6 +172,12 @@ PROXY_ARRAY_CONFIG_ (Class, Member, Count, Type, \
 	FieldProxyConfig<Type>::default_setter<Type>, \
 	__VA_ARGS__)
 
+#define PROXY_CONV_ARRAY_CONFIG(Class, Member, Count, Type, StorageType, ...) \
+PROXY_ARRAY_CONFIG_ (Class, Member, Count, Type, \
+	FieldProxyConfig<Type>::default_getter<StorageType>, \
+	FieldProxyConfig<Type>::default_setter<StorageType>, \
+	__VA_ARGS__)
+
 #define PROXY_BIT_ARRAY_CONFIG(Class, Member, Count, TypeIsBool, ...) \
 PROXY_ARRAY_CONFIG_ (Class, Member, Count, bool, \
 	FieldProxyConfig<bool>::bitmask_getter, \
@@ -177,7 +188,7 @@ PROXY_ARRAY_CONFIG_ (Class, Member, Count, bool, \
 { Major, Minor, 0, Default }
 
 #define PROXY_BIT_ARRAY_ITEM(Major, Minor, Default, Mask) \
-{ Major, Minor, Mask, Default }
+{ Major, Minor, int (Mask), Default }
 
 #define PROXY_INIT(Member) Member (*this, 0u)
 

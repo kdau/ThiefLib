@@ -30,7 +30,6 @@
 
 namespace Thief {
 
-class Being;
 class Marker;
 
 
@@ -146,6 +145,8 @@ public:
 
 	THIEF_PROP_FIELD (float, pore_size); //TESTME
 	THIEF_PROP_FIELD (bool, ai_fires_through); //TESTME
+
+	THIEF_PROP_FIELD (float, conveyor_velocity); //TESTME
 };
 
 THIEF_FLAVORED_LINK (PhysAttach) //TESTME
@@ -214,8 +215,8 @@ public:
 
 	// Dimensions
 
-	THIEF_PROP_FIELD_ARRAY (float, physics_radius, 2);
-	THIEF_PROP_FIELD_ARRAY (Vector, physics_offset, 2);
+	THIEF_PROP_FIELD_ARRAY (float, physics_radius, 2u);
+	THIEF_PROP_FIELD_ARRAY (Vector, physics_offset, 2u);
 
 	// Attributes
 
@@ -268,7 +269,7 @@ public:
 		const Object& launcher, float velocity_mult = 1.0f,
 		const Vector& velocity_add = Vector (), unsigned flags = NONE);
 
-	THIEF_PROP_FIELD_CONST (Being, launcher);
+	THIEF_PROP_FIELD_CONST (Object, launcher);
 };
 
 

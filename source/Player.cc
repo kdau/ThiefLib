@@ -27,6 +27,21 @@ namespace Thief {
 
 
 
+static bool
+Player_arm_visible_getter (const FieldProxyConfig<bool>::Item& item,
+	const LGMultiBase& multi)
+{
+	return multi.empty () ? item.default_value
+		: (reinterpret_cast<const LGMulti<int>&> (multi) != -1);
+}
+
+static void
+Player_arm_visible_setter (const FieldProxyConfig<bool>::Item&,
+	LGMultiBase& multi, const bool& value)
+{
+	reinterpret_cast<LGMulti<int>&> (multi) = value ? 0 : -1;
+}
+
 PROXY_CONFIG (Player, visibility, "AI_Visibility", "Level", int, 0);
 PROXY_CONFIG (Player, vis_light_rating, "AI_Visibility", "Light rating",
 	int, 0);
@@ -36,6 +51,8 @@ PROXY_CONFIG (Player, vis_exposure_rating, "AI_Visibility", "Exposure rating",
 	int, 0);
 PROXY_CONFIG (Player, vis_last_update, "AI_Visibility", "Last update time",
 	Time, 0ul);
+PROXY_CONFIG_ (Player, arm_visible, "INVISIBLE", nullptr, bool, true, 0,
+	Player_arm_visible_getter, Player_arm_visible_setter);
 
 Player::Player ()
 	: Object ("Player"),
@@ -43,7 +60,8 @@ Player::Player ()
 	  PROXY_INIT (vis_light_rating),
 	  PROXY_INIT (vis_movement_rating),
 	  PROXY_INIT (vis_exposure_rating),
-	  PROXY_INIT (vis_last_update)
+	  PROXY_INIT (vis_last_update),
+	  PROXY_INIT (arm_visible)
 {}
 
 
@@ -276,7 +294,6 @@ Player::remove_speed_control (const String& name)
 
 
 // Limb model (player arm)
-//TODO wrap property: Renderer\Invisible = INVISIBLE (as render_arm where true == 0 and false == -1)
 
 bool
 Player::show_arm ()

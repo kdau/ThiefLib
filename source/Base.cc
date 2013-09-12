@@ -184,6 +184,13 @@ Time::operator String () const
 
 // Vector
 
+THIEF_ENUM_CODING (Vector::Component, CODE, CODE,
+	THIEF_ENUM_VALUE (NONE),
+	THIEF_ENUM_VALUE (X, "x"),
+	THIEF_ENUM_VALUE (Y, "y"),
+	THIEF_ENUM_VALUE (Z, "z"),
+)
+
 const double
 Vector::EPSILON = 0.00001;
 
@@ -254,6 +261,30 @@ Vector::operator String () const
 	code << std::fixed << std::setprecision (3)
 		<< '(' << x << ',' << y << ',' << z << ')';
 	return code.str ();
+}
+
+float&
+Vector::operator [] (Component component)
+{
+	switch (component)
+	{
+	case Component::X: return x;
+	case Component::Y: return y;
+	case Component::Z: return z;
+	default: throw std::out_of_range ("bad component");
+	}
+}
+
+const float&
+Vector::operator [] (Component component) const
+{
+	switch (component)
+	{
+	case Component::X: return x;
+	case Component::Y: return y;
+	case Component::Z: return z;
+	default: throw std::out_of_range ("bad component");
+	}
 }
 
 
@@ -543,15 +574,13 @@ LGMulti<Empty>::LGMulti (const Empty&)
 
 
 
-// FieldProxyConfigBase
+// FieldProxyConfig
 
 template<>
 bool
-FieldProxyConfig<bool>::bitmask_getter (const Item& _item,
+FieldProxyConfig<bool>::bitmask_getter (const Item& item,
 	const LGMultiBase& _multi)
 {
-	auto& item = reinterpret_cast<const FieldProxyConfig<bool>::Item&>
-		(_item);
 	auto& multi = reinterpret_cast<const LGMulti<unsigned>&> (_multi);
 
 	if (multi.empty ()) return item.default_value;
@@ -564,11 +593,9 @@ FieldProxyConfig<bool>::bitmask_getter (const Item& _item,
 
 template<>
 void
-FieldProxyConfig<bool>::bitmask_setter (const Item& _item, LGMultiBase& _multi,
+FieldProxyConfig<bool>::bitmask_setter (const Item& item, LGMultiBase& _multi,
 	const bool& value)
 {
-	auto& item = reinterpret_cast<const FieldProxyConfig<bool>::Item&>
-		(_item);
 	auto& multi = reinterpret_cast<LGMulti<unsigned>&> (_multi);
 
 	bool negate = item.detail < 0;
@@ -577,6 +604,27 @@ FieldProxyConfig<bool>::bitmask_setter (const Item& _item, LGMultiBase& _multi,
 	unsigned raw_field = !multi.empty () ? unsigned (multi) : 0u;
 	bool raw_bit = negate ? !value : value;
 	multi = raw_bit ? (raw_field | bitmask) : (raw_field & ~bitmask);
+}
+
+template<>
+float
+FieldProxyConfig<float>::component_getter (const Item& item,
+	const LGMultiBase& multi)
+{
+	return multi.empty () ? item.default_value
+		: Vector (reinterpret_cast<const LGMulti<Vector>&> (multi))
+			[Vector::Component (item.detail)];
+}
+
+template<>
+void
+FieldProxyConfig<float>::component_setter (const Item& item, LGMultiBase& _multi,
+	const float& value)
+{
+	auto& multi = reinterpret_cast<LGMulti<Vector>&> (_multi);
+	Vector raw = multi;
+	raw [Vector::Component (item.detail)] = value;
+	multi = raw;
 }
 
 

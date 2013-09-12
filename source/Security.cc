@@ -110,7 +110,6 @@ Key::try_key_operation (Operation operation, const Lockable& lock)
 
 
 // Door
-//TODO wrap property: Door\Rotating = RotDoor
 
 THIEF_ENUM_CODING (Door::State, CODE, CODE,
 	THIEF_ENUM_VALUE (CLOSED, "closed"),
@@ -238,12 +237,8 @@ DoorMessage::get_old_state () const
 		MESSAGE_AS (sDoorMsg)->PrevActionType);
 }
 
-
-
-// TranslatingDoor
-
 static Room
-TranslatingDoor_room_getter (const FieldProxyConfig<Room>::Item& item,
+Door_room_getter (const FieldProxyConfig<Room>::Item& item,
 	const LGMultiBase& multi)
 {
 	if (multi.empty ()) return item.default_value;
@@ -251,21 +246,64 @@ TranslatingDoor_room_getter (const FieldProxyConfig<Room>::Item& item,
 	return (value == -1) ? Object::NONE : value;
 }
 
+
+
+// RotatingDoor
+
+PROXY_CONFIG (RotatingDoor, axis, "RotDoor", "Axis", Door::Axis, Axis::X);
+PROXY_CONFIG (RotatingDoor, initial_angle, "RotDoor", "Closed Angle",
+	float, 0.0f);
+PROXY_CONFIG (RotatingDoor, open_angle, "RotDoor", "Open Angle",
+	float, 0.0f);
+PROXY_CONFIG (RotatingDoor, clockwise, "RotDoor", "Clockwise?", bool, false);
+PROXY_CONFIG (RotatingDoor, speed, "RotDoor", "Base Speed", float, 0.0f);
+PROXY_CONFIG (RotatingDoor, push_mass, "RotDoor", "Push Mass",
+	float, 25.0f);
+PROXY_CONFIG (RotatingDoor, blocks_vision, "RotDoor", "Blocks Vision?",
+	bool, true);
+PROXY_CONFIG (RotatingDoor, blocks_sound_pct, "RotDoor", "Blocks Sound %",
+	float, 60.0f);
+PROXY_ARRAY_CONFIG_ (RotatingDoor, room, 2u, Room, Door_room_getter, nullptr,
+	PROXY_ARRAY_ITEM ("RotDoor", "Room ID #1", Object::NONE),
+	PROXY_ARRAY_ITEM ("RotDoor", "Room ID #2", Object::NONE)
+);
+
+OBJECT_TYPE_IMPL_ (RotatingDoor, Physical (), OBBPhysical (), Rendered (),
+	Interactive (), Damageable (), Lockable (), Door (),
+	PROXY_INIT (axis),
+	PROXY_INIT (initial_angle),
+	PROXY_INIT (open_angle),
+	PROXY_INIT (clockwise),
+	PROXY_INIT (speed),
+	PROXY_INIT (push_mass),
+	PROXY_INIT (blocks_vision),
+	PROXY_INIT (blocks_sound_pct),
+	PROXY_ARRAY_INIT (room, 2)
+)
+
+bool
+RotatingDoor::is_rotating_door () const
+{
+	return axis.exists ();
+}
+
+
+
+// TranslatingDoor
+
 PROXY_CONFIG (TranslatingDoor, axis, "TransDoor", "Axis", Door::Axis, Axis::X);
 PROXY_CONFIG (TranslatingDoor, initial_position, "TransDoor", "Closed Position",
 	float, 0.0f);
 PROXY_CONFIG (TranslatingDoor, open_position, "TransDoor", "Open Position",
 	float, 0.0f);
-PROXY_CONFIG (TranslatingDoor, base_speed, "TransDoor", "Base Speed",
-	float, 0.0f);
+PROXY_CONFIG (TranslatingDoor, speed, "TransDoor", "Base Speed", float, 0.0f);
 PROXY_CONFIG (TranslatingDoor, push_mass, "TransDoor", "Push Mass",
 	float, 25.0f);
 PROXY_CONFIG (TranslatingDoor, blocks_vision, "TransDoor", "Blocks Vision?",
 	bool, true);
 PROXY_CONFIG (TranslatingDoor, blocks_sound_pct, "TransDoor", "Blocks Sound %",
 	float, 60.0f);
-PROXY_ARRAY_CONFIG_ (TranslatingDoor, room, 2u, Room,
-	TranslatingDoor_room_getter, nullptr,
+PROXY_ARRAY_CONFIG_ (TranslatingDoor, room, 2u, Room, Door_room_getter, nullptr,
 	PROXY_ARRAY_ITEM ("TransDoor", "Room ID #1", Object::NONE),
 	PROXY_ARRAY_ITEM ("TransDoor", "Room ID #2", Object::NONE)
 );
@@ -275,7 +313,7 @@ OBJECT_TYPE_IMPL_ (TranslatingDoor, Physical (), OBBPhysical (), Rendered (),
 	PROXY_INIT (axis),
 	PROXY_INIT (initial_position),
 	PROXY_INIT (open_position),
-	PROXY_INIT (base_speed),
+	PROXY_INIT (speed),
 	PROXY_INIT (push_mass),
 	PROXY_INIT (blocks_vision),
 	PROXY_INIT (blocks_sound_pct),
@@ -290,16 +328,71 @@ TranslatingDoor::is_translating_door () const
 
 
 
-// BasicPickable
-//TODO wrap property: Dark GameSys\PickCfg = PickCfg
-//TODO wrap property: Dark GameSys\PickState = PickState (does it apply below too?)
+// Pickable
 
-OBJECT_TYPE_IMPL_ (BasicPickable, Rendered (), Interactive (), Lockable ())
+PROXY_CONFIG (Pickable, current_stage, "PickState", "CurTumbler/State", int, 0);
+PROXY_CONFIG (Pickable, current_pin, "PickState", "Pin", int, 0);
+PROXY_CONFIG (Pickable, picked, "PickState", "Done", bool, false);
+PROXY_CONFIG (Pickable, random_time, "PickState", "RandTime", Time, 0ul);
+PROXY_CONFIG (Pickable, total_time, "PickState", "TotalTime", Time, 0ul);
+PROXY_CONFIG (Pickable, stage_time, "PickState", "StageTime", Time, 0ul);
+PROXY_CONFIG (Pickable, picker, "PickState", "Picker", Being, Object::NONE);
+
+OBJECT_TYPE_IMPL_ (Pickable, Rendered (), Interactive (), Lockable (),
+	PROXY_INIT (current_stage),
+	PROXY_INIT (current_pin),
+	PROXY_INIT (picked),
+	PROXY_INIT (random_time),
+	PROXY_INIT (total_time),
+	PROXY_INIT (stage_time),
+	PROXY_INIT (picker)
+)
+
+bool
+Pickable::is_pickable () const
+{
+	return BasicPickable (*this).is_basic_pickable () ||
+		AdvPickable (*this).is_advanced_pickable;
+}
+
+
+
+// BasicPickable
+
+PROXY_ARRAY_CONFIG (BasicPickable, pick_bits, 3u, unsigned,
+	PROXY_ARRAY_ITEM ("PickCfg", "LockBits 1", 0u),
+	PROXY_ARRAY_ITEM ("PickCfg", "LockBits 2", 0u),
+	PROXY_ARRAY_ITEM ("PickCfg", "LockBits 3", 0u));
+PROXY_ARRAY_CONFIG (BasicPickable, pin_count, 3u, int,
+	PROXY_ARRAY_ITEM ("PickCfg", "Pins 1", 0),
+	PROXY_ARRAY_ITEM ("PickCfg", "Pins 2", 0),
+	PROXY_ARRAY_ITEM ("PickCfg", "Pins 3", 0));
+PROXY_CONV_ARRAY_CONFIG (BasicPickable, time_percent, 3u, float, int,
+	PROXY_ARRAY_ITEM ("PickCfg", "TimePct 1", 0.0f),
+	PROXY_ARRAY_ITEM ("PickCfg", "TimePct 2", 0.0f),
+	PROXY_ARRAY_ITEM ("PickCfg", "TimePct 3", 0.0f));
+PROXY_BIT_ARRAY_CONFIG (BasicPickable, reset_on_fail, 3u, bool,
+	PROXY_BIT_ARRAY_ITEM ("PickCfg", "Flags 1", false, 1u),
+	PROXY_BIT_ARRAY_ITEM ("PickCfg", "Flags 2", false, 1u),
+	PROXY_BIT_ARRAY_ITEM ("PickCfg", "Flags 3", false, 1u));
+PROXY_BIT_ARRAY_CONFIG (BasicPickable, randomize_time, 3u, bool,
+	PROXY_BIT_ARRAY_ITEM ("PickCfg", "Flags 1", false, 2u),
+	PROXY_BIT_ARRAY_ITEM ("PickCfg", "Flags 2", false, 2u),
+	PROXY_BIT_ARRAY_ITEM ("PickCfg", "Flags 3", false, 2u));
+
+OBJECT_TYPE_IMPL_ (BasicPickable, Rendered (), Interactive (), Lockable (),
+	Pickable (),
+	PROXY_ARRAY_INIT (pick_bits, 3),
+	PROXY_ARRAY_INIT (pin_count, 3),
+	PROXY_ARRAY_INIT (time_percent, 3),
+	PROXY_ARRAY_INIT (reset_on_fail, 3),
+	PROXY_ARRAY_INIT (randomize_time, 3)
+)
 
 bool
 BasicPickable::is_basic_pickable () const
 {
-	return ObjectProperty ("PickCfg", *this).exists () && //TODO Use a PropField.
+	return pick_bits [0u].exists () &&
 		!AdvPickable (*this).is_advanced_pickable;
 }
 
@@ -307,14 +400,30 @@ BasicPickable::is_basic_pickable () const
 
 // AdvPickable
 //TODO wrap property: Dark Gamesys\AdvPickSoundCfg = AdvPickSoundCfg (propdefs.h: sAdvPickSoundCfg)
-//TODO wrap property: Dark Gamesys\AdvPickStateCfg = AdvPickStateCfg (propdefs.h: sAdvPickStateCfg)
 //TODO wrap property: Dark Gamesys\AdvPickTransCfg = AdvPickTransCfg (propdefs.h: sAdvPickTransCfg)
 
 PROXY_CONFIG (AdvPickable, is_advanced_pickable, "AdvPickStateCfg",
 	"Enable Advanced System", bool, false);
+PROXY_ARRAY_CONFIG (AdvPickable, pick_bits, 3u, unsigned,
+	PROXY_ARRAY_ITEM ("AdvPickStateCfg", "First Pick Src", 0u),
+	PROXY_ARRAY_ITEM ("AdvPickStateCfg", "Second Pick Src", 0u),
+	PROXY_ARRAY_ITEM ("AdvPickStateCfg", "Third Pick Src", 0u));
+PROXY_ARRAY_CONFIG (AdvPickable, stage_time, 9u, Time,
+	PROXY_ARRAY_ITEM ("AdvPickStateCfg", "Time 0", 0ul),
+	PROXY_ARRAY_ITEM ("AdvPickStateCfg", "Time 1", 0ul),
+	PROXY_ARRAY_ITEM ("AdvPickStateCfg", "Time 2", 0ul),
+	PROXY_ARRAY_ITEM ("AdvPickStateCfg", "Time 3", 0ul),
+	PROXY_ARRAY_ITEM ("AdvPickStateCfg", "Time 4", 0ul),
+	PROXY_ARRAY_ITEM ("AdvPickStateCfg", "Time 5", 0ul),
+	PROXY_ARRAY_ITEM ("AdvPickStateCfg", "Time 6", 0ul),
+	PROXY_ARRAY_ITEM ("AdvPickStateCfg", "Time 7", 0ul),
+	PROXY_ARRAY_ITEM ("AdvPickStateCfg", "Time 8", 0ul));
 
 OBJECT_TYPE_IMPL_ (AdvPickable, Rendered (), Interactive (), Lockable (),
-	PROXY_INIT (is_advanced_pickable)
+	Pickable (),
+	PROXY_INIT (is_advanced_pickable),
+	PROXY_ARRAY_INIT (pick_bits, 3),
+	PROXY_ARRAY_INIT (stage_time, 9)
 )
 
 

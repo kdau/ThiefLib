@@ -126,6 +126,30 @@ public:
 
 
 
+// RotatingDoor
+
+class RotatingDoor : public Door
+{
+public:
+	THIEF_OBJECT_TYPE (RotatingDoor)
+	bool is_rotating_door () const;
+
+	THIEF_PROP_FIELD (Axis, axis); //TESTME
+	THIEF_PROP_FIELD_CONST (float, initial_angle); //TESTME
+	THIEF_PROP_FIELD (float, open_angle); //TESTME
+	THIEF_PROP_FIELD (bool, clockwise); //TESTME
+
+	THIEF_PROP_FIELD (float, speed);
+	THIEF_PROP_FIELD (float, push_mass); //TESTME
+
+	THIEF_PROP_FIELD (bool, blocks_vision); //TESTME needs rebuild?
+	THIEF_PROP_FIELD (float, blocks_sound_pct); //TESTME
+
+	THIEF_PROP_FIELD_ARRAY_CONST (Room, room, 2u); //TESTME
+};
+
+
+
 // TranslatingDoor
 
 class TranslatingDoor : public Door
@@ -138,37 +162,69 @@ public:
 	THIEF_PROP_FIELD_CONST (float, initial_position); //TESTME
 	THIEF_PROP_FIELD (float, open_position); //TESTME
 
-	THIEF_PROP_FIELD (float, base_speed);
+	THIEF_PROP_FIELD (float, speed);
 	THIEF_PROP_FIELD (float, push_mass); //TESTME
 
 	THIEF_PROP_FIELD (bool, blocks_vision); //TESTME needs rebuild?
 	THIEF_PROP_FIELD (float, blocks_sound_pct); //TESTME
 
-	THIEF_PROP_FIELD_ARRAY_CONST (Room, room, 2); //TESTME
+	THIEF_PROP_FIELD_ARRAY_CONST (Room, room, 2u); //TESTME
+};
+
+
+
+// Pickable
+
+class Pickable : public virtual Interactive, public virtual Lockable
+{
+public:
+	THIEF_OBJECT_TYPE (Pickable)
+	bool is_pickable () const; //TESTME
+
+	THIEF_PROP_FIELD (int, current_stage); //TESTME
+	THIEF_PROP_FIELD (int, current_pin); //TESTME
+	THIEF_PROP_FIELD (bool, picked); //TESTME
+
+	THIEF_PROP_FIELD (Time, random_time); //TESTME
+	THIEF_PROP_FIELD (Time, total_time); //TESTME
+	THIEF_PROP_FIELD (Time, stage_time); //TESTME
+
+	THIEF_PROP_FIELD (Being, picker); //TESTME
 };
 
 
 
 // BasicPickable
 
-class BasicPickable : public virtual Interactive, public virtual Lockable
+class BasicPickable : public Pickable
 {
 public:
 	THIEF_OBJECT_TYPE (BasicPickable)
 	bool is_basic_pickable () const; //TESTME
+
+	// A basic-pickable lock has three stages with independent settings.
+	THIEF_PROP_FIELD_ARRAY (unsigned, pick_bits, 3u); //TESTME
+	THIEF_PROP_FIELD_ARRAY (int, pin_count, 3u); //TESTME
+	THIEF_PROP_FIELD_ARRAY (float, time_percent, 3u); //TESTME
+	THIEF_PROP_FIELD_ARRAY (bool, reset_on_fail, 3u); //TESTME
+	THIEF_PROP_FIELD_ARRAY (bool, randomize_time, 3u); //TESTME
 };
 
 
 
 // AdvPickable
 
-class AdvPickable : public virtual Interactive, public virtual Lockable
+class AdvPickable : public Pickable
 {
 public:
 	THIEF_OBJECT_TYPE (AdvPickable)
 	THIEF_PROP_FIELD (bool, is_advanced_pickable);
 
+	enum class Pick { P1, P2, P3 };
+	THIEF_PROP_FIELD_ARRAY (unsigned, pick_bits, 3u); //TESTME
+
 	enum class Stage { S0, S1, S2, S3, S4, S5, S6, S7, UNLOCKED };
+	THIEF_PROP_FIELD_ARRAY (Time, stage_time, 9u); //TESTME
 };
 
 class PickMessage : public Message // "PickStateChange"

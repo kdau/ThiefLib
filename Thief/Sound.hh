@@ -123,7 +123,7 @@ public:
 
 	THIEF_PROP_FIELD (bool, active); //TESTME
 
-	THIEF_PROP_FIELD_ARRAY (String, ambient_schema, 3); //TESTME
+	THIEF_PROP_FIELD_ARRAY (String, ambient_schema, 3u); //TESTME
 
 	THIEF_PROP_FIELD (int, ambient_radius); //TESTME
 	THIEF_PROP_FIELD (int, ambient_volume); //TESTME
