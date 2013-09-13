@@ -164,11 +164,11 @@ public:
 		const Object& source, const Object& dest);
 	THIEF_MESSAGE_WRAP (LinkMessage);
 
-	Event get_event () const;
-	Flavor get_flavor () const;
-	Link::Number get_link () const;
-	Object get_source () const;
-	Object get_dest () const;
+	const Event event;
+	const Flavor flavor;
+	const Link::Number link;
+	const Object source;
+	const Object dest;
 };
 
 

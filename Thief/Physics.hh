@@ -30,8 +30,6 @@
 
 namespace Thief {
 
-class Marker;
-
 
 
 class Physical : public virtual Object
@@ -192,16 +190,16 @@ public:
 	MovingTerrainMessage (const Object& waypoint);
 	THIEF_MESSAGE_WRAP (MovingTerrainMessage);
 
-	Marker get_waypoint () const;
+	const Object waypoint;
 };
 
 class WaypointMessage : public Message // "WaypointReached" //TESTME
 {
 public:
-	WaypointMessage (const MovingTerrain& moving_terrain);
+	WaypointMessage (const Object& moving_terrain);
 	THIEF_MESSAGE_WRAP (WaypointMessage);
 
-	MovingTerrain get_moving_terrain () const;
+	const MovingTerrain moving_terrain;
 };
 
 

@@ -247,35 +247,22 @@ AmbientHacked::is_ambient_hacked () const
 
 // SchemaDoneMessage
 
-MESSAGE_WRAPPER_IMPL (SchemaDoneMessage, sSchemaDoneMsg)
+MESSAGE_WRAPPER_IMPL (SchemaDoneMessage, sSchemaDoneMsg),
+	location (LGVector (&MESSAGE_AS (sSchemaDoneMsg)->coordinates)),
+	sound_source (MESSAGE_AS (sSchemaDoneMsg)->targetObject),
+	schema_name (MESSAGE_AS (sSchemaDoneMsg)->name),
+	schema (schema_name)
+{}
 
-SchemaDoneMessage::SchemaDoneMessage (const Vector& location,
-		const Object& sound_source, const char* schema_name)
-	: Message (new sSchemaDoneMsg ())
+SchemaDoneMessage::SchemaDoneMessage (const Vector& _location,
+		const Object& _sound_source, const String& _schema_name)
+	: Message (new sSchemaDoneMsg ()), location (_location),
+	  sound_source (_sound_source), schema_name (_schema_name)
 {
 	message->message = "SchemaDone";
 	MESSAGE_AS (sSchemaDoneMsg)->coordinates = LGVector (location);
 	MESSAGE_AS (sSchemaDoneMsg)->targetObject = sound_source.number;
-	MESSAGE_AS (sSchemaDoneMsg)->name = schema_name;
-}
-
-Vector
-SchemaDoneMessage::get_location () const
-{
-	return LGVector (&MESSAGE_AS (sSchemaDoneMsg)->coordinates);
-}
-
-MESSAGE_ACCESSOR (Object, SchemaDoneMessage, get_sound_source,
-	sSchemaDoneMsg, targetObject)
-
-MESSAGE_ACCESSOR (String, SchemaDoneMessage, get_schema_name,
-	sSchemaDoneMsg, name)
-
-SoundSchema
-SchemaDoneMessage::get_schema () const
-{
-	const char* schema_name = MESSAGE_AS (sSchemaDoneMsg)->name;
-	return schema_name ? SoundSchema (schema_name) : SoundSchema ();
+	MESSAGE_AS (sSchemaDoneMsg)->name = schema_name.data ();
 }
 
 

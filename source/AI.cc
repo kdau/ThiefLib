@@ -605,11 +605,16 @@ DetailAttachementLink::create (const Object& source, const Object& dest,
 
 // AIActionResultMessage
 
-MESSAGE_WRAPPER_IMPL (AIActionResultMessage, sAIObjActResultMsg)
+MESSAGE_WRAPPER_IMPL (AIActionResultMessage, sAIObjActResultMsg),
+	action (Action (MESSAGE_AS (sAIObjActResultMsg)->action)),
+	result (Result (MESSAGE_AS (sAIObjActResultMsg)->result)),
+	target (MESSAGE_AS (sAIObjActResultMsg)->target)
+{}
 
-AIActionResultMessage::AIActionResultMessage (Action action, Result result,
-		const Object& target, const LGMultiBase& data)
-	: Message (new sAIObjActResultMsg ())
+AIActionResultMessage::AIActionResultMessage (Action _action, Result _result,
+		const Object& _target, const LGMultiBase& data)
+	: Message (new sAIObjActResultMsg ()), action (_action),
+	  result (_result), target (_target)
 {
 	message->message = "ObjActResult";
 	MESSAGE_AS (sAIObjActResultMsg)->action = eAIAction (action);
@@ -617,13 +622,6 @@ AIActionResultMessage::AIActionResultMessage (Action action, Result result,
 	MESSAGE_AS (sAIObjActResultMsg)->result_data = data;
 	MESSAGE_AS (sAIObjActResultMsg)->target = target.number;
 }
-
-MESSAGE_ACCESSOR (AIActionResultMessage::Action, AIActionResultMessage,
-	get_action, sAIObjActResultMsg, action)
-MESSAGE_ACCESSOR (AIActionResultMessage::Result, AIActionResultMessage,
-	get_result, sAIObjActResultMsg, result)
-MESSAGE_ACCESSOR (Object, AIActionResultMessage, get_target,
-	sAIObjActResultMsg, target)
 
 void
 AIActionResultMessage::_get_result_data (LGMultiBase& value) const
@@ -637,31 +635,26 @@ AIActionResultMessage::_get_result_data (LGMultiBase& value) const
 
 MESSAGE_WRAPPER_IMPL_ (AIAlertnessMessage,
 	MESSAGE_TYPENAME_TEST ("sAIAlertnessMsg") ||
-	MESSAGE_TYPENAME_TEST ("sAIHighAlertMsg"))
+	MESSAGE_TYPENAME_TEST ("sAIHighAlertMsg")),
+	high_alert (MESSAGE_NAME_TEST ("HighAlert")),
+	new_level (AI::Alert (MESSAGE_AS (sAIAlertnessMsg)->level)),
+	old_level (AI::Alert (MESSAGE_AS (sAIAlertnessMsg)->oldLevel))
+{}
 
-AIAlertnessMessage::AIAlertnessMessage (AI::Alert new_level,
-	AI::Alert old_level, bool high_alert)
+AIAlertnessMessage::AIAlertnessMessage (AI::Alert _new_level,
+	AI::Alert _old_level, bool _high_alert)
 	: Message (high_alert
 		? static_cast<sScrMsg*> (new sAIHighAlertMsg ())
-		: static_cast<sScrMsg*> (new sAIAlertnessMsg ()))
+		: static_cast<sScrMsg*> (new sAIAlertnessMsg ())),
+	  high_alert (_high_alert), new_level (_new_level),
+	  old_level (_old_level)
 {
 	message->message = high_alert ? "HighAlert" : "Alertness";
 
-	// Since the structures are identical, branching casts aren't needed.
+	// Since the structures are identical, the same casts can be used.
 	MESSAGE_AS (sAIAlertnessMsg)->level = eAIScriptAlertLevel (new_level);
 	MESSAGE_AS (sAIAlertnessMsg)->oldLevel = eAIScriptAlertLevel (old_level);
 }
-
-bool
-AIAlertnessMessage::is_high_alert () const
-{
-	return CIString (get_name ()) == "HighAlert";
-}
-
-MESSAGE_ACCESSOR (AI::Alert, AIAlertnessMessage, get_new_level,
-	sAIAlertnessMsg, level)
-MESSAGE_ACCESSOR (AI::Alert, AIAlertnessMessage, get_old_level,
-	sAIAlertnessMsg, oldLevel)
 
 
 
@@ -672,29 +665,34 @@ MESSAGE_ACCESSOR (AI::Alert, AIAlertnessMessage, get_old_level,
 
 // AIModeMessage
 
-MESSAGE_WRAPPER_IMPL (AIModeMessage, sAIModeChangeMsg)
+MESSAGE_WRAPPER_IMPL (AIModeMessage, sAIModeChangeMsg),
+	new_mode (AI::Mode (MESSAGE_AS (sAIModeChangeMsg)->mode)),
+	old_mode (AI::Mode (MESSAGE_AS (sAIModeChangeMsg)->previous_mode))
+{}
 
-AIModeMessage::AIModeMessage (AI::Mode new_mode, AI::Mode old_mode)
-	: Message (new sAIModeChangeMsg ())
+AIModeMessage::AIModeMessage (AI::Mode _new_mode, AI::Mode _old_mode)
+	: Message (new sAIModeChangeMsg ()), new_mode (_new_mode),
+	  old_mode (_old_mode)
 {
 	message->message = "AIModeChange";
 	MESSAGE_AS (sAIModeChangeMsg)->mode = eAIMode (new_mode);
 	MESSAGE_AS (sAIModeChangeMsg)->previous_mode = eAIMode (old_mode);
 }
 
-MESSAGE_ACCESSOR (AI::Mode, AIModeMessage, get_new_mode, sAIModeChangeMsg, mode)
-MESSAGE_ACCESSOR (AI::Mode, AIModeMessage, get_old_mode,
-	sAIModeChangeMsg, previous_mode)
-
 
 
 // AIMotionMessage
 
-MESSAGE_WRAPPER_IMPL (AIMotionMessage, sBodyMsg)
+MESSAGE_WRAPPER_IMPL (AIMotionMessage, sBodyMsg),
+	event (Event (MESSAGE_AS (sBodyMsg)->ActionType)),
+	motion (MESSAGE_AS (sBodyMsg)->MotionName),
+	motion_flag (MESSAGE_AS (sBodyMsg)->FlagValue)
+{}
 
-AIMotionMessage::AIMotionMessage (Event event, const char* motion_name,
-		int motion_flag)
-	: Message (new sBodyMsg ())
+AIMotionMessage::AIMotionMessage (Event _event, const String& _motion,
+		int _motion_flag)
+	: Message (new sBodyMsg ()), event (_event), motion (_motion),
+	  motion_flag (_motion_flag)
 {
 	switch (event)
 	{
@@ -704,62 +702,54 @@ AIMotionMessage::AIMotionMessage (Event event, const char* motion_name,
 	default:           message->message = "MotionEnd"; break;
 	}
 	MESSAGE_AS (sBodyMsg)->ActionType = sBodyMsg::eBodyAction (event);
-	MESSAGE_AS (sBodyMsg)->MotionName = motion_name;
+	MESSAGE_AS (sBodyMsg)->MotionName = motion.data ();
 	MESSAGE_AS (sBodyMsg)->FlagValue = motion_flag;
 }
-
-MESSAGE_ACCESSOR (AIMotionMessage::Event, AIMotionMessage, get_event,
-	sBodyMsg, ActionType)
-MESSAGE_ACCESSOR (const char*, AIMotionMessage, get_motion_name,
-	sBodyMsg, MotionName)
-MESSAGE_ACCESSOR (int, AIMotionMessage, get_motion_flag, sBodyMsg, FlagValue)
 
 
 
 // AIPatrolPointMessage
 
-MESSAGE_WRAPPER_IMPL (AIPatrolPointMessage, sAIPatrolPointMsg)
+MESSAGE_WRAPPER_IMPL (AIPatrolPointMessage, sAIPatrolPointMsg),
+	patrol_point (MESSAGE_AS (sAIPatrolPointMsg)->patrolObj)
+{}
 
-AIPatrolPointMessage::AIPatrolPointMessage (const Object& patrol_point)
-	: Message (new sAIPatrolPointMsg ())
+AIPatrolPointMessage::AIPatrolPointMessage (const Object& _patrol_point)
+	: Message (new sAIPatrolPointMsg ()), patrol_point (_patrol_point)
 {
 	message->message = "PatrolPoint";
 	MESSAGE_AS (sAIPatrolPointMsg)->patrolObj = patrol_point.number;
 }
 
-MESSAGE_ACCESSOR (Marker, AIPatrolPointMessage, get_patrol_point,
-	sAIPatrolPointMsg, patrolObj)
-
 
 
 // AISignalMessage
 
-MESSAGE_WRAPPER_IMPL (AISignalMessage, sAISignalMsg)
+MESSAGE_WRAPPER_IMPL (AISignalMessage, sAISignalMsg),
+	signal (MESSAGE_AS (sAISignalMsg)->signal)
+{}
 
-AISignalMessage::AISignalMessage (const char* signal)
-	: Message (new sAISignalMsg ())
+AISignalMessage::AISignalMessage (const String& _signal)
+	: Message (new sAISignalMsg ()), signal (_signal)
 {
 	message->message = "SignalAI";
-	MESSAGE_AS (sAISignalMsg)->signal = signal;
+	MESSAGE_AS (sAISignalMsg)->signal = signal.data ();
 }
-
-MESSAGE_ACCESSOR (String, AISignalMessage, get_signal, sAISignalMsg, signal)
 
 
 
 // ConversationMessage
 
-MESSAGE_WRAPPER_IMPL (ConversationMessage, ConversationMessageImpl)
+MESSAGE_WRAPPER_IMPL (ConversationMessage, ConversationMessageImpl),
+	conversation (MESSAGE_AS (ConversationMessageImpl)->conversation)
+{}
 
-ConversationMessage::ConversationMessage (const Object& conversation)
-	: Message (new ConversationMessageImpl ())
+ConversationMessage::ConversationMessage (const Object& _conversation)
+	: Message (new ConversationMessageImpl ()), conversation (_conversation)
 {
 	message->message = "ConversationEnd";
 	MESSAGE_AS (ConversationMessageImpl)->conversation = conversation;
 }
-
-MESSAGE_ACCESSOR (Conversation, ConversationMessage, get_conversation,
-	ConversationMessageImpl, conversation)
 
 
 

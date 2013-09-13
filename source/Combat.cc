@@ -88,10 +88,26 @@ AIAttackLink::create (const Object& source, const Object& dest,
 
 // AIAttackMessage
 
-MESSAGE_WRAPPER_IMPL (AIAttackMessage, sAttackMsg)
+static AIAttackMessage::Event
+AIAttackMessage_get_event (const char* _name)
+{
+	CIString name = _name ? _name : "";
+	if (name == "StartWindup") return AIAttackMessage::WINDUP;
+	if (name == "StartAttack") return AIAttackMessage::START;
+	if (name == "EndAttack") return AIAttackMessage::END;
+	return AIAttackMessage::Event (-1);
+}
 
-AIAttackMessage::AIAttackMessage (Event event, const Object& weapon)
-	: Message (new sAttackMsg ())
+MESSAGE_WRAPPER_IMPL (AIAttackMessage, sAttackMsg),
+	event (AIAttackMessage_get_event (message->message)),
+	weapon (MESSAGE_AS (sAttackMsg)->weapon)
+{
+	if (int (event) == -1)
+		throw MessageWrapError (message, typeid (*this), "invalid event");
+}
+
+AIAttackMessage::AIAttackMessage (Event _event, const Object& _weapon)
+	: Message (new sAttackMsg ()), event (_event), weapon (_weapon)
 {
 	switch (event)
 	{
@@ -102,18 +118,6 @@ AIAttackMessage::AIAttackMessage (Event event, const Object& weapon)
 	}
 	MESSAGE_AS (sAttackMsg)->weapon = weapon.number;
 }
-
-AIAttackMessage::Event
-AIAttackMessage::get_event () const
-{
-	CIString name = get_name ();
-	if (name == "StartWindup") return WINDUP;
-	if (name == "StartAttack") return START;
-	if (name == "EndAttack") return END;
-	throw MessageWrapError (message, typeid (*this), "invalid event");
-}
-
-MESSAGE_ACCESSOR (Weapon, AIAttackMessage, get_weapon, sAttackMsg, weapon)
 
 
 

@@ -229,11 +229,17 @@ PropFieldBase::set (Object& object, const char* property, const char* field,
 // PropertyMessage
 
 MESSAGE_WRAPPER_IMPL_ (PropertyMessage,
-	MESSAGE_TYPENAME_TEST ("PropertyMessageImpl"))
+	MESSAGE_TYPENAME_TEST ("PropertyMessageImpl")),
+	event (MESSAGE_AS (PropertyMessageImpl)->event),
+	inherited (MESSAGE_AS (PropertyMessageImpl)->inherited),
+	property (MESSAGE_AS (PropertyMessageImpl)->property),
+	object (MESSAGE_AS (PropertyMessageImpl)->object)
+{}
 
-PropertyMessage::PropertyMessage (Event event, bool inherited,
-		const Property& property, const Object& object)
-	: Message (new PropertyMessageImpl ())
+PropertyMessage::PropertyMessage (Event _event, bool _inherited,
+		const Property& _property, const Object& _object)
+	: Message (new PropertyMessageImpl ()), event (_event),
+	  inherited (_inherited), property (_property), object (_object)
 {
 	message->message = "PropertyChange";
 	MESSAGE_AS (PropertyMessageImpl)->event = event;
@@ -241,18 +247,6 @@ PropertyMessage::PropertyMessage (Event event, bool inherited,
 	MESSAGE_AS (PropertyMessageImpl)->property = property;
 	MESSAGE_AS (PropertyMessageImpl)->object = object;
 }
-
-MESSAGE_ACCESSOR (PropertyMessage::Event, PropertyMessage, get_event,
-	PropertyMessageImpl, event)
-
-MESSAGE_ACCESSOR (bool, PropertyMessage, is_inherited,
-	PropertyMessageImpl, inherited)
-
-MESSAGE_ACCESSOR (Property, PropertyMessage, get_property,
-	PropertyMessageImpl, property)
-
-MESSAGE_ACCESSOR (Object, PropertyMessage, get_object,
-	PropertyMessageImpl, object)
 
 
 

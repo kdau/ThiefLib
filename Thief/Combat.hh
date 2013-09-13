@@ -86,8 +86,8 @@ public:
 	AIAttackMessage (Event, const Object& weapon);
 	THIEF_MESSAGE_WRAP (AIAttackMessage);
 
-	Event get_event () const;
-	Weapon get_weapon () const;
+	const Event event;
+	const Weapon weapon;
 };
 
 

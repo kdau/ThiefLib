@@ -316,9 +316,9 @@ public:
 		const Object& target, const LGMultiBase& data);
 	THIEF_MESSAGE_WRAP (AIActionResultMessage);
 
-	Action get_action () const;
-	Result get_result () const;
-	Object get_target () const;
+	const Action action;
+	const Result result;
+	const Object target;
 	MULTI_GET (get_result_data);
 
 private:
@@ -334,9 +334,9 @@ public:
 		bool high_alert = false);
 	THIEF_MESSAGE_WRAP (AIAlertnessMessage);
 
-	bool is_high_alert () const;
-	AI::Alert get_new_level () const;
-	AI::Alert get_old_level () const;
+	const bool high_alert;
+	const AI::Alert new_level;
+	const AI::Alert old_level;
 };
 
 
@@ -347,8 +347,8 @@ public:
 	AIModeMessage (AI::Mode new_mode, AI::Mode old_mode);
 	THIEF_MESSAGE_WRAP (AIModeMessage);
 
-	AI::Mode get_new_mode () const;
-	AI::Mode get_old_mode () const;
+	const AI::Mode new_mode;
+	const AI::Mode old_mode;
 };
 
 
@@ -358,13 +358,12 @@ class AIMotionMessage : public Message // "Motion{Start,FlagReached,End}" //TEST
 public:
 	enum Event { START, END, FLAG_REACHED };
 
-	AIMotionMessage (Event event, const char* motion_name,
-		int motion_flag = 0);
+	AIMotionMessage (Event, const String& motion, int motion_flag = 0);
 	THIEF_MESSAGE_WRAP (AIMotionMessage);
 
-	Event get_event () const;
-	const char* get_motion_name () const;
-	int get_motion_flag () const;
+	const Event event;
+	const String motion;
+	const int motion_flag;
 };
 
 
@@ -375,7 +374,7 @@ public:
 	AIPatrolPointMessage (const Object& patrol_point);
 	THIEF_MESSAGE_WRAP (AIPatrolPointMessage);
 
-	Marker get_patrol_point () const;
+	const Marker patrol_point;
 };
 
 
@@ -383,10 +382,10 @@ public:
 class AISignalMessage : public Message // "SignalAI" //TESTME
 {
 public:
-	AISignalMessage (const char* signal);
+	AISignalMessage (const String& signal);
 	THIEF_MESSAGE_WRAP (AISignalMessage);
 
-	String get_signal () const;
+	const String signal;
 };
 
 
@@ -400,7 +399,7 @@ public:
 	ConversationMessage (const Object& conversation);
 	THIEF_MESSAGE_WRAP (ConversationMessage);
 
-	Conversation get_conversation () const;
+	const Conversation conversation;
 };
 
 

@@ -45,16 +45,19 @@ Timer::cancel ()
 
 // Message
 
-Message::Message (sScrMsg* _message, sMultiParm* reply, bool)
+Message::Message (sScrMsg* _message, sMultiParm* reply, bool valid)
 	: message (_message),
 	  reply_local (),
 	  reply_remote (reply)
 {
-	if (message)
-		message->AddRef ();
-	else
+	if (!message)
 		throw MessageWrapError (message, typeid (*this),
 			"message is null");
+	else if (!valid)
+		throw MessageWrapError (message, typeid (*this),
+			"structure type or message name mismatch");
+	else
+		message->AddRef ();
 }
 
 Message::Message (const Message& copy)
@@ -221,6 +224,7 @@ MessageWrapError::MessageWrapError (const sScrMsg* message,
 // GenericMessage
 
 MESSAGE_WRAPPER_IMPL_ (GenericMessage, true) // allow any message type
+{}
 
 GenericMessage::GenericMessage (const char* name)
 	: Message (new sGenericScrMsg ())
@@ -232,16 +236,16 @@ GenericMessage::GenericMessage (const char* name)
 
 // TimerMessage
 
-MESSAGE_WRAPPER_IMPL (TimerMessage, sScrTimerMsg)
+MESSAGE_WRAPPER_IMPL (TimerMessage, sScrTimerMsg),
+	timer_name (MESSAGE_AS (sScrTimerMsg)->name)
+{}
 
-TimerMessage::TimerMessage (const char* timer_name)
-	: Message (new sScrTimerMsg ())
+TimerMessage::TimerMessage (const String& _timer_name)
+	: Message (new sScrTimerMsg ()), timer_name (_timer_name)
 {
 	message->message = "Timer";
-	MESSAGE_AS (sScrTimerMsg)->name = timer_name;
+	MESSAGE_AS (sScrTimerMsg)->name = timer_name.data ();
 }
-
-MESSAGE_ACCESSOR (String, TimerMessage, get_timer_name, sScrTimerMsg, name)
 
 
 

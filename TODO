@@ -1,3 +1,6 @@
+Current
+	* Replace Parameter<Object> with Parameter<Object::Ref>, resolvable dynamically to an Object.
+
 ActReact.hh
 	interfaces:
 		* IActReactSrv
@@ -32,7 +35,7 @@ TNH/NV/TW features
 	* TrapTrigger: NVScript-style features (on, off, count, capacitor, falloff, failchance, dest)
 
 Other
-	* AI, Types: split each into two or more units.
+	* AI, Types: split each into two or more units
 	* EnumCoding: encoding and decoding of bitmasks
 	* Objective: VictoryCheck(er)-equivalent functionality per lg/convict.h
 	* (all): use C++11 features added in G++ 4.8 once MinGW-w64 is upgraded

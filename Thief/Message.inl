@@ -62,7 +62,7 @@ GenericMessage::with_data (const char* name, const D1& data1,
 
 template <typename D1, typename D2, typename D3>
 inline TimerMessage
-TimerMessage::with_data (const char* timer_name, const D1& data1,
+TimerMessage::with_data (const String& timer_name, const D1& data1,
 	const D2& data2, const D3& data3)
 {
 	TimerMessage message (timer_name);

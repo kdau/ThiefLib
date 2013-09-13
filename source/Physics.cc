@@ -265,33 +265,31 @@ TPathLink::create (const Object& source, const Object& dest,
 
 // MovingTerrainMessage
 
-MESSAGE_WRAPPER_IMPL (MovingTerrainMessage, sMovingTerrainMsg)
+MESSAGE_WRAPPER_IMPL (MovingTerrainMessage, sMovingTerrainMsg),
+	waypoint (MESSAGE_AS (sMovingTerrainMsg)->waypoint)
+{}
 
-MovingTerrainMessage::MovingTerrainMessage (const Object& waypoint)
-	: Message (new sMovingTerrainMsg ())
+MovingTerrainMessage::MovingTerrainMessage (const Object& _waypoint)
+	: Message (new sMovingTerrainMsg ()), waypoint (_waypoint)
 {
 	message->message = "MovingTerrainWaypoint";
 	MESSAGE_AS (sMovingTerrainMsg)->waypoint = waypoint.number;
 }
 
-MESSAGE_ACCESSOR (Marker, MovingTerrainMessage, get_waypoint,
-	sMovingTerrainMsg, waypoint)
-
 
 
 // WaypointMessage
 
-MESSAGE_WRAPPER_IMPL (WaypointMessage, sWaypointMsg)
+MESSAGE_WRAPPER_IMPL (WaypointMessage, sWaypointMsg),
+	moving_terrain (MESSAGE_AS (sWaypointMsg)->moving_terrain)
+{}
 
-WaypointMessage::WaypointMessage (const MovingTerrain& moving_terrain)
-	: Message (new sWaypointMsg ())
+WaypointMessage::WaypointMessage (const Object& _moving_terrain)
+	: Message (new sWaypointMsg ()), moving_terrain (_moving_terrain)
 {
 	message->message = "WaypointReached";
 	MESSAGE_AS (sWaypointMsg)->moving_terrain = moving_terrain.number;
 }
-
-MESSAGE_ACCESSOR (MovingTerrain, WaypointMessage, get_moving_terrain,
-	sWaypointMsg, moving_terrain)
 
 
 

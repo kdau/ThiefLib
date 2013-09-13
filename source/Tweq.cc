@@ -35,21 +35,22 @@ OBJECT_TYPE_IMPL (Tweq)
 
 // TweqMessage
 
-MESSAGE_WRAPPER_IMPL (TweqMessage, sTweqMsg)
+MESSAGE_WRAPPER_IMPL (TweqMessage, sTweqMsg),
+	event (Event (MESSAGE_AS (sTweqMsg)->Op)),
+	tweq_type (Tweq::Type (MESSAGE_AS (sTweqMsg)->Type)),
+	direction (Tweq::Direction (MESSAGE_AS (sTweqMsg)->Dir))
+{}
 
-TweqMessage::TweqMessage (Event event, Tweq::Type type,
-		Tweq::Direction direction)
-	: Message (new sTweqMsg ())
+TweqMessage::TweqMessage (Event _event, Tweq::Type _tweq_type,
+		Tweq::Direction _direction)
+	: Message (new sTweqMsg ()), event (_event), tweq_type (_tweq_type),
+	  direction (_direction)
 {
 	message->message = "TweqComplete";
 	MESSAGE_AS (sTweqMsg)->Op = eTweqOperation (event);
-	MESSAGE_AS (sTweqMsg)->Type = eTweqType (type);
+	MESSAGE_AS (sTweqMsg)->Type = eTweqType (tweq_type);
 	MESSAGE_AS (sTweqMsg)->Dir = eTweqDirection (direction);
 }
-
-MESSAGE_ACCESSOR (TweqMessage::Event, TweqMessage, get_event, sTweqMsg, Op)
-MESSAGE_ACCESSOR (Tweq::Type, TweqMessage, get_tweq_type, sTweqMsg, Type)
-MESSAGE_ACCESSOR (Tweq::Direction, TweqMessage, get_direction, sTweqMsg, Dir)
 
 
 

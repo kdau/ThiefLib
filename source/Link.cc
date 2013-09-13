@@ -248,12 +248,18 @@ Link::unsubscribe (Flavor flavor, const Object& source, const Object& host)
 
 // LinkMessage
 
-MESSAGE_WRAPPER_IMPL_ (LinkMessage,
-	MESSAGE_TYPENAME_TEST ("LinkMessageImpl"))
+MESSAGE_WRAPPER_IMPL_ (LinkMessage, MESSAGE_TYPENAME_TEST ("LinkMessageImpl")),
+	event (MESSAGE_AS (LinkMessageImpl)->event),
+	flavor (MESSAGE_AS (LinkMessageImpl)->flavor),
+	link (MESSAGE_AS (LinkMessageImpl)->link),
+	source (MESSAGE_AS (LinkMessageImpl)->source),
+	dest (MESSAGE_AS (LinkMessageImpl)->dest)
+{}
 
-LinkMessage::LinkMessage (Event event, Flavor flavor,
-		Link::Number link, const Object& source, const Object& dest)
-	: Message (new LinkMessageImpl ())
+LinkMessage::LinkMessage (Event _event, Flavor _flavor, Link::Number _link,
+		const Object& _source, const Object& _dest)
+	: Message (new LinkMessageImpl ()), event (_event), flavor (_flavor),
+	  link (_link), source (_source), dest (_dest)
 {
 	switch (event)
 	{
@@ -267,13 +273,6 @@ LinkMessage::LinkMessage (Event event, Flavor flavor,
 	MESSAGE_AS (LinkMessageImpl)->source = source;
 	MESSAGE_AS (LinkMessageImpl)->dest = dest;
 }
-
-MESSAGE_ACCESSOR (LinkMessage::Event, LinkMessage, get_event,
-	LinkMessageImpl, event)
-MESSAGE_ACCESSOR (Flavor, LinkMessage, get_flavor, LinkMessageImpl, flavor)
-MESSAGE_ACCESSOR (Link::Number, LinkMessage, get_link, LinkMessageImpl, link)
-MESSAGE_ACCESSOR (Object, LinkMessage, get_source, LinkMessageImpl, source)
-MESSAGE_ACCESSOR (Object, LinkMessage, get_dest, LinkMessageImpl, dest)
 
 
 

@@ -172,11 +172,18 @@ Door::set_blocks_sound (bool blocks_sound)
 
 #endif // !IS_OSL
 
+static Room
+Door_room_getter (const FieldProxyConfig<Room>::Item& item,
+	const LGMultiBase& multi)
+{
+	if (multi.empty ()) return item.default_value;
+	Object value = reinterpret_cast<const LGMulti<Object>&> (multi);
+	return (value == -1) ? Object::NONE : value;
+}
+
 
 
 // DoorMessage
-
-MESSAGE_WRAPPER_IMPL (DoorMessage, sDoorMsg)
 
 inline sDoorMsg::eDoorAction
 translate_door_state (Door::State state)
@@ -192,8 +199,7 @@ translate_door_state (Door::State state)
 }
 
 inline Door::State
-translate_door_action (const DoorMessage& message, const sScrMsg* lgmessage,
-	sDoorMsg::eDoorAction action)
+translate_door_action (sDoorMsg::eDoorAction action)
 {
 	switch (action)
 	{
@@ -202,13 +208,23 @@ translate_door_action (const DoorMessage& message, const sScrMsg* lgmessage,
 	case sDoorMsg::kDoorClosing: return Door::State::CLOSING;
 	case sDoorMsg::kDoorOpening: return Door::State::OPENING;
 	case sDoorMsg::kDoorHalt: return Door::State::HALTED;
-	default: throw MessageWrapError (lgmessage, typeid (message),
-		"invalid action");
+	default: return Door::State::INVALID;
 	}
 }
 
-DoorMessage::DoorMessage (Door::State new_state, Door::State old_state)
-	: Message (new sDoorMsg ())
+MESSAGE_WRAPPER_IMPL (DoorMessage, sDoorMsg),
+	new_state (translate_door_action (MESSAGE_AS (sDoorMsg)->ActionType)),
+	old_state (translate_door_action (MESSAGE_AS (sDoorMsg)->PrevActionType))
+{
+	if (new_state == Door::State::INVALID ||
+	    old_state == Door::State::INVALID)
+		throw MessageWrapError (message, typeid (*this),
+			"invalid action");
+}
+
+DoorMessage::DoorMessage (Door::State _new_state, Door::State _old_state)
+	: Message (new sDoorMsg ()), new_state (_new_state),
+	  old_state (_old_state)
 {
 	switch (new_state)
 	{
@@ -221,29 +237,6 @@ DoorMessage::DoorMessage (Door::State new_state, Door::State old_state)
 
 	MESSAGE_AS (sDoorMsg)->ActionType = translate_door_state (new_state);
 	MESSAGE_AS (sDoorMsg)->PrevActionType = translate_door_state (old_state);
-}
-
-Door::State
-DoorMessage::get_new_state () const
-{
-	return translate_door_action (*this, message,
-		MESSAGE_AS (sDoorMsg)->ActionType);
-}
-
-Door::State
-DoorMessage::get_old_state () const
-{
-	return translate_door_action (*this, message,
-		MESSAGE_AS (sDoorMsg)->PrevActionType);
-}
-
-static Room
-Door_room_getter (const FieldProxyConfig<Room>::Item& item,
-	const LGMultiBase& multi)
-{
-	if (multi.empty ()) return item.default_value;
-	Object value = reinterpret_cast<const LGMulti<Object>&> (multi);
-	return (value == -1) ? Object::NONE : value;
 }
 
 
@@ -431,22 +424,20 @@ OBJECT_TYPE_IMPL_ (AdvPickable, Rendered (), Interactive (), Lockable (),
 // PickStateMessage
 
 // "PickStateChange" reports as "sScrMsg", so it can't be tested by type.
-MESSAGE_WRAPPER_IMPL_ (PickMessage, MESSAGE_NAME_TEST ("PickStateChange"))
+MESSAGE_WRAPPER_IMPL_ (PickMessage, MESSAGE_NAME_TEST ("PickStateChange")),
+	new_stage (AdvPickable::Stage (MESSAGE_AS (sPickStateScrMsg)->NewState)),
+	old_stage (AdvPickable::Stage (MESSAGE_AS (sPickStateScrMsg)->PrevState))
+{}
 
-PickMessage::PickMessage (AdvPickable::Stage new_stage,
-		AdvPickable::Stage old_stage)
-	: Message (new sPickStateScrMsg ())
+PickMessage::PickMessage (AdvPickable::Stage _new_stage,
+		AdvPickable::Stage _old_stage)
+	: Message (new sPickStateScrMsg ()), new_stage (_new_stage),
+	  old_stage (_old_stage)
 {
 	message->message = "PickStateChange";
 	MESSAGE_AS (sPickStateScrMsg)->NewState = int (new_stage);
 	MESSAGE_AS (sPickStateScrMsg)->PrevState = int (old_stage);
 }
-
-MESSAGE_ACCESSOR (AdvPickable::Stage, PickMessage, get_new_stage,
-	sPickStateScrMsg, NewState);
-MESSAGE_ACCESSOR (AdvPickable::Stage, PickMessage, get_old_stage,
-	sPickStateScrMsg, PrevState);
-
 
 
 

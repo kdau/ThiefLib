@@ -453,35 +453,32 @@ Engine::write_to_game_log (const String& message)
 
 // "DarkGameModeChange" reports as "sScrMsg", so it can't be tested by type.
 MESSAGE_WRAPPER_IMPL_ (GameModeMessage,
-	MESSAGE_NAME_TEST ("DarkGameModeChange"))
+	MESSAGE_NAME_TEST ("DarkGameModeChange")),
+	event (MESSAGE_AS (sDarkGameModeScrMsg)->fResuming ? RESUME : SUSPEND)
+{}
 
-GameModeMessage::GameModeMessage (bool resuming, bool suspending)
-	: Message (new sDarkGameModeScrMsg ())
+GameModeMessage::GameModeMessage (Event _event)
+	: Message (new sDarkGameModeScrMsg ()), event (_event)
 {
 	message->message = "DarkGameModeChange";
-	MESSAGE_AS (sDarkGameModeScrMsg)->fResuming = resuming;
-	MESSAGE_AS (sDarkGameModeScrMsg)->fSuspending = suspending;
+	MESSAGE_AS (sDarkGameModeScrMsg)->fResuming = (event == RESUME);
+	MESSAGE_AS (sDarkGameModeScrMsg)->fSuspending = (event == SUSPEND);
 }
-
-MESSAGE_ACCESSOR (bool, GameModeMessage, is_resuming,
-	sDarkGameModeScrMsg, fResuming)
-MESSAGE_ACCESSOR (bool, GameModeMessage, is_suspending,
-	sDarkGameModeScrMsg, fSuspending)
 
 
 
 // SimMessage
 
-MESSAGE_WRAPPER_IMPL (SimMessage, sSimMsg)
+MESSAGE_WRAPPER_IMPL (SimMessage, sSimMsg),
+	event (MESSAGE_AS (sSimMsg)->fStarting ? START : FINISH)
+{}
 
-SimMessage::SimMessage (bool starting)
-	: Message (new sSimMsg ())
+SimMessage::SimMessage (Event _event)
+	: Message (new sSimMsg ()), event (_event)
 {
 	message->message = "Sim";
-	MESSAGE_AS (sSimMsg)->fStarting = starting;
+	MESSAGE_AS (sSimMsg)->fStarting = (event == START);
 }
-
-MESSAGE_ACCESSOR (bool, SimMessage, is_starting, sSimMsg, fStarting)
 
 
 

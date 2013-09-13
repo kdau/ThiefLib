@@ -54,17 +54,17 @@ Combinable::adjust_stack_count (int by, bool destroy_if_zero)
 // CombineMessage
 
 // "Combine" reports as "sScrMsg", so it can't be tested by type.
-MESSAGE_WRAPPER_IMPL_ (CombineMessage, MESSAGE_NAME_TEST ("Combine"))
+MESSAGE_WRAPPER_IMPL_ (CombineMessage, MESSAGE_NAME_TEST ("Combine")),
+	stack (MESSAGE_AS (sCombineScrMsg)->combiner)
+{}
 
-CombineMessage::CombineMessage (const Object& stack)
-	: Message (new sCombineScrMsg ())
+CombineMessage::CombineMessage (const Object& _stack)
+	: Message (new sCombineScrMsg ()),
+	  stack (_stack)
 {
 	message->message = "Combine";
 	MESSAGE_AS (sCombineScrMsg)->combiner = stack.number;
 }
-
-MESSAGE_ACCESSOR (Combinable, CombineMessage, get_stack,
-	sCombineScrMsg, combiner)
 
 
 
@@ -106,11 +106,18 @@ Damageable::resurrect (const Object& culprit)
 
 // DamageMessage
 
-MESSAGE_WRAPPER_IMPL (DamageMessage, sDamageScrMsg)
+MESSAGE_WRAPPER_IMPL (DamageMessage, sDamageScrMsg),
+	culprit (MESSAGE_AS (sDamageScrMsg)->culprit),
+	stimulus (MESSAGE_AS (sDamageScrMsg)->kind),
+	hit_points (MESSAGE_AS (sDamageScrMsg)->damage)
+{}
 
-DamageMessage::DamageMessage (const Object& culprit, const Object& stimulus,
-		int hit_points)
-	: Message (new sDamageScrMsg ())
+DamageMessage::DamageMessage (const Object& _culprit, const Object& _stimulus,
+		int _hit_points)
+	: Message (new sDamageScrMsg ()),
+	  culprit (_culprit),
+	  stimulus (_stimulus),
+	  hit_points (_hit_points)
 {
 	message->message = "Damage";
 	MESSAGE_AS (sDamageScrMsg)->culprit = culprit.number;
@@ -118,29 +125,67 @@ DamageMessage::DamageMessage (const Object& culprit, const Object& stimulus,
 	MESSAGE_AS (sDamageScrMsg)->damage = hit_points;
 }
 
-MESSAGE_ACCESSOR (Being, DamageMessage, get_culprit, sDamageScrMsg, culprit)
-
-MESSAGE_ACCESSOR (Stimulus, DamageMessage, get_stimulus, sDamageScrMsg, kind)
-
-MESSAGE_ACCESSOR (int, DamageMessage, get_hit_points, sDamageScrMsg, damage)
-
 
 
 // SlayMessage
 
-MESSAGE_WRAPPER_IMPL (SlayMessage, sSlayMsg)
+MESSAGE_WRAPPER_IMPL (SlayMessage, sSlayMsg),
+	culprit (MESSAGE_AS (sSlayMsg)->culprit),
+	stimulus (MESSAGE_AS (sSlayMsg)->kind)
+{}
 
-SlayMessage::SlayMessage (const Object& culprit, const Object& stimulus)
-	: Message (new sSlayMsg ())
+SlayMessage::SlayMessage (const Object& _culprit, const Object& _stimulus)
+	: Message (new sSlayMsg ()),
+	  culprit (_culprit),
+	  stimulus (_stimulus)
 {
 	message->message = "Slain";
 	MESSAGE_AS (sSlayMsg)->culprit = culprit.number;
 	MESSAGE_AS (sSlayMsg)->kind = stimulus.number;
 }
 
-MESSAGE_ACCESSOR (Being, SlayMessage, get_culprit, sSlayMsg, culprit)
 
-MESSAGE_ACCESSOR (Stimulus, SlayMessage, get_stimulus, sSlayMsg, kind)
+
+// Being
+//TODO wrap property: AI: Utility\Visibility control = AI_VisCtrl
+
+THIEF_ENUM_CODING (Being::Team, CODE, CODE,
+	THIEF_ENUM_VALUE (GOOD, "good"),
+	THIEF_ENUM_VALUE (NEUTRAL, "neutral"),
+	THIEF_ENUM_VALUE (BAD_1, "bad1", "bad_1", "bad 1", "bad-1", "evil"),
+	THIEF_ENUM_VALUE (BAD_2, "bad2", "bad_2", "bad 2", "bad-2"),
+	THIEF_ENUM_VALUE (BAD_3, "bad3", "bad_3", "bad 3", "bad-3"),
+	THIEF_ENUM_VALUE (BAD_4, "bad4", "bad_4", "bad 4", "bad-4"),
+	THIEF_ENUM_VALUE (BAD_5, "bad5", "bad_5", "bad 5", "bad-5", "undead"),
+)
+
+PROXY_CONFIG (Being, team, "AI_Team", nullptr, Being::Team, Team::GOOD);
+PROXY_CONFIG (Being, culpable, "Culpable", nullptr, bool, false);
+PROXY_CONFIG (Being, blood_type, "BloodType", nullptr, String, "");
+PROXY_CONFIG (Being, current_breath, "AirSupply", nullptr, Time, 0ul);
+PROXY_CONFIG (Being, maximum_breath, "BreathConfig", "Max Air (ms)", Time, 0ul);
+PROXY_CONFIG (Being, breath_recovery_rate, "BreathConfig", "Recover rate",
+	float, 0.0f);
+PROXY_CONFIG (Being, drowning_damage, "BreathConfig", "Drown Damage", int, 0);
+PROXY_CONFIG (Being, drowning_frequency, "BreathConfig", "Drown Freq (ms)",
+	Time, 0ul);
+
+OBJECT_TYPE_IMPL_ (Being, Physical (), SpherePhysical (), Damageable (),
+	PROXY_INIT (team),
+	PROXY_INIT (culpable),
+	PROXY_INIT (blood_type),
+	PROXY_INIT (current_breath),
+	PROXY_INIT (maximum_breath),
+	PROXY_INIT (breath_recovery_rate),
+	PROXY_INIT (drowning_damage),
+	PROXY_INIT (drowning_frequency)
+)
+
+bool
+Being::is_being () const
+{
+	return culpable.exists ();
+}
 
 
 
@@ -194,12 +239,39 @@ OBJECT_TYPE_IMPL_ (Interactive, Rendered (),
 
 // FrobMessage
 
-MESSAGE_WRAPPER_IMPL (FrobMessage, sFrobMsg)
+static FrobMessage::Event
+FrobMessage_get_event (const char* _name)
+{
+	CIString name = _name ? _name : "";
+	size_t length = name.length ();
+	if (length > 5 && name.compare (length - 5, 5, "Begin") == 0)
+		return FrobMessage::BEGIN;
+	else if (length > 3 && name.compare (length - 3, 3, "End") == 0)
+		return FrobMessage::END;
+	else
+		return FrobMessage::Event (-1);
+}
 
-FrobMessage::FrobMessage (Event event, const Object& frobber, const Object& tool,
-		const Object& frobbed, Location frob_loc, Location obj_loc,
-		Time duration, bool aborted)
-	: Message (new sFrobMsg ())
+MESSAGE_WRAPPER_IMPL (FrobMessage, sFrobMsg),
+	event (FrobMessage_get_event (message->message)),
+	frobber (MESSAGE_AS (sFrobMsg)->Frobber),
+	tool (MESSAGE_AS (sFrobMsg)->SrcObjId),
+	frobbed (MESSAGE_AS (sFrobMsg)->DstObjId),
+	frob_loc (Location (MESSAGE_AS (sFrobMsg)->SrcLoc)),
+	obj_loc (Location (MESSAGE_AS (sFrobMsg)->DstLoc)),
+	duration (MESSAGE_AS (sFrobMsg)->Sec * 1000ul),
+	was_aborted (MESSAGE_AS (sFrobMsg)->Abort)
+{
+	if (int (event) == -1)
+		throw MessageWrapError (message, typeid (*this), "invalid event");
+}
+
+FrobMessage::FrobMessage (Event _event, const Object& _frobber,
+		const Object& _tool, const Object& _frobbed, Location _frob_loc,
+		Location _obj_loc, Time _duration, bool _was_aborted)
+	: Message (new sFrobMsg ()), event (_event), frobber (_frobber),
+	  tool (_tool), frobbed (_frobbed), frob_loc (_frob_loc),
+	  obj_loc (_obj_loc), duration (_duration), was_aborted (_was_aborted)
 {
 	switch (event)
 	{
@@ -228,79 +300,7 @@ FrobMessage::FrobMessage (Event event, const Object& frobber, const Object& tool
 	MESSAGE_AS (sFrobMsg)->SrcLoc = eFrobLoc (frob_loc);
 	MESSAGE_AS (sFrobMsg)->DstLoc = eFrobLoc (obj_loc);
 	MESSAGE_AS (sFrobMsg)->Sec = duration / 1000.0f;
-	MESSAGE_AS (sFrobMsg)->Abort = aborted;
-}
-
-
-MESSAGE_ACCESSOR (Being, FrobMessage, get_frobber, sFrobMsg, Frobber);
-MESSAGE_ACCESSOR (Interactive, FrobMessage, get_tool, sFrobMsg, SrcObjId);
-MESSAGE_ACCESSOR (Interactive, FrobMessage, get_frobbed, sFrobMsg, DstObjId);
-MESSAGE_ACCESSOR (FrobMessage::Location, FrobMessage, get_frob_loc,
-	sFrobMsg, SrcLoc);
-MESSAGE_ACCESSOR (FrobMessage::Location, FrobMessage, get_obj_loc,
-	sFrobMsg, DstLoc);
-MESSAGE_ACCESSOR (bool, FrobMessage, was_aborted, sFrobMsg, Abort);
-
-FrobMessage::Event
-FrobMessage::get_event () const
-{
-	CIString name = get_name ();
-	size_t length = name.length ();
-	if (length > 5 && name.compare (length - 5, 5, "Begin") == 0)
-		return BEGIN;
-	else if (length > 3 && name.compare (length - 3, 3, "End") == 0)
-		return END;
-	else
-		throw MessageWrapError (message, typeid (*this), "invalid event");
-}
-
-Time
-FrobMessage::get_duration () const
-{
-	return MESSAGE_AS (sFrobMsg)->Sec * 1000ul;
-}
-
-
-
-// Being
-//TODO wrap property: AI: Utility\Visibility control = AI_VisCtrl
-
-THIEF_ENUM_CODING (Being::Team, CODE, CODE,
-	THIEF_ENUM_VALUE (GOOD, "good"),
-	THIEF_ENUM_VALUE (NEUTRAL, "neutral"),
-	THIEF_ENUM_VALUE (BAD_1, "bad1", "bad_1", "bad 1", "bad-1", "evil"),
-	THIEF_ENUM_VALUE (BAD_2, "bad2", "bad_2", "bad 2", "bad-2"),
-	THIEF_ENUM_VALUE (BAD_3, "bad3", "bad_3", "bad 3", "bad-3"),
-	THIEF_ENUM_VALUE (BAD_4, "bad4", "bad_4", "bad 4", "bad-4"),
-	THIEF_ENUM_VALUE (BAD_5, "bad5", "bad_5", "bad 5", "bad-5", "undead"),
-)
-
-PROXY_CONFIG (Being, team, "AI_Team", nullptr, Being::Team, Team::GOOD);
-PROXY_CONFIG (Being, culpable, "Culpable", nullptr, bool, false);
-PROXY_CONFIG (Being, blood_type, "BloodType", nullptr, String, "");
-PROXY_CONFIG (Being, current_breath, "AirSupply", nullptr, Time, 0ul);
-PROXY_CONFIG (Being, maximum_breath, "BreathConfig", "Max Air (ms)", Time, 0ul);
-PROXY_CONFIG (Being, breath_recovery_rate, "BreathConfig", "Recover rate",
-	float, 0.0f);
-PROXY_CONFIG (Being, drowning_damage, "BreathConfig", "Drown Damage", int, 0);
-PROXY_CONFIG (Being, drowning_frequency, "BreathConfig", "Drown Freq (ms)",
-	Time, 0ul);
-
-OBJECT_TYPE_IMPL_ (Being, Physical (), SpherePhysical (), Damageable (),
-	PROXY_INIT (team),
-	PROXY_INIT (culpable),
-	PROXY_INIT (blood_type),
-	PROXY_INIT (current_breath),
-	PROXY_INIT (maximum_breath),
-	PROXY_INIT (breath_recovery_rate),
-	PROXY_INIT (drowning_damage),
-	PROXY_INIT (drowning_frequency)
-)
-
-bool
-Being::is_being () const
-{
-	return culpable.exists ();
+	MESSAGE_AS (sFrobMsg)->Abort = was_aborted;
 }
 
 
@@ -399,52 +399,38 @@ ContainsLink::create (const Object& source, const Object& dest,
 // "Contained" and "Container" both report as "sScrMsg", so neither can be
 // tested by type.
 MESSAGE_WRAPPER_IMPL_ (ContainmentMessage,
-	MESSAGE_NAME_TEST ("Container") || MESSAGE_NAME_TEST ("Contained"))
+	MESSAGE_NAME_TEST ("Container") || MESSAGE_NAME_TEST ("Contained")),
+	subject (MESSAGE_NAME_TEST ("Container") ? CONTAINER : CONTENT),
+	// The event member will work for either structure.
+	event (Event (MESSAGE_AS (sContainedScrMsg)->event)),
+	container ((subject == CONTAINER) ? message->to
+		: MESSAGE_AS (sContainedScrMsg)->container),
+	content ((subject == CONTENT) ? message->to
+		: MESSAGE_AS (sContainerScrMsg)->containee)
+{}
 
-ContainmentMessage::ContainmentMessage (Subject subject, Event event,
-		const Object& container, const Object& contents)
-	: Message ((subject == CONTAINER)
+ContainmentMessage::ContainmentMessage (Subject _subject, Event _event,
+		const Object& _container, const Object& _content)
+	: Message ((_subject == CONTAINER)
 		? static_cast<sScrMsg*> (new sContainerScrMsg ())
-		: static_cast<sScrMsg*> (new sContainedScrMsg ()))
+		: static_cast<sScrMsg*> (new sContainedScrMsg ())),
+	  subject (_subject), event (_event),
+	  container (_container), content (_content)
 {
 	if (subject == CONTAINER)
 	{
 		message->message = "Container";
 		MESSAGE_AS (sContainerScrMsg)->event = event;
-		MESSAGE_AS (sContainerScrMsg)->containee = contents.number;
+		MESSAGE_AS (sContainerScrMsg)->containee = content.number;
 		// Caller may send/post the message only to the container.
 	}
-	else // CONTENTS
+	else // CONTENT
 	{
 		message->message = "Contained";
 		MESSAGE_AS (sContainedScrMsg)->event = event;
 		MESSAGE_AS (sContainedScrMsg)->container = container.number;
 		// Caller may send/post the message only to the contents.
 	}
-}
-
-ContainmentMessage::Subject
-ContainmentMessage::get_subject () const
-{
-	return (_stricmp (message->message, "Container") == 0)
-		? CONTAINER : CONTENTS;
-}
-
-MESSAGE_ACCESSOR (ContainmentMessage::Event, ContainmentMessage, get_event,
-	sContainedScrMsg, event) // the cast will work either way
-
-Container
-ContainmentMessage::get_container () const
-{
-	return (get_subject () == CONTAINER) ? message->to
-		: MESSAGE_AS (sContainedScrMsg)->container;
-}
-
-Object
-ContainmentMessage::get_contents () const
-{
-	return (get_subject () == CONTENTS) ? message->to
-		: MESSAGE_AS (sContainerScrMsg)->containee;
 }
 
 
@@ -561,12 +547,19 @@ Room::is_room () const
 
 // RoomMessage
 
-MESSAGE_WRAPPER_IMPL (RoomMessage, sRoomMsg)
+MESSAGE_WRAPPER_IMPL (RoomMessage, sRoomMsg),
+	event (Event (MESSAGE_AS (sRoomMsg)->TransitionType)),
+	object_type (ObjectType (MESSAGE_AS (sRoomMsg)->ObjType)),
+	object (MESSAGE_AS (sRoomMsg)->MoveObjId),
+	from_room (MESSAGE_AS (sRoomMsg)->FromObjId),
+	to_room (MESSAGE_AS (sRoomMsg)->ToObjId)
+{}
 
-RoomMessage::RoomMessage (Event event, ObjectType object_type,
-		const Object& object, const Object& from_room,
-		const Object& to_room)
-	: Message (new sRoomMsg ())
+RoomMessage::RoomMessage (Event _event, ObjectType _object_type,
+		const Object& _object, const Object& _from_room,
+		const Object& _to_room)
+	: Message (new sRoomMsg ()), event (_event), object_type (_object_type),
+	  object (_object), from_room (_from_room), to_room (_to_room)
 {
 	switch (event)
 	{
@@ -600,14 +593,6 @@ RoomMessage::RoomMessage (Event event, ObjectType object_type,
 	MESSAGE_AS (sRoomMsg)->ObjType = sRoomMsg::eObjType (object_type);
 	MESSAGE_AS (sRoomMsg)->TransitionType = sRoomMsg::eTransType (event);
 }
-
-MESSAGE_ACCESSOR (RoomMessage::Event, RoomMessage, get_event,
-	sRoomMsg, TransitionType);
-MESSAGE_ACCESSOR (RoomMessage::ObjectType, RoomMessage, get_object_type,
-	sRoomMsg, ObjType);
-MESSAGE_ACCESSOR (Object, RoomMessage, get_object, sRoomMsg, MoveObjId);
-MESSAGE_ACCESSOR (Room, RoomMessage, get_from_room, sRoomMsg, FromObjId);
-MESSAGE_ACCESSOR (Room, RoomMessage, get_to_room, sRoomMsg, ToObjId);
 
 
 

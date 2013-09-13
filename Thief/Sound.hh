@@ -143,13 +143,13 @@ class SchemaDoneMessage : public Message //TESTME
 {
 public:
 	SchemaDoneMessage (const Vector& location, const Object& sound_source,
-		const char* schema_name);
+		const String& schema_name);
 	THIEF_MESSAGE_WRAP (SchemaDoneMessage);
 
-	Vector get_location () const;
-	Object get_sound_source () const;
-	String get_schema_name () const;
-	SoundSchema get_schema () const;
+	const Vector location;
+	const Object sound_source;
+	const String schema_name;
+	const SoundSchema schema;
 };
 
 

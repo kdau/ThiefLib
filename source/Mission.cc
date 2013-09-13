@@ -44,17 +44,16 @@ THIEF_ENUM_CODING (Difficulty, BOTH, VALUE,
 
 // DifficultyMessage
 
-MESSAGE_WRAPPER_IMPL (DifficultyMessage, sDiffScrMsg)
+MESSAGE_WRAPPER_IMPL (DifficultyMessage, sDiffScrMsg),
+	difficulty (Difficulty (MESSAGE_AS (sDiffScrMsg)->difficulty))
+{}
 
-DifficultyMessage::DifficultyMessage (Difficulty difficulty)
-	: Message (new sDiffScrMsg ())
+DifficultyMessage::DifficultyMessage (Difficulty _difficulty)
+	: Message (new sDiffScrMsg ()), difficulty (_difficulty)
 {
 	message->message = "Difficulty";
 	MESSAGE_AS (sDiffScrMsg)->difficulty = int (difficulty);
 }
-
-MESSAGE_ACCESSOR (Difficulty, DifficultyMessage, get_difficulty,
-	sDiffScrMsg, difficulty)
 
 
 

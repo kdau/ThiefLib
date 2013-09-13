@@ -34,8 +34,6 @@
 
 namespace Thief {
 
-class Being;
-
 
 
 // Combinable
@@ -55,7 +53,7 @@ public:
 	CombineMessage (const Object& stack);
 	THIEF_MESSAGE_WRAP (CombineMessage);
 
-	Combinable get_stack () const;
+	const Combinable stack;
 };
 
 
@@ -88,9 +86,9 @@ public:
 		int hit_points);
 	THIEF_MESSAGE_WRAP (DamageMessage);
 
-	Being get_culprit () const;
-	Stimulus get_stimulus () const;
-	int get_hit_points () const;
+	const Object culprit;
+	const Stimulus stimulus;
+	const int hit_points;
 };
 
 class SlayMessage : public Message // "Slain"
@@ -99,8 +97,31 @@ public:
 	SlayMessage (const Object& culprit, const Object& stimulus);
 	THIEF_MESSAGE_WRAP (SlayMessage);
 
-	Being get_culprit () const;
-	Object get_stimulus () const;
+	const Object culprit;
+	const Stimulus stimulus;
+};
+
+
+
+// Being: base class for shared features of AIs and avatars
+
+class Being : public virtual SpherePhysical, public virtual Damageable
+{
+public:
+	THIEF_OBJECT_TYPE (Being)
+	bool is_being () const;
+
+	enum class Team { GOOD, NEUTRAL, BAD_1, BAD_2, BAD_3, BAD_4, BAD_5 };
+	THIEF_PROP_FIELD (Team, team);
+	THIEF_PROP_FIELD (bool, culpable);
+
+	THIEF_PROP_FIELD (String, blood_type);
+
+	THIEF_PROP_FIELD (Time, current_breath);
+	THIEF_PROP_FIELD (Time, maximum_breath);
+	THIEF_PROP_FIELD (float, breath_recovery_rate);
+	THIEF_PROP_FIELD (int, drowning_damage);
+	THIEF_PROP_FIELD (Time, drowning_frequency);
 };
 
 
@@ -159,40 +180,17 @@ public:
 
 	FrobMessage (Event, const Object& frobber, const Object& tool,
 		const Object& frobbed, Location frob_loc, Location obj_loc,
-		Time duration, bool aborted);
+		Time duration, bool was_aborted);
 	THIEF_MESSAGE_WRAP (FrobMessage);
 
-	Event get_event () const; //TESTME
-	Being get_frobber () const; //TESTME
-	Interactive get_tool () const; //TESTME
-	Interactive get_frobbed () const; //TESTME
-	Location get_frob_loc () const; //TESTME
-	Location get_obj_loc () const; //TESTME
-	Time get_duration () const; //TESTME
-	bool was_aborted () const; //TESTME
-};
-
-
-
-// Being: base class for shared features of AIs and avatars
-
-class Being : public virtual SpherePhysical, public virtual Damageable
-{
-public:
-	THIEF_OBJECT_TYPE (Being)
-	bool is_being () const;
-
-	enum class Team { GOOD, NEUTRAL, BAD_1, BAD_2, BAD_3, BAD_4, BAD_5 };
-	THIEF_PROP_FIELD (Team, team);
-	THIEF_PROP_FIELD (bool, culpable);
-
-	THIEF_PROP_FIELD (String, blood_type);
-
-	THIEF_PROP_FIELD (Time, current_breath);
-	THIEF_PROP_FIELD (Time, maximum_breath);
-	THIEF_PROP_FIELD (float, breath_recovery_rate);
-	THIEF_PROP_FIELD (int, drowning_damage);
-	THIEF_PROP_FIELD (Time, drowning_frequency);
+	const Event event; //TESTME
+	const Being frobber; //TESTME
+	const Interactive tool; //TESTME
+	const Interactive frobbed; //TESTME
+	const Location frob_loc; //TESTME
+	const Location obj_loc; //TESTME
+	const Time duration; //TESTME
+	const bool was_aborted; //TESTME
 };
 
 
@@ -246,17 +244,17 @@ THIEF_FLAVORED_LINK (Contains)
 class ContainmentMessage : public Message // "Contained", "Container"
 {
 public:
-	enum Subject { CONTAINER, CONTENTS };
+	enum Subject { CONTAINER, CONTENT };
 	enum Event { QUERY_ADD, QUERY_COMBINE, ADD, REMOVE, COMBINE };
 
 	ContainmentMessage (Subject, Event,
-		const Object& container, const Object& contents);
+		const Object& container, const Object& content);
 	THIEF_MESSAGE_WRAP (ContainmentMessage);
 
-	Subject get_subject () const;
-	Event get_event () const;
-	Container get_container () const;
-	Object get_contents () const;
+	const Subject subject;
+	const Event event;
+	const Container container;
+	const Object content;
 };
 
 
@@ -332,11 +330,11 @@ public:
 		const Object& from_room, const Object& to_room);
 	THIEF_MESSAGE_WRAP (RoomMessage);
 
-	Event get_event () const;
-	ObjectType get_object_type () const;
-	Object get_object () const;
-	Room get_from_room () const;
-	Room get_to_room () const;
+	const Event event;
+	const ObjectType object_type;
+	const Object object;
+	const Room from_room;
+	const Room to_room;
 };
 
 

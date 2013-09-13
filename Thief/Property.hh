@@ -161,11 +161,10 @@ public:
 		const Object&);
 	THIEF_MESSAGE_WRAP (PropertyMessage);
 
-	Event get_event () const; //TESTME
-	bool is_inherited () const; //TESTME
-
-	Property get_property () const;
-	Object get_object () const;
+	const Event event; //TESTME
+	const bool inherited; //TESTME
+	const Property property;
+	const Object object;
 };
 
 

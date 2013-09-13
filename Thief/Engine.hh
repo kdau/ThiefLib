@@ -160,11 +160,12 @@ template<> String Engine::get_config (const String& variable);
 class GameModeMessage : public Message
 {
 public:
-	GameModeMessage (bool resuming, bool suspending);
+	enum Event { SUSPEND, RESUME };
+
+	GameModeMessage (Event);
 	THIEF_MESSAGE_WRAP (GameModeMessage);
 
-	bool is_resuming () const;
-	bool is_suspending () const;
+	const Event event;
 };
 
 
@@ -174,10 +175,12 @@ public:
 class SimMessage : public Message
 {
 public:
-	SimMessage (bool starting);
+	enum Event { START, FINISH };
+
+	SimMessage (Event);
 	THIEF_MESSAGE_WRAP (SimMessage);
 
-	bool is_starting () const;
+	const Event event;
 };
 
 

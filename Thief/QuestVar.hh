@@ -56,9 +56,9 @@ public:
 	QuestMessage (const char* quest_var, int new_value, int old_value);
 	THIEF_MESSAGE_WRAP (QuestMessage);
 
-	QuestVar get_quest_var () const;
-	int get_new_value () const;
-	int get_old_value () const;
+	const QuestVar quest_var;
+	const int new_value;
+	const int old_value;
 };
 
 

@@ -87,7 +87,7 @@ public:
 
 protected:
 	Message (sScrMsg* message, sMultiParm* reply = nullptr,
-		bool own_message = false);
+		bool valid = true);
 
 	sScrMsg* const message;
 
@@ -140,13 +140,13 @@ public:
 class TimerMessage : public Message // "Timer"
 {
 public:
-	TimerMessage (const char* timer_name);
+	TimerMessage (const String& timer_name);
 	THIEF_MESSAGE_WRAP (TimerMessage);
 
-	String get_timer_name () const;
+	const String timer_name;
 
 	template <typename D1, typename D2 = Empty, typename D3 = Empty>
-	static TimerMessage with_data (const char* timer_name, const D1& data1,
+	static TimerMessage with_data (const String& timer_name, const D1& data1,
 		const D2& data2 = D2 (), const D3& data3 = D3 ());
 };
 

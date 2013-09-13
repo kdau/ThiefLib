@@ -120,8 +120,8 @@ public:
 	DoorMessage (Door::State new_state, Door::State old_state);
 	THIEF_MESSAGE_WRAP (DoorMessage);
 
-	Door::State get_new_state () const;
-	Door::State get_old_state () const;
+	const Door::State new_state;
+	const Door::State old_state;
 };
 
 
@@ -233,8 +233,8 @@ public:
 	PickMessage (AdvPickable::Stage new_stage, AdvPickable::Stage old_stage);
 	THIEF_MESSAGE_WRAP (PickMessage);
 
-	AdvPickable::Stage get_new_stage () const;
-	AdvPickable::Stage get_old_stage () const;
+	const AdvPickable::Stage new_stage;
+	const AdvPickable::Stage old_stage;
 };
 
 

@@ -47,7 +47,7 @@ public:
 	DifficultyMessage (Difficulty);
 	THIEF_MESSAGE_WRAP (DifficultyMessage);
 
-	Difficulty get_difficulty () const;
+	const Difficulty difficulty;
 };
 
 

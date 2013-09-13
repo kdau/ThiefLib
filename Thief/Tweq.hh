@@ -57,9 +57,9 @@ public:
 	TweqMessage (Event, Tweq::Type, Tweq::Direction);
 	THIEF_MESSAGE_WRAP (TweqMessage);
 
-	Event get_event () const;
-	Tweq::Type get_tweq_type () const;
-	Tweq::Direction get_direction () const;
+	const Event event;
+	const Tweq::Type tweq_type;
+	const Tweq::Direction direction;
 };
 
 

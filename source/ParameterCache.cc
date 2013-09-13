@@ -276,7 +276,7 @@ bool
 ParameterCacheImpl::copy (const Object& _source, const Object& _dest,
 	const CIString& parameter)
 {
-	ParameterBase watch_dest (_dest, parameter, { false });
+	Parameter<String> keep_dest_watched (_dest, parameter, { "" });
 	DesignNote* source = update_object (_source.number);
 	DesignNote* dest = update_object (_dest.number);
 
