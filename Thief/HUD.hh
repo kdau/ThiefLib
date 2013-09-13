@@ -29,8 +29,6 @@
 
 namespace Thief {
 
-class HUDElement;
-
 
 
 struct CanvasPoint
@@ -88,6 +86,7 @@ public:
 	typedef size_t Frame;
 	static const Frame STATIC;
 
+	static Ptr load (const String& path, bool animation);
 	virtual ~HUDBitmap ();
 
 	String get_path () const { return path; }
@@ -98,7 +97,7 @@ public:
 		CanvasRect clip = CanvasRect::NOCLIP) const;
 
 private:
-	friend class HUDImpl;
+	friend class OSL;
 	HUDBitmap (const String& path, bool animation);
 
 	const String path;
@@ -109,24 +108,25 @@ private:
 
 
 
-class HUD
+class HUDElementBase
 {
 public:
 	typedef int ZIndex;
 
 	enum class Event { ENTER_GAME_MODE, DRAW_STAGE_1, DRAW_STAGE_2 };
 
-	typedef std::function<void (HUDElement&, Event)> Callback;
+protected:
+	bool initialize (ZIndex priority);
+	bool deinitialize ();
 
-	static bool register_element (HUDElement&, Callback, ZIndex priority);
-	static bool unregister_element (HUDElement&);
-
-	static HUDBitmap::Ptr load_bitmap (const String& path, bool animation);
+private:
+	friend class OSL;
+	virtual void on_event (Event event) = 0;
 };
 
 
 
-class HUDElement
+class HUDElement : public HUDElementBase
 {
 public:
 	virtual ~HUDElement ();
@@ -134,7 +134,7 @@ public:
 protected:
 	HUDElement ();
 
-	bool initialize (HUD::ZIndex priority);
+	bool initialize (ZIndex priority);
 	void deinitialize ();
 
 	void schedule_redraw ();
@@ -186,7 +186,7 @@ private:
 	void do_offset (CanvasPoint& point) const;
 	void do_offset (CanvasRect& area) const;
 
-	void on_event (HUD::Event event);
+	virtual void on_event (Event event);
 
 	bool initialized, should_draw, needs_redraw, drawing;
 

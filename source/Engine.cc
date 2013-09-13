@@ -121,7 +121,7 @@ Monolog::Streambuf::write (const char* string)
 			SService<IDebugScrSrv> (LG)->MPrint
 				(string,"","","","","","","");
 		}
-		catch (no_interface&) {}
+		catch (...) {}
 }
 
 

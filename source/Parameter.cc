@@ -98,6 +98,9 @@ ParameterBase::initialize () const
 	if (!cache)
 	{
 		cache = SService<IOSLService> (LG)->get_param_cache ();
+		if (!cache)
+			throw std::runtime_error
+				("could not access parameter cache");
 		cache->watch_object (object, *this);
 	}
 }

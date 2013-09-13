@@ -41,29 +41,17 @@ typedef bool (__cdecl *OSLInitProc) (IScriptMan*, MPrintfProc, IMalloc*);
 
 
 
-// IHUD
-
-interface IHUD : IUnknown
-{
-	STDMETHOD_ (bool, register_element) (HUDElement&, HUD::Callback,
-		HUD::ZIndex priority) PURE;
-	STDMETHOD_ (bool, unregister_element) (HUDElement&) PURE;
-	STDMETHOD_ (HUDBitmap::Ptr, load_bitmap) (const String& path,
-		bool animation) PURE;
-};
-
-extern "C" const GUID IID_IHUD;
-#define THIEF_IHUD_GUID { 0x709a2033, 0x3d7e, 0x4424, \
-		{ 0x97, 0x1d, 0xed, 0xf5, 0x55, 0x45, 0x2b, 0x03 } }
-
-
-
 // IOSLService
 
 interface IOSLService : IScriptServiceBase
 {
-	STDMETHOD_ (SInterface<IHUD>, get_hud) () PURE;
 	STDMETHOD_ (ParameterCache*, get_param_cache) () PURE;
+
+	STDMETHOD_ (bool, register_hud_element) (HUDElementBase&,
+		HUDElementBase::ZIndex priority) PURE;
+	STDMETHOD_ (bool, unregister_hud_element) (HUDElementBase&) PURE;
+	STDMETHOD_ (HUDBitmap::Ptr, load_hud_bitmap) (const String& path,
+		bool animation) PURE;
 
 	STDMETHOD_ (bool, subscribe_links) (const Flavor&,
 		const Object& source, const Object& host) PURE;
@@ -162,66 +150,30 @@ struct ConversationMessageImpl : public sScrMsg
 
 #ifdef IS_OSL
 
-
-
-// HUDImpl
-
-class HUDImpl : public IDarkOverlayHandler,
-	public cInterfaceImp<IHUD, IID_Def<IHUD>, kInterfaceImpStatic>
+class OSL : public cInterfaceImp<IOSLService, IID_Def<IOSLService>,
+	kInterfaceImpStatic>, public IDarkOverlayHandler
 {
 public:
-	virtual ~HUDImpl ();
+	virtual ~OSL ();
+
+	// IUnknown
+	STDMETHOD_ (void, Init) ();
+	STDMETHOD_ (void, End) ();
 
 	// IDarkOverlayHandler
 	STDMETHOD_ (void, DrawHUD) ();
 	STDMETHOD_ (void, DrawTOverlay) ();
 	STDMETHOD_ (void, OnUIEnterMode) ();
 
-	// IHUD
-	STDMETHOD_ (bool, register_element) (HUDElement&, HUD::Callback,
-		HUD::ZIndex priority);
-	STDMETHOD_ (bool, unregister_element) (HUDElement&);
-	STDMETHOD_ (HUDBitmap::Ptr, load_bitmap) (const String& path,
-		bool animation);
+	// IOSLService
 
-private:
-	friend class OSL;
-	HUDImpl (bool sim);
-	void sim ();
-
-	struct ElementInfo
-	{
-		ElementInfo (HUDElement&, HUD::Callback, HUD::ZIndex);
-		bool operator == (const ElementInfo&) const;
-		bool operator < (const ElementInfo&) const;
-
-		HUDElement& element;
-		HUD::Callback callback;
-		HUD::ZIndex priority;
-	};
-
-	typedef std::set<ElementInfo> Elements;
-	Elements elements;
-
-	typedef std::map<String, HUDBitmap::WeakPtr> Bitmaps;
-	Bitmaps bitmaps;
-};
-
-
-
-// OSL
-
-class OSL : public cInterfaceImp<IOSLService, IID_Def<IOSLService>,
-	kInterfaceImpStatic>
-{
-public:
-	virtual ~OSL ();
-
-	STDMETHOD_ (void, Init) ();
-	STDMETHOD_ (void, End) ();
-
-	STDMETHOD_ (SInterface<IHUD>, get_hud) ();
 	STDMETHOD_ (ParameterCache*, get_param_cache) ();
+
+	STDMETHOD_ (bool, register_hud_element) (HUDElementBase&,
+		HUDElementBase::ZIndex priority);
+	STDMETHOD_ (bool, unregister_hud_element) (HUDElementBase&);
+	STDMETHOD_ (HUDBitmap::Ptr, load_hud_bitmap) (const String& path,
+		bool animation);
 
 	STDMETHOD_ (bool, subscribe_links) (const Flavor&,
 		const Object& source, const Object& host);
@@ -248,8 +200,25 @@ private:
 	static int __cdecl on_sim (const sDispatchMsg*,
 		const sDispatchListenerDesc*);
 
-	std::unique_ptr<HUDImpl> hud;
 	std::unique_ptr<ParameterCacheImpl> param_cache;
+
+	// HUD
+
+	struct HUDElementInfo
+	{
+		HUDElementInfo (HUDElementBase&, HUDElementBase::ZIndex);
+		bool operator == (const HUDElementInfo&) const;
+		bool operator < (const HUDElementInfo&) const;
+
+		HUDElementBase& element;
+		HUDElementBase::ZIndex priority;
+	};
+
+	typedef std::set<HUDElementInfo> HUDElements;
+	HUDElements hud_elements;
+
+	typedef std::map<String, HUDBitmap::WeakPtr> HUDBitmaps;
+	HUDBitmaps hud_bitmaps;
 
 	// LinkChange, LinkAdd, and LinkRemove messages
 
@@ -288,13 +257,12 @@ private:
 	ConversationSubscriptions conversation_subscriptions;
 };
 
-
-
 #endif // IS_OSL
+
+
 
 } // namespace Thief
 
-DEFINE_IIDSTRUCT (Thief::IHUD, Thief::IID_IHUD);
 DEFINE_IIDSTRUCT (Thief::IOSLService, Thief::IID_IOSLService);
 
 #endif // OSL_HH

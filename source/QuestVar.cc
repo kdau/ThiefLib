@@ -412,7 +412,7 @@ Objective::dump_objectives ()
 				% loot.total % specials;
 		}
 		else
-			mono << objective.get_target ().get_editor_name ();
+			mono << objective.get_target ();
 		mono << '\n';
 	}
 

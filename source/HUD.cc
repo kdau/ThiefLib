@@ -122,6 +122,12 @@ CanvasRect::valid () const
 const HUDBitmap::Frame
 HUDBitmap::STATIC = 0;
 
+HUDBitmap::Ptr
+HUDBitmap::load (const String& path, bool animation)
+{
+	return SService<IOSLService> (LG)->load_hud_bitmap (path, animation);
+}
+
 HUDBitmap::HUDBitmap (const String& _path, bool animation)
 	: path (_path)
 {
@@ -191,27 +197,19 @@ HUDBitmap::draw (Frame frame, CanvasPoint position, CanvasRect clip) const
 
 
 
-// HUD
+// HUDElementBase
 
 bool
-HUD::register_element (HUDElement& element, Callback callback, ZIndex priority)
+HUDElementBase::initialize (ZIndex priority)
 {
-	return SService<IOSLService> (LG)->get_hud ()->
-		register_element (element, callback, priority);
+	return SService<IOSLService> (LG)->register_hud_element
+		(*this, priority);
 }
 
 bool
-HUD::unregister_element (HUDElement& element)
+HUDElementBase::deinitialize ()
 {
-	return SService<IOSLService> (LG)->get_hud ()->
-		unregister_element (element);
-}
-
-HUDBitmap::Ptr
-HUD::load_bitmap (const String& path, bool animation)
-{
-	return SService<IOSLService> (LG)->get_hud ()->
-		load_bitmap (path, animation);
+	return SService<IOSLService> (LG)->unregister_hud_element (*this);
 }
 
 
@@ -241,14 +239,13 @@ HUDElement::~HUDElement ()
 }
 
 bool
-HUDElement::initialize (HUD::ZIndex priority)
+HUDElement::initialize (ZIndex priority)
 {
 	if (initialized) // The element has already been registered.
 		return false;
 	else // Register the element with the handler.
 	{
-		initialized = HUD::register_element
-			(*this, &HUDElement::on_event, priority);
+		initialized = HUDElementBase::initialize (priority);
 		return initialized;
 	}
 }
@@ -259,9 +256,9 @@ HUDElement::deinitialize ()
 	// Destroy any overlay.
 	destroy_overlay ();
 
-	// Unregister with the handler.
+	// Unregister with the HUD coordinator.
 	if (initialized)
-		HUD::unregister_element (*this);
+		HUDElementBase::deinitialize ();
 }
 
 void
@@ -514,14 +511,14 @@ HUDElement::do_offset (CanvasRect& area) const
 }
 
 void
-HUDElement::on_event (HUD::Event event)
+HUDElement::on_event (Event event)
 {
 	SService<IDarkOverlaySrv> DOS (LG);
 
 	switch (event)
 	{
 
-	case HUD::Event::DRAW_STAGE_1:
+	case Event::DRAW_STAGE_1:
 		drawing = true;
 		should_draw = prepare ();
 		if (should_draw && !is_overlay ())
@@ -532,7 +529,7 @@ HUDElement::on_event (HUD::Event event)
 		drawing = false;
 		break;
 
-	case HUD::Event::DRAW_STAGE_2:
+	case Event::DRAW_STAGE_2:
 		if (!should_draw || !is_overlay ()) return;
 		if (needs_redraw && DOS->BeginTOverlayUpdate (overlay))
 		{

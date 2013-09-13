@@ -32,123 +32,29 @@ namespace Thief {
 IScriptMan*
 LG = nullptr;
 
-extern "C" const GUID IID_IHUD = THIEF_IHUD_GUID;
 extern "C" const GUID IID_IOSLService = THIEF_IOSLService_GUID;
 
 
 
-// HUDImpl::ElementInfo
+// OSL::HUDElementInfo
 
-HUDImpl::ElementInfo::ElementInfo (HUDElement& _element,
-		HUD::Callback _callback, HUD::ZIndex _priority)
+OSL::HUDElementInfo::HUDElementInfo (HUDElementBase& _element,
+		HUDElementBase::ZIndex _priority)
 	: element (_element),
-	  callback (_callback),
 	  priority (_priority)
 {}
 
 bool
-HUDImpl::ElementInfo::operator == (const ElementInfo& rhs) const
+OSL::HUDElementInfo::operator == (const HUDElementInfo& rhs) const
 {
 	return &element == &rhs.element;
 }
 
 bool
-HUDImpl::ElementInfo::operator < (const ElementInfo& rhs) const
+OSL::HUDElementInfo::operator < (const HUDElementInfo& rhs) const
 {
 	return priority < rhs.priority ||
 		(priority == rhs.priority && &element < &rhs.element);
-}
-
-
-
-// HUDImpl
-
-HUDImpl::HUDImpl (bool _sim)
-{
-	if (_sim) sim ();
-}
-
-void
-HUDImpl::sim ()
-{
-	SService<IDarkOverlaySrv> (LG)->SetHandler (this);
-}
-
-HUDImpl::~HUDImpl ()
-{
-	SService<IDarkOverlaySrv> (LG)->SetHandler (nullptr);
-}
-
-STDMETHODIMP_ (void)
-HUDImpl::DrawHUD ()
-{
-	for (auto& element : elements)
-		element.callback (element.element, HUD::Event::DRAW_STAGE_1);
-}
-
-STDMETHODIMP_ (void)
-HUDImpl::DrawTOverlay ()
-{
-	for (auto& element : elements)
-		element.callback (element.element, HUD::Event::DRAW_STAGE_2);
-}
-
-STDMETHODIMP_ (void)
-HUDImpl::OnUIEnterMode ()
-{
-	for (auto& element : elements)
-		element.callback (element.element, HUD::Event::ENTER_GAME_MODE);
-}
-
-STDMETHODIMP_ (bool)
-HUDImpl::register_element (HUDElement& element, HUD::Callback callback,
-	HUD::ZIndex priority)
-{
-	elements.insert (ElementInfo (element, callback, priority));
-	return true;
-}
-
-STDMETHODIMP_ (bool)
-HUDImpl::unregister_element (HUDElement& element)
-{
-	for (auto entry = elements.begin (); entry != elements.end (); ++entry)
-		if (&entry->element == &element)
-		{
-			elements.erase (entry);
-			return true;
-		}
-	return false;
-}
-
-STDMETHODIMP_ (HUDBitmap::Ptr)
-HUDImpl::load_bitmap (const String& path, bool animation)
-{
-	HUDBitmap::Ptr bitmap;
-
-	// Look for an existing bitmap first.
-	Bitmaps::iterator existing = bitmaps.find (path);
-	if (existing != bitmaps.end ())
-	{
-		bitmap = existing->second.lock ();
-		if (bitmap)
-			return bitmap;
-		else
-			bitmaps.erase (existing);
-	}
-
-	try
-	{
-		// The bitmap hasn't been loaded yet, so load it now.
-		bitmap = HUDBitmap::Ptr (new HUDBitmap (path, animation));
-		bitmaps.insert (std::make_pair (path, bitmap));
-	}
-	catch (std::exception& e)
-	{
-		mono.log (boost::format ("WARNING: Could not load bitmap at "
-			"\"%||\": %||.") % path % e.what ());
-	}
-
-	return bitmap;
 }
 
 
@@ -174,6 +80,7 @@ OSL::OSL ()
 OSL::~OSL ()
 {
 	self = nullptr;
+	SService<IDarkOverlaySrv> (LG)->SetHandler (nullptr);
 	SInterface<ISimManager> (LG)->Unlisten (&IID_IOSLService);
 }
 
@@ -185,21 +92,21 @@ STDMETHODIMP_ (void)
 OSL::End ()
 {}
 
-STDMETHODIMP_ (SInterface<IHUD>)
-OSL::get_hud ()
-{
-	if (!hud)
-		try { hud.reset (new HUDImpl (sim)); }
-		catch (...) {}
-	return hud.get ();
-}
-
 STDMETHODIMP_ (ParameterCache*)
 OSL::get_param_cache ()
 {
 	if (!param_cache)
 		try { param_cache.reset (new ParameterCacheImpl ()); }
-		catch (...) {}
+		catch (std::exception& e)
+		{
+			mono.log (boost::format ("ERROR: Could not create "
+				"parameter cache: %||.") % e.what ());
+		}
+		catch (...)
+		{
+			mono.log ("ERROR: Could not create parameter cache: "
+				"an unknown error occurred.");
+		}
 	return param_cache.get ();
 }
 
@@ -216,8 +123,7 @@ OSL::on_sim (const sDispatchMsg* message, const sDispatchListenerDesc*)
 		self->sim = true;
 		try
 		{
-			if (self->hud)
-				self->hud->sim ();
+			SService<IDarkOverlaySrv> (LG)->SetHandler (self);
 		}
 		catch (...) {}
 		break;
@@ -226,11 +132,11 @@ OSL::on_sim (const sDispatchMsg* message, const sDispatchListenerDesc*)
 		self->sim = false;
 		try
 		{
-			if (self->hud)
-				self->hud.reset ();
-
 			if (self->param_cache)
 				self->param_cache->reset ();
+
+			self->hud_elements.clear ();
+			self->hud_bitmaps.clear ();
 
 			self->link_subscriptions.clear ();
 			self->property_subscriptions.clear ();
@@ -249,6 +155,84 @@ OSL::on_sim (const sDispatchMsg* message, const sDispatchListenerDesc*)
 
 	return 0;
 }
+
+
+
+// OSL: HUD
+
+STDMETHODIMP_ (void)
+OSL::DrawHUD ()
+{
+	for (auto& element : hud_elements)
+		element.element.on_event (HUDElementBase::Event::DRAW_STAGE_1);
+}
+
+STDMETHODIMP_ (void)
+OSL::DrawTOverlay ()
+{
+	for (auto& element : hud_elements)
+		element.element.on_event (HUDElementBase::Event::DRAW_STAGE_2);
+}
+
+STDMETHODIMP_ (void)
+OSL::OnUIEnterMode ()
+{
+	for (auto& element : hud_elements)
+		element.element.on_event (HUDElementBase::Event::ENTER_GAME_MODE);
+}
+
+STDMETHODIMP_ (bool)
+OSL::register_hud_element (HUDElementBase& element,
+	HUDElementBase::ZIndex priority)
+{
+	hud_elements.insert (HUDElementInfo (element, priority));
+	return true;
+}
+
+STDMETHODIMP_ (bool)
+OSL::unregister_hud_element (HUDElementBase& element)
+{
+	for (auto entry = hud_elements.begin ();
+	     entry != hud_elements.end (); ++entry)
+		if (&entry->element == &element)
+		{
+			hud_elements.erase (entry);
+			return true;
+		}
+	return false;
+}
+
+STDMETHODIMP_ (HUDBitmap::Ptr)
+OSL::load_hud_bitmap (const String& path, bool animation)
+{
+	HUDBitmap::Ptr bitmap;
+
+	// Look for an existing bitmap first.
+	HUDBitmaps::iterator existing = hud_bitmaps.find (path);
+	if (existing != hud_bitmaps.end ())
+	{
+		bitmap = existing->second.lock ();
+		if (bitmap)
+			return bitmap;
+		else
+			hud_bitmaps.erase (existing);
+	}
+
+	try
+	{
+		// The bitmap hasn't been loaded yet, so load it now.
+		bitmap = HUDBitmap::Ptr (new HUDBitmap (path, animation));
+		hud_bitmaps.insert (std::make_pair (path, bitmap));
+	}
+	catch (std::exception& e)
+	{
+		mono.log (boost::format ("WARNING: Could not load bitmap at "
+			"\"%||\": %||.") % path % e.what ());
+	}
+
+	return bitmap;
+}
+
 
 
 
