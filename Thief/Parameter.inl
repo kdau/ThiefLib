@@ -92,37 +92,20 @@ template <typename T>
 inline bool
 Parameter<T, THIEF_NOT_ENUM>::operator == (const T& rhs) const
 {
-	initialize ();
-	return value == rhs;
+	return operator const T& () == rhs;
 }
 
 template <typename T>
 inline bool
 Parameter<T, THIEF_NOT_ENUM>::operator != (const T& rhs) const
 {
-	initialize ();
-	return value != rhs;
+	return operator const T& () != rhs;
 }
 
 template <typename T>
-void
-Parameter<T, THIEF_NOT_ENUM>::reparse () const //TODO Refactor most of this method into ParameterBase.
+inline void
+Parameter<T, THIEF_NOT_ENUM>::set_default () const
 {
-	ParameterBase::reparse ();
-
-	try
-	{
-		if (does_exist && decode (get_raw ()))
-			return;
-	}
-	catch (std::exception& e)
-	{
-		mono.log (boost::format ("WARNING: Could not parse parameter "
-			"\"%||\" on %||: %||.") % name % object % e.what ());
-	}
-	catch (...)
-	{}
-
 	value = config.default_value;
 }
 
@@ -175,6 +158,7 @@ Parameter<T, THIEF_IS_ENUM>::Parameter (const Object& _object,
 {}
 
 template <typename T>
+inline
 Parameter<T, THIEF_IS_ENUM>::operator T () const
 {
 	initialize ();
@@ -182,6 +166,7 @@ Parameter<T, THIEF_IS_ENUM>::operator T () const
 }
 
 template <typename T>
+inline
 Parameter<T, THIEF_IS_ENUM>::operator int () const
 {
 	initialize ();
@@ -197,6 +182,20 @@ Parameter<T, THIEF_IS_ENUM>::operator = (T _value)
 	if (!set_raw (coding.encode (value)))
 		throw std::runtime_error ("could not set parameter");
 	return *this;
+}
+
+template <typename T>
+inline bool
+Parameter<T, THIEF_IS_ENUM>::operator == (T rhs) const
+{
+	return operator T () == rhs;
+}
+
+template <typename T>
+inline bool
+Parameter<T, THIEF_IS_ENUM>::operator != (T rhs) const
+{
+	return operator T () != rhs;
 }
 
 

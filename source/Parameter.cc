@@ -90,6 +90,23 @@ ParameterBase::reparse () const
 {
 	initialize ();
 	does_exist = cache->exists (object, name, config.inheritable);
+
+	if (does_exist)
+	try
+	{
+		if (!decode (get_raw ()))
+			throw std::runtime_error ("An unknown error occurred.");
+		return;
+	}
+	catch (std::exception& e)
+	{
+		mono.log (boost::format ("WARNING: Could not parse parameter "
+			"\"%||\" on %||: %||.") % name % object % e.what ());
+	}
+	catch (...)
+	{}
+
+	set_default ();
 }
 
 void
@@ -109,9 +126,7 @@ int
 ParameterBase::decode_quest_ref (const String& raw)
 {
 	if (raw.empty () || raw.front () != '$') return INT_MAX;
-
-	QuestVar quest_var (raw.substr (1).data ());
-	return quest_var.exists () ? quest_var.get () : INT_MAX;
+	return QuestVar (raw.substr (1).data ()).get (INT_MAX);
 }
 
 
@@ -257,35 +272,27 @@ EnumParameterBase::EnumParameterBase (const Object& _object,
 	  value (config.default_value)
 {}
 
-void
-EnumParameterBase::reparse () const
+bool
+EnumParameterBase::decode (const String& raw) const
 {
-	ParameterBase::reparse ();
-
-	if (does_exist) try
+	if (coding.input_type != EnumCoding::Input::CODE) // values allowed
 	{
-		const String& raw = get_raw ();
-
-		if (coding.input_type != EnumCoding::Input::CODE) // values OK
-		{
-			value = decode_quest_ref (raw);
-			if (value != INT_MAX) return;
-		}
-
-		if (!raw.empty ())
-		{
-			value = coding.decode (raw);
-			return;
-		}
+		value = decode_quest_ref (raw);
+		if (value != INT_MAX) return true;
 	}
-	catch (std::exception& e)
+
+	if (!raw.empty ())
 	{
-		mono.log (boost::format ("WARNING: Could not parse parameter "
-			"\"%||\" on %||: %||.") % name % object % e.what ());
+		value = coding.decode (raw);
+		return true;
 	}
-	catch (...)
-	{}
 
+	return false;
+}
+
+void
+EnumParameterBase::set_default () const
+{
 	value = config.default_value;
 }
 

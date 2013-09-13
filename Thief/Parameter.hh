@@ -71,6 +71,10 @@ protected:
 	const Object object;
 	const CIString name;
 	const Config& config;
+
+private:
+	virtual bool decode (const String&) const = 0;
+	virtual void set_default () const = 0;
 };
 
 
@@ -109,10 +113,9 @@ public:
 	bool operator == (const T&) const;
 	bool operator != (const T&) const;
 
-	virtual void reparse () const;
-
 private:
-	bool decode (const String&) const;
+	virtual bool decode (const String&) const;
+	virtual void set_default () const;
 	String encode () const;
 
 	const Config config;
@@ -158,8 +161,6 @@ class EnumParameterBase : public ParameterBase
 public:
 	typedef ParameterConfig<int> Config;
 
-	virtual void reparse () const;
-
 protected:
 	EnumParameterBase (const Object& object, const CIString& name,
 		const EnumCoding& coding, const Config& config);
@@ -167,6 +168,10 @@ protected:
 	const EnumCoding& coding;
 	const Config config;
 	mutable int value;
+
+private:
+	virtual bool decode (const String&) const;
+	virtual void set_default () const;
 };
 
 template <typename T>
@@ -180,7 +185,11 @@ public:
 
 	operator T () const;
 	explicit operator int () const;
+
 	Parameter& operator = (T);
+
+	bool operator == (T) const;
+	bool operator != (T) const;
 };
 
 

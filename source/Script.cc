@@ -123,6 +123,14 @@ Script::Impl::ReceiveMessage (sScrMsg* message, sMultiParm* reply,
 
 // Script
 
+THIEF_ENUM_CODING (Script::Log, CODE, CODE,
+	THIEF_ENUM_VALUE (VERBOSE, "verbose", "verb"),
+	THIEF_ENUM_VALUE (NORMAL, "normal", "norm"),
+	THIEF_ENUM_VALUE (INFO, "info"),
+	THIEF_ENUM_VALUE (WARNING, "warning", "warn"),
+	THIEF_ENUM_VALUE (ERROR, "error", "err"),
+)
+
 Script::Script (const String& _name, const Object& _host, Log _min_level)
 	: impl (*new Impl (*this)),
 	  script_name (_name),
@@ -135,6 +143,37 @@ Script::Script (const String& _name, const Object& _host, Log _min_level)
 
 Script::~Script ()
 {}
+
+void
+Script::initialize ()
+{
+	// Adjust minimum logging level based on "debug" parameter or "debug"
+	// quest variable, if any.
+	Parameter<Log> min_level_param (host_obj, "debug", {});
+	if (min_level_param.exists ())
+		min_level = min_level_param;
+	else
+		switch (QuestVar ("debug").get ())
+		{
+		case 2: // always VERBOSE
+			min_level = Log::VERBOSE;
+			break;
+		case 1: // at least NORMAL
+			if (min_level != Log::VERBOSE)
+				min_level = Log::NORMAL;
+			break;
+		case -1: // at most INFO
+			if (min_level != Log::ERROR &&
+			    min_level != Log::WARNING)
+				min_level = Log::INFO;
+			break;
+		case -2: // at most WARNING
+			if (min_level != Log::ERROR)
+				min_level = Log::WARNING;
+			break;
+		default: break;
+		}
+}
 
 IScript*
 Script::get_interface ()
@@ -194,10 +233,6 @@ Script::unset_persistent (const String& datum)
 	sScrDatumTag tag { host_obj, script_name.data (), datum.data () };
 	return LG->ClearScriptData (&tag, &(sMultiParm&)junk) == S_OK;
 }
-
-void
-Script::initialize ()
-{}
 
 void
 Script::fix_player_links ()
@@ -314,8 +349,8 @@ Script::_start_timer (const char* timer, Time delay, bool repeating,
 
 // TrapTrigger
 
-TrapTrigger::TrapTrigger (const String& _name, const Object& _host)
-	: Script (_name, _host)
+TrapTrigger::TrapTrigger (const String& _name, const Object& _host, Log _level)
+	: Script (_name, _host, _level)
 #ifdef IS_THIEF1
 	  , PARAMETER (tcf)
 #endif

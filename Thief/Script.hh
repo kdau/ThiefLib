@@ -74,6 +74,8 @@ public:
 class Script
 {
 public:
+	enum class Log { VERBOSE, NORMAL, INFO, WARNING, ERROR };
+
 	virtual ~Script ();
 
 	const String& name () const;
@@ -84,8 +86,6 @@ public:
 	IScript* get_interface ();
 
 protected:
-	enum class Log { VERBOSE, NORMAL, INFO, WARNING, ERROR };
-
 	Script (const String& name, const Object& host, Log min_level =
 #ifdef DEBUG
 		Log::NORMAL
@@ -93,6 +93,7 @@ protected:
 		Log::INFO
 #endif
 		);
+	virtual void initialize ();
 
 	Monolog& mono (Log level = Log::NORMAL) const;
 	template <typename... Args>
@@ -125,7 +126,6 @@ protected:
 	bool unset_persistent (const String& datum);
 
 private:
-	virtual void initialize ();
 	void fix_player_links (); //TESTME
 
 	template <typename T, typename... Args>
@@ -214,7 +214,13 @@ public:
 	virtual ~TrapTrigger ();
 
 protected:
-	TrapTrigger (const String& name, const Object& host);
+	TrapTrigger (const String& name, const Object& host, Log min_level =
+#ifdef DEBUG
+		Log::NORMAL
+#else
+		Log::INFO
+#endif
+		);
 
 	enum Flags
 	{
