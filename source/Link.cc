@@ -354,7 +354,13 @@ ScriptParamsLink::get_one_by_data (const Object& source, const CIString& data,
 	{
 	case 1u: return links.front ();
 	case 0u: return ScriptParamsLink ();
-	default: throw std::runtime_error ("too many of a singleton link type");
+	default:
+	    {
+		boost::format error ("Too many %||ScriptParams links from %|| "
+			"of singleton data \"%||\".");
+		error % (reverse ? "~" : "") % source % data;
+		throw std::runtime_error (error.str ());
+	    }
 	}
 }
 

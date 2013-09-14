@@ -176,7 +176,7 @@ PROXY_CONFIG (Bitmapped, tile_size_y, "BitmapWorld", "y feet per tile",
 	float, 0.0f);
 PROXY_BIT_CONFIG (Bitmapped, apply_lighting, "BitmapWorld", "Flags", 4u, false);
 PROXY_CONFIG (Bitmapped, bitmap_color, "BitmapColor", nullptr, Color,
-	Color (0xffffff)); //FIXME This is not setting correctly (only the red channel is taking effect).
+	Color (0xffffff)); // see assignment operator override below
 PROXY_BIT_CONFIG (Bitmapped, double_sided, "BitmapWorld", "Flags", 1u, false);
 PROXY_BIT_CONFIG (Bitmapped, flip_backside_uv, "BitmapWorld", "Flags", 2u, false);
 PROXY_BIT_CONFIG (Bitmapped, face_camera, "BitmapWorld", "Flags", 8u, false);
@@ -207,6 +207,17 @@ bool
 Bitmapped::is_bitmapped () const
 {
 	return bitmap_size_x.exists ();
+}
+
+// This specialization works around a bizarre issue with the BitmapColor
+// property that causes it to ignore the green and blue channels when set
+// through an LGMulti of type INT.
+template<>
+PropField<Color, Bitmapped::F_bitmap_color>&
+PropField<Color, Bitmapped::F_bitmap_color>::operator = (const Color& value)
+{
+	set_raw (object, "BitmapColor", reinterpret_cast<void*> (long (value)));
+	return *this;
 }
 
 

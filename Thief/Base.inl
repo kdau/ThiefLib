@@ -590,6 +590,13 @@ template <typename Type, const FieldProxyConfig<Type>& config>
 
 #define THIEF_FIELD_PROXY_CLASS(Name) Name<Type, config>
 
+#define THIEF_OVERRIDE_FIELD_PROXY_GET(ProxyType, Type, Class, Member) \
+template<> ProxyType<Type, Class::F_##Member>::operator Type () const;
+
+#define THIEF_OVERRIDE_FIELD_PROXY_SET(ProxyType, Type, Class, Member) \
+template<> ProxyType<Type, Class::F_##Member>& \
+ProxyType<Type, Class::F_##Member>::operator = (const Type&);
+
 
 
 } // namespace Thief

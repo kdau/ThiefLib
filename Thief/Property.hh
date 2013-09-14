@@ -87,9 +87,6 @@ public:
 	template <typename T>
 	T get_field (const String& field, const T& default_value) const;
 
-	const void* get_raw (bool inherited = true) const;
-	bool set_raw (const void*);
-
 	static bool subscribe (const Property&, const Object&,
 		const Object& host = Object::SELF);
 	static bool unsubscribe (const Property&, const Object&,
@@ -101,12 +98,17 @@ private:
 
 	void _get (LGMultiBase& value) const;
 	bool _set (const LGMultiBase& value);
+
 	void _get_field (const String& field, LGMultiBase& value) const;
 	void _get_field (const char* field, LGMultiBase& value) const;
+
 	bool _set_field (const String& field, const LGMultiBase& value,
 		bool instantiate_if_missing = false);
 	bool _set_field (const char* field, const LGMultiBase& value,
 		bool instantiate_if_missing = false);
+
+	const void* get_raw (bool inherited = true) const;
+	bool set_raw (const void*);
 
 	Property property;
 	Object object;
@@ -121,6 +123,8 @@ class PropFieldBase
 protected:
 	void get (const Object&, const char*, const char*, LGMultiBase&) const;
 	void set (Object&, const char*, const char*, const LGMultiBase&);
+
+	void set_raw (Object&, const char*, const void*);
 };
 
 THIEF_FIELD_PROXY_TEMPLATE

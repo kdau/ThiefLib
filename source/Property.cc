@@ -182,19 +182,19 @@ const void*
 ObjectProperty::get_raw (bool inherited) const
 {
 	if (!object.exists () || !property.iface) return nullptr;
-	void* raw = nullptr; //FIXME FIXME Does this need to be freed?
-	long result = inherited
+	void* raw = nullptr;
+	bool success = inherited
 		? property.iface->Get (object.number, &raw)
 		: property.iface->GetSimple (object.number, &raw);
-	return (result == S_OK) ? raw : nullptr;
+	return success ? raw : nullptr;
 }
 
 bool
 ObjectProperty::set_raw (const void* raw)
 {
 	if (!object.exists () || !property.iface) return false;
-	return property.iface->Set (object.number, const_cast<void*> (raw)) //FIXME FIXME Is this const_cast safe?
-		== S_OK;
+	if (!exists (false) && !instantiate ()) return false;
+	return property.iface->Set (object.number, const_cast<void*> (raw));
 }
 
 
@@ -221,6 +221,13 @@ PropFieldBase::set (Object& object, const char* property, const char* field,
 	ObjectProperty objprop (property, object);
 	if (field ? !objprop._set_field (field, value, true)
 	          : !objprop._set (value))
+		throw std::runtime_error ("could not set property field");
+}
+
+void
+PropFieldBase::set_raw (Object& object, const char* property, const void* raw)
+{
+	if (!ObjectProperty (property, object).set_raw (raw))
 		throw std::runtime_error ("could not set property field");
 }
 
