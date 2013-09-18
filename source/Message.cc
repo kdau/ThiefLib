@@ -45,16 +45,16 @@ Timer::cancel ()
 
 // Message
 
-Message::Message (sScrMsg* _message, sMultiParm* reply, bool valid)
+Message::Message (sScrMsg* _message, sMultiParm* reply, bool valid,
+		const char* wrap_type)
 	: message (_message),
 	  reply_local (),
 	  reply_remote (reply)
 {
 	if (!message)
-		throw MessageWrapError (message, typeid (*this),
-			"message is null");
+		throw MessageWrapError (message, wrap_type, "message is null");
 	else if (!valid)
-		throw MessageWrapError (message, typeid (*this),
+		throw MessageWrapError (message, wrap_type,
 			"structure type or message name mismatch");
 	else
 		message->AddRef ();
@@ -68,8 +68,7 @@ Message::Message (const Message& copy)
 	if (message)
 		message->AddRef ();
 	else
-		throw MessageWrapError (message, typeid (*this),
-			"message is null");
+		throw MessageWrapError (message, "Message", "message is null");
 }
 
 Message::~Message ()
@@ -208,14 +207,15 @@ Message::get_lg_typename () const
 // Message wrapping
 
 MessageWrapError::MessageWrapError (const sScrMsg* message,
-	const std::type_info& wrap_type, const char* problem) noexcept
+	const char* wrap_type, const char* problem) noexcept
 {
-	boost::format _explanation ("Can't wrap a \"%||\" message of engine "
-		"type %|| as a %||: %||.");
+	boost::format _explanation ("Can't wrap a(n) \"%||\" message of engine "
+		"type %|| as a(n) %||: %||.");
 	_explanation
-		% (message ? message->message : "")
+		% ((message && message->message) ? message->message : "")
 		% (message ? message->Persistent_GetName () : "null")
-		% wrap_type.name () % problem;
+		% (wrap_type ? wrap_type : "Message")
+		% (problem ? problem : "an unknown error occurred");
 	explanation = _explanation.str ();
 }
 

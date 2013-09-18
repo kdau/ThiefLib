@@ -25,7 +25,6 @@ ActReact.hh
 Novel messages/wrappers
 	* HierarchyMessage: ITraitManager::Listen (per DH2)
 	* ObjectMessage: IObjectSystem::Listen (per DH2)
-	* ObjectiveMessage: from appropriate QuestChange messages
 	* ParameterMessage: from ParameterCache activity
 
 TNH/NV/TW features

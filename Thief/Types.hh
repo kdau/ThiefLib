@@ -191,6 +191,9 @@ public:
 	const Location obj_loc; //TESTME
 	const Time duration; //TESTME
 	const bool was_aborted; //TESTME
+
+private:
+	static Event parse (const char* name);
 };
 
 

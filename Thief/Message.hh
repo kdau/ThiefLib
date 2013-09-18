@@ -87,7 +87,7 @@ public:
 
 protected:
 	Message (sScrMsg* message, sMultiParm* reply = nullptr,
-		bool valid = true);
+		bool valid = true, const char* wrap_type = nullptr);
 
 	sScrMsg* const message;
 
@@ -113,8 +113,8 @@ private:
 class MessageWrapError : public std::exception
 {
 public:
-	MessageWrapError (const sScrMsg* message,
-		const std::type_info& wrap_type, const char* problem) noexcept;
+	MessageWrapError (const sScrMsg* message, const char* wrap_type,
+		const char* problem) noexcept;
 	virtual ~MessageWrapError () noexcept {}
 	virtual const char* what () const noexcept
 		{ return explanation.data (); }

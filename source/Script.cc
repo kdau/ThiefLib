@@ -95,7 +95,7 @@ Script::Impl::ReceiveMessage (sScrMsg* message, sMultiParm* reply,
 	try
 	{
 		if (!message)
-			throw MessageWrapError (message, typeid (Message),
+			throw MessageWrapError (message, "Message",
 				"message is null");
 		return script.dispatch (*message, reply, trace) ? S_OK : S_FALSE;
 	}
@@ -153,7 +153,7 @@ Script::initialize ()
 	if (min_level_param.exists ())
 		min_level = min_level_param;
 	else
-		switch (QuestVar ("debug").get ())
+		switch (QuestVar ("debug"))
 		{
 		case 2: // always VERBOSE
 			min_level = Log::VERBOSE;
@@ -293,6 +293,15 @@ Script::dispatch (sScrMsg& message, sMultiParm* reply, unsigned trace)
 
 	bool result = dispatch_cycle
 		(message_handlers, message.message, message, reply);
+
+	if (_stricmp (message.message, "QuestChange") == 0)
+		try
+		{
+			ObjectiveMessage check_type (&message, reply);
+			result &= dispatch_cycle (message_handlers,
+				"ObjectiveChange", message, reply);
+		}
+		catch (...) {} // The quest variable is not objective-related.
 
 	if (_stricmp (message.message, "Timer") == 0)
 		result &= dispatch_cycle (timer_handlers, (const char*)

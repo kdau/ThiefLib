@@ -239,21 +239,21 @@ OBJECT_TYPE_IMPL_ (Interactive, Rendered (),
 
 // FrobMessage
 
-static FrobMessage::Event
-FrobMessage_get_event (const char* _name)
+FrobMessage::Event
+FrobMessage::parse (const char* _name)
 {
 	CIString name = _name ? _name : "";
 	size_t length = name.length ();
 	if (length > 5 && name.compare (length - 5, 5, "Begin") == 0)
-		return FrobMessage::BEGIN;
+		return Event::BEGIN;
 	else if (length > 3 && name.compare (length - 3, 3, "End") == 0)
-		return FrobMessage::END;
+		return Event::END;
 	else
-		return FrobMessage::Event (-1);
+		return Event (-1);
 }
 
 MESSAGE_WRAPPER_IMPL (FrobMessage, sFrobMsg),
-	event (FrobMessage_get_event (message->message)),
+	event (parse (message->message)),
 	frobber (MESSAGE_AS (sFrobMsg)->Frobber),
 	tool (MESSAGE_AS (sFrobMsg)->SrcObjId),
 	frobbed (MESSAGE_AS (sFrobMsg)->DstObjId),
@@ -263,7 +263,7 @@ MESSAGE_WRAPPER_IMPL (FrobMessage, sFrobMsg),
 	was_aborted (MESSAGE_AS (sFrobMsg)->Abort)
 {
 	if (int (event) == -1)
-		throw MessageWrapError (message, typeid (*this), "invalid event");
+		throw MessageWrapError (message, "FrobMessage", "invalid event");
 }
 
 FrobMessage::FrobMessage (Event _event, const Object& _frobber,

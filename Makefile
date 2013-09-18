@@ -188,6 +188,11 @@ $(bindir2n)/Property.o: ./Thief/Property.inl
 $(bindir2d)/Property.o: ./Thief/Property.inl
 $(bindir_osl)/Property.o: ./Thief/Property.inl
 
+$(bindir1n)/QuestVar.o: ./Thief/QuestVar.inl
+$(bindir1d)/QuestVar.o: ./Thief/QuestVar.inl
+$(bindir2n)/QuestVar.o: ./Thief/QuestVar.inl
+$(bindir2d)/QuestVar.o: ./Thief/QuestVar.inl
+
 $(bindir1n)/Script.o: ./Thief/Script.inl
 $(bindir1d)/Script.o: ./Thief/Script.inl
 $(bindir2n)/Script.o: ./Thief/Script.inl

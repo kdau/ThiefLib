@@ -29,8 +29,8 @@ namespace Thief {
 
 // QuestVar
 
-QuestVar::QuestVar (const String& _name)
-	: name (_name)
+QuestVar::QuestVar (const String& _name, Scope _scope)
+	: name (_name), scope (_scope)
 {}
 
 bool
@@ -49,27 +49,27 @@ QuestVar::get (int default_value) const
 }
 
 void
-QuestVar::set (int value, Scope scope)
+QuestVar::set (int value)
 {
 	SService<IQuestSrv> (LG)->Set
 		(name.data (), value, eQuestDataType (scope));
 }
 
 void
-QuestVar::unset ()
+QuestVar::clear ()
 {
 	SService<IQuestSrv> (LG)->Delete (name.data ());
 }
 
 void
-QuestVar::subscribe (const Object& host, Scope scope) const
+QuestVar::subscribe (const String& name, const Object& host, Scope scope)
 {
 	SService<IQuestSrv> (LG)->SubscribeMsg
 		(host.number, name.data (), eQuestDataType (scope));
 }
 
 void
-QuestVar::unsubscribe (const Object& host) const
+QuestVar::unsubscribe (const String& name, const Object& host)
 {
 	SService<IQuestSrv> (LG)->UnsubscribeMsg (host.number, name.data ());
 }
@@ -98,114 +98,19 @@ QuestMessage::QuestMessage (const char* _quest_var, int _new_value,
 
 
 
-// Objective
+// DifficultyQuestField
 
-const Objective::Number
-Objective::NONE = UINT_MAX;
+const FieldProxyConfig<Difficulty>::Item
+I_objective_difficulty { "goal_min_diff_%||", "goal_max_diff_%||",
+	int (QuestVar::Scope::MISSION), Difficulty::NONE }; \
 
-Objective::Objective (Number _number)
-	: number (_number)
-{}
+const FieldProxyConfig<Difficulty>
+F_objective_difficulty { &I_objective_difficulty, 1u, nullptr, nullptr };
 
-bool
-Objective::exists () const
+DifficultyQuestField::operator Difficulty () const
 {
-	return quest_var (Field::STATE).exists ();
-}
-
-Objective::State
-Objective::get_state () const
-{
-	return State (quest_var (Field::STATE).get ());
-}
-
-void
-Objective::set_state (State state)
-{
-	quest_var (Field::STATE).set (int (state));
-}
-
-bool
-Objective::is_visible () const
-{
-	return bool (quest_var (Field::VISIBLE).get ());
-}
-
-void
-Objective::set_visible (bool visible)
-{
-	quest_var (Field::VISIBLE).set (visible);
-}
-
-bool
-Objective::is_final () const
-{
-	return bool (quest_var (Field::FINAL).get ());
-}
-
-void
-Objective::set_final (bool final)
-{
-	quest_var (Field::FINAL).set (final);
-}
-
-bool
-Objective::is_irreversible () const
-{
-	return bool (quest_var (Field::IRREVERSIBLE).get ());
-}
-
-void
-Objective::set_irreversible (bool irreversible)
-{
-	quest_var (Field::IRREVERSIBLE).set (irreversible);
-}
-
-bool
-Objective::is_reverse () const
-{
-	return bool (quest_var (Field::REVERSE).get ());
-}
-
-void
-Objective::set_reverse (bool reverse)
-{
-	quest_var (Field::REVERSE).set (reverse);
-}
-
-#ifdef IS_THIEF2
-
-bool
-Objective::is_optional () const
-{
-	return bool (quest_var (Field::OPTIONAL).get ());
-}
-
-void
-Objective::set_optional (bool optional)
-{
-	quest_var (Field::OPTIONAL).set (optional);
-}
-
-bool
-Objective::is_bonus () const
-{
-	return bool (quest_var (Field::BONUS).get ());
-}
-
-void
-Objective::set_bonus (bool bonus)
-{
-	quest_var (Field::BONUS).set (bonus);
-}
-
-#endif // IS_THIEF2
-
-Difficulty
-Objective::get_difficulty () const
-{
-	Difficulty min_diff = Difficulty (quest_var (Field::MIN_DIFF).get (-1)),
-		max_diff = Difficulty (quest_var (Field::MAX_DIFF).get (-1));
+	Difficulty min_diff = Difficulty (qvar (true).get (-1)),
+		max_diff = Difficulty (qvar (false).get (-1));
 
 	switch (min_diff)
 	{
@@ -245,8 +150,8 @@ Objective::get_difficulty () const
 	}
 }
 
-void
-Objective::set_difficulty (Difficulty difficulty)
+DifficultyQuestField&
+DifficultyQuestField::operator = (Difficulty difficulty)
 {
 	Difficulty min_diff = Difficulty::NONE,
 		max_diff = Difficulty::NONE;
@@ -259,77 +164,124 @@ Objective::set_difficulty (Difficulty difficulty)
 	case Difficulty::NOT_EXPERT: max_diff = Difficulty::HARD; break;
 	case Difficulty::NOT_NORMAL: min_diff = Difficulty::HARD; break;
 	case Difficulty::ANY:        break;
-	case Difficulty::NONE: default: return;
+	case Difficulty::NONE:
+	default:
+		throw std::runtime_error ("invalid difficulty");
 	}
 
 	if (min_diff != Difficulty::NONE)
-		quest_var (Field::MIN_DIFF).set (int (min_diff));
+		qvar (true) = int (min_diff);
+	else
+		qvar (true).clear ();
+
 	if (max_diff != Difficulty::NONE)
-		quest_var (Field::MAX_DIFF).set (int (max_diff));
+		qvar (false) = int (max_diff);
+	else
+		qvar (false).clear ();
+
+	return *this;
 }
 
-Objective::Type
-Objective::get_type () const
-{
-	return Type (quest_var (Field::TYPE).get ());
-}
 
-void
-Objective::set_type (Type type)
-{
-	quest_var (Field::TYPE).set (int (type));
-}
 
-Object
-Objective::get_target () const
-{
-	return Object (quest_var (Field::TARGET).get ());
-}
+// SpecialsQuestField
 
-void
-Objective::set_target (const Object& target)
-{
-	quest_var (Field::TARGET).set (target.number);
-}
+const FieldProxyConfig<Objective::Specials>::Item
+I_objective_specials { "goal_special_%||", "goal_specials_%||",
+	int (QuestVar::Scope::MISSION), 0ull }; \
 
-Objective::Loot
-Objective::get_loot () const
+const FieldProxyConfig<Objective::Specials>
+F_objective_specials { &I_objective_specials, 1u, nullptr, nullptr };
+
+SpecialsQuestField::operator Objective::Specials () const
 {
-	int special = quest_var (Field::SPECIAL).get (),
-		specials = quest_var (Field::SPECIALS).get ();
+#ifdef IS_THIEF2
+	int special = qvar (true), specials = qvar (false);
 	if (special > 0)
 		specials |= 1 << ((special - 1) & 0xFF);
-
-	return {
-		quest_var (Field::GOLD).get (),
-		quest_var (Field::GEMS).get (),
-		quest_var (Field::GOODS).get (),
-		quest_var (Field::LOOT).get (),
-		specials
-	};
+	return specials;
+#else
+	return int (qvar (true));
+#endif
 }
 
-void
-Objective::set_loot (const Loot& loot)
+SpecialsQuestField&
+SpecialsQuestField::operator = (const Objective::Specials& specials)
 {
-	quest_var (Field::GOLD).set (loot.gold);
-	quest_var (Field::GEMS).set (loot.gems);
-	quest_var (Field::GOODS).set (loot.goods);
-	quest_var (Field::LOOT).set (loot.total);
-	quest_var (Field::SPECIAL).unset ();
-	quest_var (Field::SPECIALS).set (loot.specials.to_ulong ());
+#ifdef IS_THIEF2
+	qvar (true).clear ();
+	qvar (false) = specials.to_ulong ();
+#else
+	qvar (true) = specials.to_ulong ();
+	qvar (false).clear ();
+#endif
+	return *this;
 }
 
-void
-Objective::subscribe (const Object& host, Field field) const
-{
-	quest_var (field).subscribe (host);
-}
 
-void
-Objective::unsubscribe (const Object& host, Field field) const
+
+// Objective
+
+const Objective::Number
+Objective::NONE = UINT_MAX;
+
+#define QUEST_PROXY_CONFIG_(Class, Member, Major, Type, Default, Scope) \
+PROXY_CONFIG_ (Class, Member, Major, nullptr, Type, Default, Scope, nullptr, \
+	nullptr)
+
+#define QUEST_PROXY_CONFIG(Class, Member, Major, Type, Default) \
+QUEST_PROXY_CONFIG_ (Class, Member, Major, Type, Default, \
+	QuestVar::Scope::MISSION)
+
+QUEST_PROXY_CONFIG (Objective, state, "goal_state_%||",
+	Objective::State, State::INCOMPLETE);
+QUEST_PROXY_CONFIG (Objective, visible, "goal_visible_%||", bool, false);
+QUEST_PROXY_CONFIG (Objective, final, "goal_final_%||", bool, false);
+QUEST_PROXY_CONFIG (Objective, irreversible, "goal_irreversible_%||",
+	bool, false);
+QUEST_PROXY_CONFIG (Objective, reverse, "goal_reverse_%||", bool, false);
+#ifdef IS_THIEF2
+QUEST_PROXY_CONFIG (Objective, optional, "goal_optional_%||", bool, false);
+QUEST_PROXY_CONFIG (Objective, bonus, "goal_bonus_%||", bool, false);
+#endif
+QUEST_PROXY_CONFIG (Objective, type, "goal_type_%||",
+	Objective::Type, Type::NONE);
+QUEST_PROXY_CONFIG (Objective, target, "goal_target_%||", Object, Object::NONE);
+QUEST_PROXY_CONFIG (Objective, loot_gold, "goal_gold_%||", int, 0);
+QUEST_PROXY_CONFIG (Objective, loot_gems, "goal_gems_%||", int, 0);
+QUEST_PROXY_CONFIG (Objective, loot_goods, "goal_goods_%||", int, 0);
+QUEST_PROXY_CONFIG (Objective, loot_total, "goal_loot_%||", int, 0);
+
+#define OBJECTIVE_IMPL(...) \
+Objective::Objective (Number _number) : Numbered (_number), __VA_ARGS__ {} \
+Objective::Objective (const Objective& copy) : Numbered (copy), __VA_ARGS__ {} \
+Objective& Objective::operator = (const Objective& copy) \
+	{ number = copy.number; return *this; }
+
+OBJECTIVE_IMPL (
+	  PROXY_INIT (state),
+	  PROXY_INIT (visible),
+	  PROXY_INIT (final),
+	  PROXY_INIT (irreversible),
+	  PROXY_INIT (reverse),
+#ifdef IS_THIEF2
+	  PROXY_INIT (optional),
+	  PROXY_INIT (bonus),
+#endif
+	  PROXY_INIT (difficulty),
+	  PROXY_INIT (type),
+	  PROXY_INIT (target),
+	  PROXY_INIT (loot_gold),
+	  PROXY_INIT (loot_gems),
+	  PROXY_INIT (loot_goods),
+	  PROXY_INIT (loot_total),
+	  PROXY_INIT (loot_specials)
+)
+
+bool
+Objective::exists () const
 {
-	quest_var (field).unsubscribe (host);
+	return state.exists ();
 }
 
 size_t
@@ -359,7 +311,7 @@ Objective::dump_objectives ()
 	for (Objective objective = 0; objective.exists (); ++objective.number)
 	{
 		const char* state = nullptr;
-		switch (objective.get_state ())
+		switch (objective.state)
 		{
 		case State::INCOMPLETE: state = "- inco"; break;
 		case State::COMPLETE:   state = "+ comp"; break;
@@ -368,20 +320,19 @@ Objective::dump_objectives ()
 		default:                state = "? ????"; break;
 		}
 
-		Type type = objective.get_type ();
-		const char* type_name = nullptr;
-		switch (type)
+		const char* type = nullptr;
+		switch (objective.type)
 		{
-		case Type::NONE: type_name = "none"; break;
-		case Type::TAKE: type_name = "take"; break;
-		case Type::SLAY: type_name = "slay"; break;
-		case Type::LOOT: type_name = "loot"; break;
-		case Type::GOTO: type_name = "goto"; break;
-		default:         type_name = "????"; break;
+		case Type::NONE: type = "none"; break;
+		case Type::TAKE: type = "take"; break;
+		case Type::SLAY: type = "slay"; break;
+		case Type::LOOT: type = "loot"; break;
+		case Type::GOTO: type = "goto"; break;
+		default:         type = "????"; break;
 		}
 
 		const char* difficulty = nullptr;
-		switch (objective.get_difficulty ())
+		switch (objective.difficulty)
 		{
 		case Difficulty::NOT_EXPERT: difficulty = "NH-"; break;
 		case Difficulty::NOT_NORMAL: difficulty = "-HE"; break;
@@ -394,91 +345,118 @@ Objective::dump_objectives ()
 
 		mono << std::setw (3) << objective.number
 			<< "   " << state
-			<< "  " << (objective.is_visible () ? '+' : '-')
+			<< "  " << (objective.visible ? '+' : '-')
 			<< "  " << difficulty
-			<< "    " << (objective.is_final () ? '+' : '-')
-			<< "   " << (objective.is_irreversible () ? '+' : '-')
-			<< "   " << (objective.is_reverse () ? '+' : '-')
+			<< "    " << (objective.final ? '+' : '-')
+			<< "   " << (objective.irreversible ? '+' : '-')
+			<< "   " << (objective.reverse ? '+' : '-')
 #ifdef IS_THIEF2
-			<< "   " << (objective.is_optional () ? '+' : '-')
-			<< "   " << (objective.is_bonus () ? '+' : '-')
+			<< "   " << (objective.optional ? '+' : '-')
+			<< "   " << (objective.bonus ? '+' : '-')
 #endif // IS_THIEF2
-			<< "    " << type_name << " ";
-		if (type == Type::LOOT)
+			<< "    " << type << " ";
+		if (objective.type == Type::LOOT)
 		{
-			Loot loot = objective.get_loot ();
-			String specials = loot.specials.to_string ();
+			String specials =
+				Specials (objective.loot_specials).to_string ();
 			std::reverse (specials.begin (), specials.end ());
 			mono << boost::format ("{ %||g, %||g, %||g, %||g; %|| }")
-				% loot.gold % loot.gems % loot.goods
-				% loot.total % specials;
+				% objective.loot_gold % objective.loot_gems
+				% objective.loot_goods % objective.loot_total
+				% specials;
 		}
 		else
-			mono << objective.get_target ();
+			mono << objective.target;
 		mono << '\n';
 	}
 
 	mono << std::flush << std::internal;
 }
 
-typedef std::map<Objective::Field, CIString> ObjectiveFieldPrefixes;
 
-static const ObjectiveFieldPrefixes&
-get_field_prefixes ()
-{
-	static const ObjectiveFieldPrefixes FIELD_PREFIXES =
-	{
-		{ Objective::Field::STATE, "goal_state_" },
-		{ Objective::Field::VISIBLE, "goal_visible_" },
-		{ Objective::Field::FINAL, "goal_final_" },
-		{ Objective::Field::IRREVERSIBLE, "goal_irreversible_" },
-		{ Objective::Field::REVERSE, "goal_reverse_" },
+
+// ObjectiveMessage
+
+THIEF_ENUM_CODING (ObjectiveMessage::Field, CODE, CODE,
+	THIEF_ENUM_VALUE (STATE, "state"),
+	THIEF_ENUM_VALUE (VISIBLE, "visible"),
+	THIEF_ENUM_VALUE (FINAL, "final"),
+	THIEF_ENUM_VALUE (IRREVERSIBLE, "irreversible"),
+	THIEF_ENUM_VALUE (REVERSE, "reverse"),
+	THIEF_ENUM_VALUE (MIN_DIFF, "min_diff"),
+	THIEF_ENUM_VALUE (MAX_DIFF, "max_diff"),
+	THIEF_ENUM_VALUE (TYPE, "type"),
+	THIEF_ENUM_VALUE (TARGET, "target"),
+	THIEF_ENUM_VALUE (GOLD, "gold"),
+	THIEF_ENUM_VALUE (GEMS, "gems"),
+	THIEF_ENUM_VALUE (GOODS, "goods"),
+	THIEF_ENUM_VALUE (LOOT, "loot"),
+	THIEF_ENUM_VALUE (SPECIAL, "special"),
 #ifdef IS_THIEF2
-		{ Objective::Field::OPTIONAL, "goal_optional_" },
-		{ Objective::Field::BONUS, "goal_bonus_" },
+	THIEF_ENUM_VALUE (SPECIALS, "specials"),
+	THIEF_ENUM_VALUE (OPTIONAL, "optional"),
+	THIEF_ENUM_VALUE (BONUS, "bonus"),
 #endif
-		{ Objective::Field::MIN_DIFF, "goal_min_diff_" },
-		{ Objective::Field::MAX_DIFF, "goal_max_diff_" },
-		{ Objective::Field::TYPE, "goal_type_" },
-		{ Objective::Field::TARGET, "goal_target_" },
-		{ Objective::Field::GOLD, "goal_gold_" },
-		{ Objective::Field::GEMS, "goal_gems_" },
-		{ Objective::Field::GOODS, "goal_goods_" },
-		{ Objective::Field::LOOT, "goal_loot_" },
-		{ Objective::Field::SPECIAL, "goal_special_" },
-		{ Objective::Field::SPECIALS, "goal_specials_" },
-	};
-	return FIELD_PREFIXES;
+)
+
+MESSAGE_WRAPPER_IMPL_ (ObjectiveMessage,
+	MESSAGE_TYPENAME_TEST ("sQuestMsg") &&
+		parse (static_cast<sQuestMsg*> (_message)->m_pName).first
+			!= Objective::NONE),
+	objective (parse (MESSAGE_AS (sQuestMsg)->m_pName).first),
+	field (parse (MESSAGE_AS (sQuestMsg)->m_pName).second),
+	new_raw_value (MESSAGE_AS (sQuestMsg)->m_newValue),
+	old_raw_value (MESSAGE_AS (sQuestMsg)->m_oldValue)
+{}
+
+ObjectiveMessage::ObjectiveMessage (const Objective& _objective, Field _field,
+		int _new_raw_value, int _old_raw_value)
+	: Message (new sQuestMsg ()), objective (_objective), field (_field),
+	  new_raw_value (_new_raw_value), old_raw_value (_old_raw_value)
+{
+	message->message = "QuestChange";
+	MESSAGE_AS (sQuestMsg)->m_newValue = new_raw_value;
+	MESSAGE_AS (sQuestMsg)->m_oldValue = old_raw_value;
+
+	boost::format qvar_name ("goal_%||_%||");
+	qvar_name % EnumCoding::get<Field> ().encode (field) % objective.number;
+	MESSAGE_AS (sQuestMsg)->m_pName = qvar_name.str ().data (); //FIXME This data will be lost.
 }
 
-Objective::QVData
-Objective::parse_quest_var (const QuestVar& quest_var)
+ObjectiveMessage::ParseResult
+ObjectiveMessage::parse (const char* _quest_var)
 {
-	static const QVData BAD_QV = { NONE, Field (-1) };
+	static const ParseResult BAD_QV { Objective::NONE, Field (-1) };
 
-	size_t number_pos = quest_var.name.find_first_of ("0123456789");
-	if (number_pos == String::npos) return BAD_QV;
+	if (!_quest_var) return BAD_QV;
+	String quest_var { _quest_var };
 
-	String _prefix = quest_var.name.substr (0, number_pos),
-		_number = quest_var.name.substr (number_pos);
+	if (quest_var.size () < 8 || quest_var.substr (0, 5) != "goal_")
+		return BAD_QV;
+
+	size_t number_pos = quest_var.find_first_of ("0123456789");
+	if (number_pos == String::npos || quest_var [number_pos - 1] != '_')
+		return BAD_QV;
+
+	String _field = quest_var.substr (5, number_pos - 6),
+		_number = quest_var.substr (number_pos);
+
+	Field field = Field (-1);
+	try
+	{
+		field = Field (EnumCoding::get<Field> ().decode (_field));
+	}
+	catch (...)
+	{
+		return BAD_QV;
+	}
 
 	char* end = nullptr;
-	Number number = strtol (_number.data (), &end, 10);
-	if (end == _number.data ()) return BAD_QV;
+	Objective::Number number = strtol (_number.data (), &end, 10);
+	if (end == _number.data ())
+		return BAD_QV;
 
-	for (auto& prefix : get_field_prefixes ())
-		if (prefix.second == _prefix)
-			return { number, prefix.first };
-
-	return BAD_QV;
-}
-
-QuestVar
-Objective::quest_var (Field field) const
-{
-	std::ostringstream _quest_var;
-	_quest_var << get_field_prefixes ().at (field).data () << number;
-	return QuestVar (_quest_var.str ());
+	return { number, field };
 }
 
 

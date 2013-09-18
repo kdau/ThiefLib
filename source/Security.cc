@@ -218,8 +218,7 @@ MESSAGE_WRAPPER_IMPL (DoorMessage, sDoorMsg),
 {
 	if (new_state == Door::State::INVALID ||
 	    old_state == Door::State::INVALID)
-		throw MessageWrapError (message, typeid (*this),
-			"invalid action");
+		throw MessageWrapError (message, "DoorMessage", "invalid action");
 }
 
 DoorMessage::DoorMessage (Door::State _new_state, Door::State _old_state)

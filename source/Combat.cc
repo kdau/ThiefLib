@@ -88,22 +88,23 @@ AIAttackLink::create (const Object& source, const Object& dest,
 
 // AIAttackMessage
 
-static AIAttackMessage::Event
-AIAttackMessage_get_event (const char* _name)
+AIAttackMessage::Event
+AIAttackMessage::parse (const char* _name)
 {
 	CIString name = _name ? _name : "";
-	if (name == "StartWindup") return AIAttackMessage::WINDUP;
-	if (name == "StartAttack") return AIAttackMessage::START;
-	if (name == "EndAttack") return AIAttackMessage::END;
-	return AIAttackMessage::Event (-1);
+	if (name == "StartWindup") return Event::WINDUP;
+	if (name == "StartAttack") return Event::START;
+	if (name == "EndAttack") return Event::END;
+	return Event (-1);
 }
 
 MESSAGE_WRAPPER_IMPL (AIAttackMessage, sAttackMsg),
-	event (AIAttackMessage_get_event (message->message)),
+	event (parse (message->message)),
 	weapon (MESSAGE_AS (sAttackMsg)->weapon)
 {
 	if (int (event) == -1)
-		throw MessageWrapError (message, typeid (*this), "invalid event");
+		throw MessageWrapError (message, "AIAttackMessage",
+			"invalid event");
 }
 
 AIAttackMessage::AIAttackMessage (Event _event, const Object& _weapon)

@@ -88,6 +88,9 @@ public:
 
 	const Event event;
 	const Weapon weapon;
+
+private:
+	static Event parse (const char* name);
 };
 
 

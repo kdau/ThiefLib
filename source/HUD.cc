@@ -291,7 +291,7 @@ HUDElement::create_overlay ()
 	}
 	else
 	{
-		mono << "ERROR: Could not create a HUD overlay." << std::endl;
+		mono.log ("ERROR: Could not create a HUD overlay.");
 		return false;
 	}
 }

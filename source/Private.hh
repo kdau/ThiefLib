@@ -75,6 +75,8 @@ struct XYZColor
 
 	explicit XYZColor (const LabColor& lab);
 	explicit operator LabColor () const;
+
+	static const XYZColor D65_WHITE;
 };
 
 
@@ -288,12 +290,13 @@ FlavorName##Link::FlavorName##Link (const FlavorName##Link& link) \
 
 #define MESSAGE_WRAPPER_IMPL_(Type, Tests) \
 Type::Type (sScrMsg* _message, sMultiParm* _reply) \
-	: Message (_message, _reply, (Tests))
+	: Message (_message, _reply, (Tests), #Type)
 
-#define MESSAGE_NAME_TEST(Name) (_stricmp (_message->message, Name) == 0)
+#define MESSAGE_NAME_TEST(Name) \
+(_message && _message->message && _stricmp (_message->message, Name) == 0)
 
 #define MESSAGE_TYPENAME_TEST(LGType) \
-(strcmp (_message->Persistent_GetName (), LGType) == 0)
+(_message && strcmp (_message->Persistent_GetName (), LGType) == 0)
 
 #define MESSAGE_WRAPPER_IMPL(Type, LGType) \
 MESSAGE_WRAPPER_IMPL_ (Type, MESSAGE_TYPENAME_TEST (#LGType))

@@ -469,7 +469,7 @@ LGMulti<Type>::operator = (const Type& value) \
 LGMulti<Type>::operator Type () const \
 { \
 	if (type != MultiType) \
-		throw LGMultiTypeError (type, typeid (Type).name ()); \
+		throw LGMultiTypeError (type, #Type); \
 	return data.Member; \
 }
 

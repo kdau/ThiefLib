@@ -185,6 +185,9 @@ Allocator::free (void* ptr)
 
 // XYZColor
 
+const XYZColor
+XYZColor::D65_WHITE = { 0.950456, 1.0, 1.088754 };
+
 inline double
 sRGB_gamma (double c)
 {
@@ -223,8 +226,6 @@ XYZColor::operator RGBColor () const
 	B = 255.0 * std::max (0.0, std::min (1.0, sRGB_gamma (B)));
 	return RGBColor (R, G, B);
 }
-
-static const XYZColor D65_WHITE = { 0.950456, 1.0, 1.088754 };
 
 inline double
 Lab_f (double t)
