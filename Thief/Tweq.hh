@@ -47,6 +47,30 @@ protected:
 	THIEF_OBJECT_TYPE (Tweq)
 };
 
+#define THIEF_TWEQ_COMMON \
+	THIEF_PROP_FIELD (bool, simulate_always); \
+	THIEF_PROP_FIELD (bool, simulate_far); \
+	THIEF_PROP_FIELD (bool, simulate_near); \
+	THIEF_PROP_FIELD (bool, simulate_onscreen); \
+	\
+	THIEF_PROP_FIELD (bool, jitter_low); \
+	THIEF_PROP_FIELD (bool, jitter_high); \
+	THIEF_PROP_FIELD (bool, jitter_multiply); \
+	\
+	THIEF_PROP_FIELD (bool, bounce); \
+	THIEF_PROP_FIELD (bool, bounce_once); \
+	THIEF_PROP_FIELD (bool, pendulum); \
+	THIEF_PROP_FIELD (bool, unlimited); \
+	THIEF_PROP_FIELD (bool, wrap); \
+	THIEF_PROP_FIELD (Halt, halt_action); \
+	\
+	THIEF_PROP_FIELD (bool, subscribed); \
+	\
+	THIEF_PROP_FIELD (bool, active); \
+	THIEF_PROP_FIELD (bool, reversed);
+
+//TESTME: simulate_far, simulate_near, simulate_onscreen, jitter_low, jitter_high, jitter_multiply, bounce, bounce_once, pendulum, unlimited, wrap, subscribed, reversed
+
 
 
 class TweqMessage : public Message // "TweqComplete" //TESTME
@@ -70,16 +94,25 @@ public:
 	THIEF_OBJECT_TYPE (DeleteTweq)
 	bool has_delete_tweq () const;
 
-	THIEF_PROP_FIELD (bool, simulate_always);
-	THIEF_PROP_FIELD (bool, simulate_far); //TESTME
-	THIEF_PROP_FIELD (bool, simulate_near); //TESTME
-	THIEF_PROP_FIELD (bool, simulate_onscreen); //TESTME
+	THIEF_TWEQ_COMMON
 
 	THIEF_PROP_FIELD (Time, duration);
-	THIEF_PROP_FIELD (Halt, halt_action);
-
-	THIEF_PROP_FIELD (bool, active);
 	THIEF_PROP_FIELD (Time, current_time); //TESTME
+};
+
+
+
+class FlickerTweq : public virtual Tweq
+{
+public:
+	THIEF_OBJECT_TYPE (FlickerTweq)
+	bool has_flicker_tweq () const;
+
+	THIEF_TWEQ_COMMON
+
+	THIEF_PROP_FIELD (Time, rate);
+	THIEF_PROP_FIELD (Time, current_time); //TESTME
+	THIEF_PROP_FIELD (unsigned, current_frame); //TESTME
 };
 
 

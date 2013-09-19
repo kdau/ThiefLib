@@ -80,13 +80,13 @@ public:
 	enum class ActionPriority { LOW, NORMAL, HIGH };
 
 	bool go_to_location (const Object& nearby, Speed = Speed::NORMAL,
-		ActionPriority = ActionPriority::NORMAL); //TESTME
+		ActionPriority = ActionPriority::NORMAL);
 
 	template <typename T>
 	bool go_to_location (const Object& nearby, Speed, ActionPriority,
-		const T& result_data); //TESTME
+		const T& result_data);
 
-	bool face_object (const Object& target); //TESTME
+	bool face_object (const Object& target);
 
 	bool frob_object (const Object& target,
 		const Object& tool = Object::NONE,
@@ -106,10 +106,10 @@ public:
 	THIEF_PROP_FIELD (Rating, aptitude); //TESTME
 	THIEF_PROP_FIELD (Rating, defensiveness); //TESTME
 	THIEF_PROP_FIELD (Rating, dodginess); //TESTME
-	THIEF_PROP_FIELD (Rating, hearing); //TESTME
+	THIEF_PROP_FIELD (Rating, hearing);
 	THIEF_PROP_FIELD (Rating, sloth); //TESTME
 	THIEF_PROP_FIELD (Rating, verbosity); //TESTME
-	THIEF_PROP_FIELD (Rating, vision); //TESTME
+	THIEF_PROP_FIELD (Rating, vision);
 
 	THIEF_PROP_FIELD (float, time_warp); //TESTME
 
@@ -120,7 +120,7 @@ public:
 
 	THIEF_PROP_FIELD (bool, head_tracks_player); //TESTME
 
-	THIEF_PROP_FIELD (bool, investigates); //TESTME
+	THIEF_PROP_FIELD (bool, investigates);
 
 	THIEF_PROP_FIELD (bool, patrols);
 	THIEF_PROP_FIELD (bool, patrols_randomly); //TESTME
@@ -137,9 +137,14 @@ public:
 
 	enum class Alert { NONE, LOW, MODERATE, HIGH };
 
-	Alert get_current_alert () const; //TESTME
-	void set_minimum_alert (Alert); //TESTME
-	void clear_alertness (); //TESTME
+	THIEF_PROP_FIELD_CONST (Alert, current_alert); //TESTME
+	THIEF_PROP_FIELD_CONST (Alert, peak_alert); //TESTME
+
+	THIEF_PROP_FIELD (Alert, minimum_alert);
+	THIEF_PROP_FIELD (Alert, minimum_relax_alert); //TESTME
+	THIEF_PROP_FIELD (Alert, maximum_alert); //TESTME
+
+	void clear_alertness ();
 
 	// Model
 
@@ -306,7 +311,7 @@ THIEF_FLAVORED_LINK (DetailAttachement)
 
 
 
-class AIActionResultMessage : public Message // "ObjActResult" //TESTME
+class AIActionResultMessage : public Message // "ObjActResult"
 {
 public:
 	enum Action { NONE, GOTO, FROB, MANEUVER };
@@ -316,9 +321,9 @@ public:
 		const Object& target, const LGMultiBase& data);
 	THIEF_MESSAGE_WRAP (AIActionResultMessage);
 
-	const Action action;
-	const Result result;
-	const Object target;
+	const Action action; //TESTME
+	const Result result; //TESTME
+	const Object target; //TESTME
 	MULTI_GET (get_result_data);
 
 private:

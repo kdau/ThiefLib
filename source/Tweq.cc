@@ -31,6 +31,47 @@ namespace Thief {
 
 OBJECT_TYPE_IMPL (Tweq)
 
+#define TWEQ_COMMON_CONFIG(Type, ConfigProp, StateProp) \
+PROXY_BIT_CONFIG (Type, simulate_always, ConfigProp, "AnimC", 2u, false); \
+PROXY_BIT_CONFIG (Type, simulate_far, ConfigProp, "AnimC", 32u, false); \
+PROXY_BIT_CONFIG (Type, simulate_near, ConfigProp, "AnimC", 16u, false); \
+PROXY_NEG_BIT_CONFIG (Type, simulate_onscreen, ConfigProp, "AnimC", 64u, true); \
+\
+PROXY_BIT_CONFIG (Type, jitter_low, ConfigProp, "CurveC", 1u, false); \
+PROXY_BIT_CONFIG (Type, jitter_high, ConfigProp, "CurveC", 2u, false); \
+PROXY_BIT_CONFIG (Type, jitter_multiply, ConfigProp, "CurveC", 4u, false); \
+\
+PROXY_BIT_CONFIG (Type, bounce, ConfigProp, "CurveC", 16u, false); \
+PROXY_BIT_CONFIG (Type, bounce_once, ConfigProp, "AnimC", 8u, false); \
+PROXY_BIT_CONFIG (Type, pendulum, ConfigProp, "CurveC", 8u, false); \
+PROXY_BIT_CONFIG (Type, unlimited, ConfigProp, "AnimC", 1u, false); \
+PROXY_BIT_CONFIG (Type, wrap, ConfigProp, "AnimC", 4u, false); \
+PROXY_CONFIG (Type, halt_action, ConfigProp, "Halt", \
+	Tweq::Halt, Halt::DESTROY_OBJECT); \
+\
+PROXY_BIT_CONFIG (Type, subscribed, ConfigProp, "MiscC", 2u, false); \
+\
+PROXY_BIT_CONFIG (Type, active, StateProp, "AnimS", 1u, false); \
+PROXY_BIT_CONFIG (Type, reversed, StateProp, "AnimS", 2u, false);
+
+#define TWEQ_COMMON_INIT \
+	PROXY_INIT (simulate_always), \
+	PROXY_INIT (simulate_far), \
+	PROXY_INIT (simulate_near), \
+	PROXY_INIT (simulate_onscreen), \
+	PROXY_INIT (jitter_low), \
+	PROXY_INIT (jitter_high), \
+	PROXY_INIT (jitter_multiply), \
+	PROXY_INIT (bounce), \
+	PROXY_INIT (bounce_once), \
+	PROXY_INIT (pendulum), \
+	PROXY_INIT (unlimited), \
+	PROXY_INIT (wrap), \
+	PROXY_INIT (halt_action), \
+	PROXY_INIT (subscribed), \
+	PROXY_INIT (active), \
+	PROXY_INIT (reversed)
+
 
 
 // TweqMessage
@@ -56,29 +97,12 @@ TweqMessage::TweqMessage (Event _event, Tweq::Type _tweq_type,
 
 // DeleteTweq
 
-PROXY_BIT_CONFIG (DeleteTweq, simulate_always, "CfgTweqDelete", "AnimC",
-	2u, false);
-PROXY_BIT_CONFIG (DeleteTweq, simulate_far, "CfgTweqDelete", "AnimC",
-	32u, false);
-PROXY_BIT_CONFIG (DeleteTweq, simulate_near, "CfgTweqDelete", "AnimC",
-	16u, false);
-PROXY_NEG_BIT_CONFIG (DeleteTweq, simulate_onscreen, "CfgTweqDelete", "AnimC",
-	64u, true);
+TWEQ_COMMON_CONFIG (DeleteTweq, "CfgTweqDelete", "StTweqDelete");
 PROXY_CONFIG (DeleteTweq, duration, "CfgTweqDelete", "Rate", Time, 0ul);
-PROXY_CONFIG (DeleteTweq, halt_action, "CfgTweqDelete", "Halt",
-	Tweq::Halt, Halt::DESTROY_OBJECT);
-
-PROXY_BIT_CONFIG (DeleteTweq, active, "StTweqDelete", "AnimS", 1u, false);
 PROXY_CONFIG (DeleteTweq, current_time, "StTweqDelete", "Cur Time", Time, 0ul);
 
-OBJECT_TYPE_IMPL_ (DeleteTweq, Tweq (),
-	PROXY_INIT (simulate_always),
-	PROXY_INIT (simulate_far),
-	PROXY_INIT (simulate_near),
-	PROXY_INIT (simulate_onscreen),
+OBJECT_TYPE_IMPL_ (DeleteTweq, Tweq (), TWEQ_COMMON_INIT,
 	PROXY_INIT (duration),
-	PROXY_INIT (halt_action),
-	PROXY_INIT (active),
 	PROXY_INIT (current_time)
 )
 
@@ -105,10 +129,24 @@ DeleteTweq::has_delete_tweq () const
 
 
 
-/*TODO Create FlickerTweq and wrap the following properties:
- * Tweq\Flicker = CfgTweqBlink
- * Tweq\FlickerState = StTweqBlink
- */
+// FlickerTweq
+
+TWEQ_COMMON_CONFIG (FlickerTweq, "CfgTweqBlink", "StTweqBlink");
+PROXY_CONFIG (FlickerTweq, rate, "CfgTweqBlink", "Rate", Time, 0ul);
+PROXY_CONFIG (FlickerTweq, current_time, "StTweqBlink", "Cur Time", Time, 0ul);
+PROXY_CONFIG (FlickerTweq, current_frame, "StTweqBlink", "Frame #", unsigned, 0u);
+
+OBJECT_TYPE_IMPL_ (FlickerTweq, Tweq (), TWEQ_COMMON_INIT,
+	PROXY_INIT (rate),
+	PROXY_INIT (current_time),
+	PROXY_INIT (current_frame)
+)
+
+bool
+FlickerTweq::has_flicker_tweq () const
+{
+	return halt_action.exists ();
+}
 
 
 

@@ -97,7 +97,7 @@ public:
 
 	THIEF_PROP_FIELD (bool, loop_is_poly); //TESTME
 	THIEF_PROP_FIELD (unsigned, loop_max_samples); //TESTME
-	THIEF_PROP_FIELD (Time, loop_min_interval); //TETME
+	THIEF_PROP_FIELD (Time, loop_min_interval); //TESTME
 	THIEF_PROP_FIELD (Time, loop_max_interval); //TESTME
 
 	// Semantic value
@@ -121,7 +121,7 @@ public:
 	THIEF_OBJECT_TYPE (AmbientHacked)
 	bool is_ambient_hacked () const;
 
-	THIEF_PROP_FIELD (bool, active); //TESTME
+	THIEF_PROP_FIELD (bool, active);
 
 	THIEF_PROP_FIELD_ARRAY (String, ambient_schema, 3u); //TESTME
 

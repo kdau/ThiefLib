@@ -103,8 +103,7 @@ ParameterBase::reparse () const
 		mono.log (boost::format ("WARNING: Could not parse parameter "
 			"\"%||\" on %||: %||.") % name % object % e.what ());
 	}
-	catch (...)
-	{}
+	catch (...) {}
 
 	set_default ();
 }

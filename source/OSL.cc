@@ -65,16 +65,17 @@ OSL*
 OSL::self = nullptr;
 
 OSL::OSL ()
-	: sim (false)
+	: sim (Engine::is_sim ())
 {
 	if (self)
 		throw std::runtime_error ("Thief::OSL already initialized.");
+	self = this;
+
+	SService<IDarkOverlaySrv> (LG)->SetHandler (self);
 
 	static sDispatchListenerDesc sim_listener
 		{ &IID_IOSLService, 0xF, on_sim, nullptr };
 	SInterface<ISimManager> (LG)->Listen (&sim_listener);
-
-	self = this;
 }
 
 OSL::~OSL ()
@@ -102,11 +103,7 @@ OSL::get_param_cache ()
 			mono.log (boost::format ("ERROR: Could not create "
 				"parameter cache: %||.") % e.what ());
 		}
-		catch (...)
-		{
-			mono.log ("ERROR: Could not create parameter cache: "
-				"an unknown error occurred.");
-		}
+		catch (...) {}
 	return param_cache.get ();
 }
 

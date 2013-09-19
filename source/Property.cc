@@ -345,6 +345,9 @@ PropertyMessage::PropertyMessage (Event _event, bool _inherited,
  * Speech\Pause Min = MinSpchPause
  * Speech\Voice Index = VoiceIdx
  * Texture\Index = TextureID
+ * (Tweq\*: "MiscC"): "Host Only"
+ * (Tweq\*State: "AnimS"): "ReSynch", "GoEdge", "LapOne"
+ * (Tweq\*State): "MiscS"
  * Weapon\BaseDamage = BaseWpnDmg
  * Weapon\CurDamage = CurWpnDmg
  * Weapon\Mode Change Metaproperty = ModeChangeMeta

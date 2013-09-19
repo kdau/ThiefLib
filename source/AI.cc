@@ -58,6 +58,14 @@ PROXY_NEG_CONFIG (AI, notices_cameras, "AI_IgCam", nullptr, bool, true);
 PROXY_CONFIG (AI, notices_damage, "AI_NoticeDmg", nullptr, bool, true);
 PROXY_NEG_CONFIG (AI, notices_other_ai, "AI_OnlyPlayer", nullptr, bool, true);
 PROXY_CONFIG (AI, notices_projectiles, "AI_SeesPrj", nullptr, bool, true);
+PROXY_CONFIG (AI, current_alert, "AI_Alertness", "Level", AI::Alert, Alert::NONE);
+PROXY_CONFIG (AI, peak_alert, "AI_Alertness", "Peak", AI::Alert, Alert::NONE);
+PROXY_CONFIG (AI, minimum_alert, "AI_AlertCap", "Min level",
+	AI::Alert, Alert::NONE);
+PROXY_CONFIG (AI, minimum_relax_alert, "AI_AlertCap", "Min relax after peak",
+	AI::Alert, Alert::LOW);
+PROXY_CONFIG (AI, maximum_alert, "AI_AlertCap", "Max level",
+	AI::Alert, Alert::HIGH);
 PROXY_CONFIG (AI, creature_type, "Creature", nullptr,
 	AI::CreatureType, CreatureType::NONE);
 PROXY_CONFIG (AI, creature_scale, "CretScale", nullptr, float, 1.0f);
@@ -101,6 +109,11 @@ OBJECT_TYPE_IMPL_ (AI, Rendered (), Interactive (), Physical (),
 	PROXY_INIT (notices_damage),
 	PROXY_INIT (notices_other_ai),
 	PROXY_INIT (notices_projectiles),
+	PROXY_INIT (current_alert),
+	PROXY_INIT (peak_alert),
+	PROXY_INIT (minimum_alert),
+	PROXY_INIT (minimum_relax_alert),
+	PROXY_INIT (maximum_alert),
 	PROXY_INIT (creature_type),
 	PROXY_INIT (creature_scale),
 	PROXY_INIT (is_small_creature),
@@ -250,12 +263,10 @@ AI::_frob_object (const Object& target, const Object& tool,
 
 
 // AI: alertness and awareness
-//TODO wrap property: AI: AI Core\Alertness cap = AI_AlertCap
 //TODO wrap property: AI: AI Core\Alertness sense multipliers = AI_AlSnMul
 //TODO wrap property: AI: AI Core\Awareness capacitor = AI_AwareCap
 //TODO wrap property: AI: AI Core\Awareness delay (react time) = AI_AwrDel2
 //TODO wrap property: AI: AI Core\Suprise [0, 1, Rad] = AISuprise
-//TODO wrap property (const): AI: State\Current alertness = AI_Alertness
 
 THIEF_ENUM_CODING (AI::Alert, BOTH, CODE,
 	THIEF_ENUM_VALUE (NONE, "none"),
@@ -263,19 +274,6 @@ THIEF_ENUM_CODING (AI::Alert, BOTH, CODE,
 	THIEF_ENUM_VALUE (MODERATE, "moderate"),
 	THIEF_ENUM_VALUE (HIGH, "high"),
 )
-
-AI::Alert
-AI::get_current_alert () const
-{
-	return AI::Alert (SService<IAIScrSrv> (LG)->GetAlertLevel (number));
-}
-
-void
-AI::set_minimum_alert (Alert alert)
-{
-	SService<IAIScrSrv> (LG)->SetMinimumAlert (number,
-		eAIScriptAlertLevel (alert));
-}
 
 void
 AI::clear_alertness ()
