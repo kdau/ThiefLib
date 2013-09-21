@@ -110,12 +110,18 @@ Parameter<T, THIEF_NOT_ENUM>::set_default () const
 }
 
 template <typename T>
+inline bool
+Parameter<T, THIEF_NOT_ENUM>::decode (const String& raw) const
+{
+	value = T (raw);
+	return true;
+}
+
+template <typename T>
 inline String
 Parameter<T, THIEF_NOT_ENUM>::encode () const
 {
-	std::ostringstream raw;
-	raw << std::boolalpha << value;
-	return raw.str ();
+	return std::to_string (value);
 }
 
 template <typename T>

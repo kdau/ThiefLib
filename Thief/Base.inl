@@ -196,6 +196,32 @@ Time::fminutes () const
 	return float (value) / float (MINUTES);
 }
 
+inline Time
+Time::operator + (const Time& rhs) const
+{
+	return value + rhs.value;
+}
+
+inline Time
+Time::operator - (const Time& rhs) const
+{
+	return value - rhs.value;
+}
+
+inline Time&
+Time::operator += (const Time& rhs)
+{
+	value += rhs.value;
+	return *this;
+}
+
+inline Time&
+Time::operator -= (const Time& rhs)
+{
+	value -= rhs.value;
+	return *this;
+}
+
 inline
 Time::Time (const String& code)
 	: value (0ul)

@@ -446,15 +446,14 @@ ObjectiveMessage::parse (const char* _quest_var)
 	{
 		field = Field (EnumCoding::get<Field> ().decode (_field));
 	}
-	catch (...)
-	{
-		return BAD_QV;
-	}
+	catch (...) { return BAD_QV; }
 
-	char* end = nullptr;
-	Objective::Number number = strtol (_number.data (), &end, 10);
-	if (end == _number.data ())
-		return BAD_QV;
+	Objective::Number number = Objective::NONE;
+	try
+	{
+		number = std::stoul (_number, nullptr, 10);
+	}
+	catch (...) { return BAD_QV; }
 
 	return { number, field };
 }

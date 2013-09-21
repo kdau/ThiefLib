@@ -130,12 +130,11 @@ std::ostream& operator << (std::ostream&, const Parameter<T>&);
 // Specializations of Parameter::encode/decode for fundamental and class types
 
 template<> bool Parameter<bool>::decode (const String& raw) const;
+template<> String Parameter<bool>::encode () const;
 
 template<> bool Parameter<int>::decode (const String& raw) const;
 
 template<> bool Parameter<float>::decode (const String& raw) const;
-
-template<> bool Parameter<Color>::decode (const String& raw) const;
 
 template<> bool Parameter<Object>::decode (const String& raw) const;
 template<> String Parameter<Object>::encode () const;
@@ -147,8 +146,6 @@ template<> bool Parameter<String>::decode (const String& raw) const;
 template<> String Parameter<String>::encode () const;
 
 template<> bool Parameter<Time>::decode (const String& raw) const;
-
-template<> bool Parameter<Vector>::decode (const String& raw) const;
 
 
 

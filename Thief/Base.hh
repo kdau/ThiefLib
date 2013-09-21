@@ -26,21 +26,11 @@
 
 
 
-// Configuration for Windows headers
-
-#define WINVER 0x0400
-#define _WIN32_WINNT 0x0400
-#define WIN32_LEAN_AND_MEAN
-
-
-
 // Dark Engine version checks
 
 #if (_DARKGAME == 1)
-#define IS_THIEF
 #define IS_THIEF1
 #elif (_DARKGAME == 2)
-#define IS_THIEF
 #define IS_THIEF2
 #elif defined(_DARKGAME)
 #error "ThiefLib does not support this game."
@@ -51,6 +41,31 @@
 #ifndef _NEWDARK
 #error "ThiefLib does not support pre-NewDark versions of the Dark Engine."
 #endif
+
+
+
+// Configuration for Windows headers
+
+#define WINVER 0x0400
+#define _WIN32_WINNT 0x0400
+#define WIN32_LEAN_AND_MEAN
+
+
+
+// This odd incantation works around an overzealous workaround in the GNU C++
+// library. The first macro undefined below is only supposed to disable the
+// wchar and wstring overloads of sto*, getline and to_wstring, but it also
+// disables the char and string overloads, which are unaffected by the bug in
+// question. wchar and wstring shouldn't be necessary in a Dark Engine OSM.
+
+#include <limits>
+#ifdef _GLIBCXX_HAVE_BROKEN_VSWPRINTF
+#undef _GLIBCXX_HAVE_BROKEN_VSWPRINTF
+#endif
+#ifdef _GLIBCXX_USE_WCHAR_T
+#undef _GLIBCXX_USE_WCHAR_T
+#endif
+#pragma GCC poison wchar wstring
 
 
 
@@ -166,6 +181,11 @@ struct Time
 	explicit operator float () const { return value; }
 	float fseconds () const;
 	float fminutes () const;
+
+	Time operator + (const Time&) const;
+	Time operator - (const Time&) const;
+	Time& operator += (const Time&);
+	Time& operator -= (const Time&);
 
 	explicit Time (const String&);
 	Time& operator = (const String&);

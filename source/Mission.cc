@@ -375,10 +375,8 @@ Mission::show_text (const String& text, Time duration, const Color& color)
 String
 Mission::get_book_text (const String& book, int page)
 {
-	std::ostringstream file, name;
-	file << "..\\books\\" << book;
-	name << "page_" << page;
-	return get_text ("strings", file.str (), name.str ());
+	return get_text ("strings", "..\\books\\" + book,
+		"page_" + std::to_string (page));
 }
 
 void

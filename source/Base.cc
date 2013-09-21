@@ -49,18 +49,18 @@ RGBColor::operator = (const String& code)
 	// hexadecimal full
 	if (code.length () == 7 && code.front () == '#')
 	{
-		red = strtoul (code.substr (1, 2).data (), nullptr, 16);
-		green = strtoul (code.substr (3, 2).data (), nullptr, 16);
-		blue = strtoul (code.substr (5, 2).data (), nullptr, 16);
+		red = std::stoul (code.substr (1, 2), nullptr, 16);
+		green = std::stoul (code.substr (3, 2), nullptr, 16);
+		blue = std::stoul (code.substr (5, 2), nullptr, 16);
 		return *this;
 	}
 
 	// hexadecimal short
 	if (code.length () == 4 && code.front () == '#')
 	{
-		red = strtoul (code.substr (1, 1).data (), nullptr, 16);
-		green = strtoul (code.substr (2, 1).data (), nullptr, 16);
-		blue = strtoul (code.substr (3, 1).data (), nullptr, 16);
+		red = std::stoul (code.substr (1, 1), nullptr, 16);
+		green = std::stoul (code.substr (2, 1), nullptr, 16);
+		blue = std::stoul (code.substr (3, 1), nullptr, 16);
 		red *= 17u; green *= 17u; blue *= 17u;
 		return *this;
 	}
@@ -69,10 +69,10 @@ RGBColor::operator = (const String& code)
 	size_t comma1 = code.find (','), comma2 = code.rfind (',');
 	if (comma1 != String::npos && comma2 != String::npos && comma1 != comma2)
 	{
-		red = strtoul (code.substr (0, comma1).data (), nullptr, 10);
-		green = strtoul (code.substr (comma1 + 1,
-			comma2 - comma1 - 1).data (), nullptr, 10);
-		blue = strtoul (code.substr (comma2 + 1).data (), nullptr, 10);
+		red = std::stoul (code.substr (0, comma1), nullptr, 10);
+		green = std::stoul (code.substr (comma1 + 1,
+			comma2 - comma1 - 1), nullptr, 10);
+		blue = std::stoul (code.substr (comma2 + 1), nullptr, 10);
 		return *this;
 	}
 
@@ -121,9 +121,12 @@ RGBColor::operator = (const String& code)
 
 RGBColor::operator String () const
 {
-	char code[8];
-	snprintf (code, sizeof code, "#%.2X%.2X%.2X", red, green, blue);
-	return code;
+	std::ostringstream code;
+	code << '#' << std::hex << std::setfill ('0')
+		<< std::setw (2) << unsigned (red)
+		<< std::setw (2) << unsigned (green)
+		<< std::setw (2) << unsigned (blue);
+	return code.str ();
 }
 
 
@@ -148,13 +151,11 @@ LabColor::operator RGBColor () const
 Time&
 Time::operator = (const String& code)
 {
-	char* end = nullptr;
-	double units = strtod (code.data (), &end);
-	if (end == code.data ())
-		throw std::runtime_error ("invalid time code");
+	size_t end = 0u;
+	double units = std::stod (code, &end);
 
-	if (end)
-		switch (*end)
+	if (end < code.length ())
+		switch (code [end])
 		{
 		case 'm': case 'M':
 			units *= MINUTES;
@@ -162,10 +163,8 @@ Time::operator = (const String& code)
 		case 's': case 'S':
 			units *= SECONDS;
 			break;
-		case '\0':
-			break;
 		default:
-			if (!std::isspace (*end))
+			if (!std::isspace (code [end]))
 				throw std::runtime_error ("invalid time code");
 		}
 
@@ -175,9 +174,7 @@ Time::operator = (const String& code)
 
 Time::operator String () const
 {
-	std::ostringstream code;
-	code << value;
-	return code.str ();
+	return std::to_string (value);
 }
 
 
@@ -247,10 +244,9 @@ Vector::operator = (const String& code)
 	if (comma1 == String::npos || comma2 == String::npos || comma1 == comma2)
 		throw std::runtime_error ("invalid vector specification");
 
-	x = strtof (code.substr (0, comma1).data (), nullptr);
-	y = strtof (code.substr (comma1 + 1, comma2 - comma1 - 1).data (),
-		nullptr);
-	z = strtof (code.substr (comma2 + 1).data (), nullptr);
+	x = std::stof (code.substr (0, comma1));
+	y = std::stof (code.substr (comma1 + 1, comma2 - comma1 - 1));
+	z = std::stof (code.substr (comma2 + 1));
 
 	return *this;
 }

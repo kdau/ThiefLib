@@ -139,12 +139,14 @@ HUDBitmap::HUDBitmap (const String& _path, bool animation)
 	Frame max_frames = animation ? MAX_BITMAP_HANDLE : 1;
 	for (Frame frame = STATIC; frame < max_frames; ++frame)
 	{
-		std::ostringstream _file;
-		_file << fname;
-		if (frame != STATIC) _file << '_' << frame;
-		_file << ext;
+		String file = fname;
+		if (frame != STATIC)
+		{
+			file += '_';
+			file += std::to_string (frame);
+		}
+		file += ext;
 
-		String file = _file.str ();
 		Handle handle = DOS->GetBitmap (file.data (), dir);
 		if (handle != INVALID_HANDLE)
 			frames.push_back (handle);

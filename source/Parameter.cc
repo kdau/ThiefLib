@@ -92,18 +92,18 @@ ParameterBase::reparse () const
 	does_exist = cache->exists (object, name, config.inheritable);
 
 	if (does_exist)
-	try
-	{
-		if (!decode (get_raw ()))
-			throw std::runtime_error ("An unknown error occurred.");
-		return;
-	}
-	catch (std::exception& e)
-	{
-		mono.log (boost::format ("WARNING: Could not parse parameter "
-			"\"%||\" on %||: %||.") % name % object % e.what ());
-	}
-	catch (...) {}
+		try
+		{
+			if (decode (get_raw ()))
+				return;
+		}
+		catch (std::exception& e)
+		{
+			mono.log (boost::format ("WARNING: Could not parse "
+				"parameter \"%||\" on %||: %||.")
+				% name % object % e.what ());
+		}
+		catch (...) {}
 
 	set_default ();
 }
@@ -148,11 +148,18 @@ Parameter<bool>::decode (const String& raw) const
 		break;
 	default:
 		// Kept like this to conform to ScriptLib's DN syntax.
-		value = strtol (raw.data (), nullptr, 0);
+		value = std::stol (raw, nullptr, 0);
 		break;
 	}
 
 	return true;
+}
+
+template<>
+String
+Parameter<bool>::encode () const
+{
+	return value ? "true" : "false";
 }
 
 template<>
@@ -162,9 +169,8 @@ Parameter<int>::decode (const String& raw) const
 	value = decode_quest_ref (raw);
 	if (value != INT_MAX) return true;
 
-	char* end = nullptr;
-	value = strtol (raw.data (), &end, 0);
-	return end != raw.data ();
+	value = std::stoi (raw, nullptr, 0);
+	return true;
 }
 
 template<>
@@ -174,21 +180,8 @@ Parameter<float>::decode (const String& raw) const
 	int _value = decode_quest_ref (raw);
 	if (_value != INT_MAX) { value = _value; return true; }
 
-	char* end = nullptr;
-	value = strtof (raw.data (), &end);
-	return end != raw.data ();
-}
-
-template<>
-bool
-Parameter<Color>::decode (const String& raw) const
-{
-	try
-	{
-		value = raw;
-		return true;
-	}
-	catch (...) { return false; }
+	value = std::stof (raw);
+	return true;
 }
 
 template<>
@@ -204,10 +197,10 @@ String
 Parameter<Object>::encode () const
 {
 	String obj_name = value.get_name ();
-	if (!obj_name.empty ()) return obj_name;
-	std::ostringstream raw;
-	raw << value.number;
-	return raw.str ();
+	if (!obj_name.empty ())
+		return obj_name;
+	else
+		return std::to_string (value.number);
 }
 
 template<>
@@ -218,18 +211,15 @@ Parameter<Objective>::decode (const String& raw) const
 	if (_value != INT_MAX && _value >= 0)
 		{ value.number = _value; return true; }
 
-	char* end = nullptr;
-	value.number = strtoul (raw.data (), &end, 10);
-	return end != raw.data ();
+	value.number = std::stoul (raw, nullptr, 10);
+	return true;
 }
 
 template<>
 String
 Parameter<Objective>::encode () const
 {
-	std::ostringstream raw;
-	raw << value.number;
-	return raw.str ();
+	return std::to_string (value.number);
 }
 
 template<>
@@ -239,24 +229,8 @@ Parameter<Time>::decode (const String& raw) const
 	int _value = decode_quest_ref (raw);
 	if (_value != INT_MAX) { value = _value; return true; }
 
-	try
-	{
-		value = raw;
-		return true;
-	}
-	catch (...) { return false; }
-}
-
-template<>
-bool
-Parameter<Vector>::decode (const String& raw) const
-{
-	try
-	{
-		value = raw;
-		return true;
-	}
-	catch (...) { return false; }
+	value = raw;
+	return true;
 }
 
 
@@ -311,18 +285,16 @@ EnumCoding::decode (const String& raw) const
 
 	// Try decoding as a value integer.
 	if (input_type != Input::CODE)
-	{
-		char* end = nullptr;
-		int candidate = strtol (raw.data (), &end, 0);
-		if (end != raw.data ())
+		try
 		{
+			int candidate = std::stoi (raw, nullptr, 0);
 			if (enumerators.empty ())
 				return candidate;
 			for (auto& enumerator : enumerators)
 				if (enumerator.value == candidate)
 					return candidate;
 		}
-	}
+		catch (...) {}
 
 	throw std::runtime_error ("invalid enumerator");
 }
@@ -340,9 +312,7 @@ EnumCoding::encode (int value) const
 					return enumerator.codes.front ().data ();
 			}
 
-	std::ostringstream raw;
-	raw << value;
-	return raw.str ();
+	return std::to_string (value);
 }
 
 

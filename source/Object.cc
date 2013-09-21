@@ -211,17 +211,24 @@ Object::set_name (const String& name)
 String
 Object::get_editor_name () const
 {
-	std::ostringstream fname;
+	static const boost::format NAMED ("%|| (%||)"), UNNAMED ("A %|| (%||)");
+	boost::format editor_name;
 
-	String name = exists () ? get_name ()
-		: (number == NONE) ? "None" : "NONEXISTENT";
+	String name = (number == NONE) ? "None"
+		: exists () ? get_name () : "NONEXISTENT";
+
 	if (!name.empty ())
-		fname << name;
+	{
+		editor_name = NAMED;
+		editor_name % name % number;
+	}
 	else
-		fname << "A " << get_archetype ().get_name ();
+	{
+		editor_name = UNNAMED;
+		editor_name % get_archetype ().get_name () % number;
+	}
 
-	fname << " (" << number << ")";
-	return fname.str ();
+	return editor_name.str ();
 }
 
 //TODO wrap property: Inventory\Object Name = GameName
@@ -426,7 +433,13 @@ Object::find (const String& name)
 	SService<IObjectSrv> (LG)->Named (named, name.data ());
 	if (named) return named.id;
 
-	Number number = strtol (name.data (), nullptr, 10);
+	Number number = NONE;
+	try
+	{
+		number = std::stoi (name, nullptr, 10);
+	}
+	catch (...) {}
+
 	return Object (number).exists () ? number : NONE;
 }
 
