@@ -196,12 +196,12 @@ class ParticleGroup : public virtual Object
 {
 public:
 	THIEF_OBJECT_TYPE (ParticleGroup)
-	bool is_particle_group () const; //TESTME
+	bool is_particle_group () const;
 
 	THIEF_PROP_FIELD (int, particle_count); //TESTME
 	THIEF_PROP_FIELD (float, particle_size); //TESTME
 
-	THIEF_PROP_FIELD (bool, active); //TESTME
+	THIEF_PROP_FIELD (bool, active);
 };
 
 

@@ -299,12 +299,6 @@ ParticleGroup::is_particle_group () const
 	return particle_count.exists ();
 }
 
-void
-ParticleGroup::set_particles_active (bool active) //TODO Replace with PropField?
-{
-	SService<IPGroupSrv> (LG)->SetActive (number, active);
-}
-
 
 
 // TextureSwapper
