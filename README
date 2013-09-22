@@ -13,7 +13,7 @@ Particularly, the library is still almost entirely undocumented.
 
 
 
-The library requires the following to build:
+The library itself requires the following to build:
  * a recent (GCC 4.6 or later) MinGW build environment
  * the Boost libraries (currently Format and Preprocessor, but others too later)
  * my modified version of Telliamed's lg library

@@ -181,9 +181,8 @@ PROXY_BIT_CONFIG (OBBPhysical, platform_friction, "PhysAttr", "Flags", 2u,
 PROXY_CONFIG (OBBPhysical, pore_size, "PhysAttr", "Pore Size", float, 0.0f);
 PROXY_CONFIG (OBBPhysical, ai_fires_through, "AIFiresThrough", nullptr,
 	bool, false);
-PROXY_CONFIG_ (OBBPhysical, conveyor_velocity, "ConveyorVel", nullptr, float,
-	0.0f, Vector::Component::X, FieldProxyConfig<float>::component_getter,
-	FieldProxyConfig<float>::component_setter);
+PROXY_COMP_CONFIG (OBBPhysical, conveyor_velocity, "ConveyorVel", nullptr,
+	Component::X, 0.0f);
 
 OBJECT_TYPE_IMPL_ (OBBPhysical, Physical (),
 	PROXY_INIT (physics_size),

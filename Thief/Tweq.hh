@@ -56,6 +56,7 @@ protected:
 	THIEF_PROP_FIELD (bool, jitter_low); \
 	THIEF_PROP_FIELD (bool, jitter_high); \
 	THIEF_PROP_FIELD (bool, jitter_multiply); \
+	THIEF_PROP_FIELD (bool, random); \
 	\
 	THIEF_PROP_FIELD (bool, bounce); \
 	THIEF_PROP_FIELD (bool, bounce_once); \
@@ -69,7 +70,7 @@ protected:
 	THIEF_PROP_FIELD (bool, active); \
 	THIEF_PROP_FIELD (bool, reversed);
 
-//TESTME: simulate_far, simulate_near, simulate_onscreen, jitter_low, jitter_high, jitter_multiply, bounce, bounce_once, pendulum, unlimited, wrap, subscribed, reversed
+//TESTME: simulate_far, simulate_near, simulate_onscreen, jitter_low, jitter_high, jitter_multiply, random, bounce, bounce_once, pendulum, unlimited, wrap, subscribed, reversed
 
 
 
@@ -111,6 +112,46 @@ public:
 	THIEF_TWEQ_COMMON
 
 	THIEF_PROP_FIELD (Time, rate);
+	THIEF_PROP_FIELD (Time, current_time); //TESTME
+	THIEF_PROP_FIELD (unsigned, current_frame); //TESTME
+};
+
+
+
+class LockTweq : public virtual Tweq
+{
+public:
+	THIEF_OBJECT_TYPE (LockTweq)
+	bool has_lock_tweq () const;
+
+	THIEF_TWEQ_COMMON
+
+	THIEF_PROP_FIELD (int, joint); //TESTME
+	THIEF_PROP_FIELD (float, min_angle); //TESTME
+	THIEF_PROP_FIELD (float, max_angle); //TESTME
+	THIEF_PROP_FIELD (float, rate); //TESTME
+
+	THIEF_PROP_FIELD (float, target_angle); //TESTME
+	THIEF_PROP_FIELD (unsigned, current_stage); //TESTME
+};
+
+
+
+class ModelsTweq : public virtual Tweq
+{
+public:
+	THIEF_OBJECT_TYPE (ModelsTweq)
+	bool has_models_tweq () const;
+
+	THIEF_TWEQ_COMMON
+
+	THIEF_PROP_FIELD (Time, rate); //TESTME
+	THIEF_PROP_FIELD_ARRAY (String, model, 6u); //TESTME
+	THIEF_PROP_FIELD (bool, anchor_bottom); //TESTME
+	THIEF_PROP_FIELD (bool, anchor_vhot); //TESTME
+	THIEF_PROP_FIELD (bool, use_creature_scale); //TESTME
+	THIEF_PROP_FIELD (bool, use_model_5); //TESTME
+
 	THIEF_PROP_FIELD (Time, current_time); //TESTME
 	THIEF_PROP_FIELD (unsigned, current_frame); //TESTME
 };

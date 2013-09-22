@@ -96,37 +96,49 @@ OBJECT_TYPE_IMPL_ (Light,
 
 
 // AnimLight
-//TODO wrap rest of property: Renderer\Anim Light = AnimLight
+//TODO Wrap "Dynamic Light" field of "AnimLight" property, possibly making some other fields non-const in support (or subclassing).
 
-PROXY_NEG_CONFIG (AnimLight, initially_on, "AnimLight", "inactive", bool, false);
+PROXY_CONFIG (AnimLight, light_mode, "AnimLight", "Mode",
+	AnimLight::Mode, Mode::FLIP);
+PROXY_NEG_CONFIG (AnimLight, active, "AnimLight", "inactive", bool, true);
+PROXY_CONFIG (AnimLight, brighten_time, "AnimLight", "millisecs to brighten",
+	Time, 0ul);
+PROXY_CONFIG (AnimLight, dim_time, "AnimLight", "millisecs to dim", Time, 0ul);
+PROXY_CONV_CONFIG (AnimLight, min_brightness, "AnimLight", "min brightness",
+	int, 0, float);
+PROXY_CONV_CONFIG (AnimLight, max_brightness, "AnimLight", "max brightness",
+	int, 0, float);
+PROXY_CONFIG (AnimLight, outer_radius, "AnimLight", "radius (0 for infinite)",
+	float, 0.0f);
+PROXY_CONFIG (AnimLight, inner_radius, "AnimLight", "inner radius (0 for none)",
+	float, 0.0f);
+PROXY_CONFIG (AnimLight, light_offset, "AnimLight", "offset from object",
+	Vector, Vector ());
+PROXY_CONFIG (AnimLight, soft_shadows, "AnimLight", "quad lit", bool, false);
+PROXY_CONV_CONFIG (AnimLight, current_state, "AnimLight", "currently rising?",
+	AnimLight::State, State::FALLING, bool);
+PROXY_CONFIG (AnimLight, current_countdown, "AnimLight", "current countdown",
+	Time, 0ul);
 
 OBJECT_TYPE_IMPL_ (AnimLight, Light (),
-	PROXY_INIT (initially_on)
+	PROXY_INIT (light_mode),
+	PROXY_INIT (active),
+	PROXY_INIT (brighten_time),
+	PROXY_INIT (dim_time),
+	PROXY_INIT (min_brightness),
+	PROXY_INIT (max_brightness),
+	PROXY_INIT (outer_radius),
+	PROXY_INIT (inner_radius),
+	PROXY_INIT (light_offset),
+	PROXY_INIT (soft_shadows),
+	PROXY_INIT (current_state),
+	PROXY_INIT (current_countdown)
 )
 
 bool
 AnimLight::is_anim_light () const
 {
-	return initially_on.exists ();
-}
-
-AnimLight::Mode
-AnimLight::get_light_mode () const //TODO Replace with PropField?
-{
-	return Mode (SService<ILightScrSrv> (LG)->GetMode (number));
-}
-
-void
-AnimLight::set_light_mode (Mode mode) //TODO Replace with PropField?
-{
-	SService<ILightScrSrv> (LG)->SetMode (number, int (mode));
-}
-
-void
-AnimLight::set_light_range (float minimum, float maximum) //TODO Replace with PropField?
-{
-	SService<ILightScrSrv> (LG)->Set
-		(number, int (get_light_mode ()), minimum, maximum);
+	return light_mode.exists ();
 }
 
 void
@@ -271,12 +283,14 @@ Flash::flash_world ()
 
 PROXY_CONFIG (ParticleGroup, particle_count, "ParticleGroup",
 	"number of particles", int, 0);
-PROXY_CONFIG (ParticleGroup, particle_size, "ParticleGroup",
-	"size of particle", float, 0.0f);
+PROXY_CONFIG (ParticleGroup, particle_size, "ParticleGroup", "size of particle",
+	float, 0.0f);
+PROXY_CONFIG (ParticleGroup, active, "ParticleGroup", "Active", bool, false);
 
 OBJECT_TYPE_IMPL_ (ParticleGroup,
 	PROXY_INIT (particle_count),
-	PROXY_INIT (particle_size)
+	PROXY_INIT (particle_size),
+	PROXY_INIT (active)
 )
 
 bool

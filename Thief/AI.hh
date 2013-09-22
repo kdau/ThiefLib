@@ -140,9 +140,9 @@ public:
 	THIEF_PROP_FIELD_CONST (Alert, current_alert); //TESTME
 	THIEF_PROP_FIELD_CONST (Alert, peak_alert); //TESTME
 
-	THIEF_PROP_FIELD (Alert, minimum_alert);
-	THIEF_PROP_FIELD (Alert, minimum_relax_alert); //TESTME
-	THIEF_PROP_FIELD (Alert, maximum_alert); //TESTME
+	THIEF_PROP_FIELD (Alert, min_alert);
+	THIEF_PROP_FIELD (Alert, relax_alert); //TESTME
+	THIEF_PROP_FIELD (Alert, max_alert); //TESTME
 
 	void clear_alertness ();
 
@@ -269,7 +269,7 @@ THIEF_FLAVORED_LINK (AIAwareness) //TESTME
 
 	THIEF_LINK_FIELD_CONST (Time, update_time);
 	THIEF_LINK_FIELD_CONST (Time, los_update_time);
-	void update (Time, bool have_los);
+	void update (Time, bool updated_los = false);
 };
 
 

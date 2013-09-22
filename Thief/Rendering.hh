@@ -70,7 +70,10 @@ class Light : public virtual Object
 public:
 	THIEF_OBJECT_TYPE (Light)
 
-	// These fields should be considered constant for non-dynamic lights.
+	// For dynamic lights, these fields are fully variable. For non-dynamic
+	// animated lights, changes to these fields will affect the light cast
+	// on objects, but not that cast on terrain. For static lights, these
+	// fields should be considered constant.
 	THIEF_PROP_FIELD (float, hue);
 	THIEF_PROP_FIELD (float, saturation);
 };
@@ -83,9 +86,7 @@ class AnimLight : public Light
 {
 public:
 	THIEF_OBJECT_TYPE (AnimLight)
-	bool is_anim_light () const; //TESTME
-
-	THIEF_PROP_FIELD_CONST (bool, initially_on); //TESTME
+	bool is_anim_light () const;
 
 	enum class Mode
 	{
@@ -94,10 +95,30 @@ public:
 		SMOOTH_BRIGHTEN, SMOOTH_DIM,
 		RANDOM_COHERENT, FLICKER
 	};
-	Mode get_light_mode () const;
-	void set_light_mode (Mode);
+	THIEF_PROP_FIELD (Mode, light_mode);
 
-	void set_light_range (float minimum, float maximum); //TESTME
+	// Note that "active" does not mean "on" ("maximally bright"). This
+	// controls whether the animation is active, and stopping it freezes
+	// the brightness at its current value.
+	THIEF_PROP_FIELD (bool, active);
+
+	THIEF_PROP_FIELD (Time, brighten_time);
+	THIEF_PROP_FIELD (Time, dim_time);
+
+	// The light cast on terrain is generally constant in brightness,
+	// although setting the minimum to zero is possible. The light cast on
+	// objects is fully variable in brightness.
+	THIEF_PROP_FIELD (int, min_brightness);
+	THIEF_PROP_FIELD (int, max_brightness);
+
+	THIEF_PROP_FIELD_CONST (float, outer_radius); //TESTME
+	THIEF_PROP_FIELD_CONST (float, inner_radius); //TESTME
+	THIEF_PROP_FIELD_CONST (Vector, light_offset); //TESTME
+	THIEF_PROP_FIELD_CONST (bool, soft_shadows); //TESTME
+
+	enum class State { FALLING, RISING };
+	THIEF_PROP_FIELD_CONST (State, current_state); //TESTME -const?
+	THIEF_PROP_FIELD_CONST (Time, current_countdown); //TESTME -const?
 
 	void subscribe_light (); //TESTME
 	void unsubscribe_light (); //TESTME
@@ -180,7 +201,7 @@ public:
 	THIEF_PROP_FIELD (int, particle_count); //TESTME
 	THIEF_PROP_FIELD (float, particle_size); //TESTME
 
-	void set_particles_active (bool); //TESTME
+	THIEF_PROP_FIELD (bool, active); //TESTME
 };
 
 

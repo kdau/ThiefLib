@@ -40,6 +40,7 @@ PROXY_NEG_BIT_CONFIG (Type, simulate_onscreen, ConfigProp, "AnimC", 64u, true); 
 PROXY_BIT_CONFIG (Type, jitter_low, ConfigProp, "CurveC", 1u, false); \
 PROXY_BIT_CONFIG (Type, jitter_high, ConfigProp, "CurveC", 2u, false); \
 PROXY_BIT_CONFIG (Type, jitter_multiply, ConfigProp, "CurveC", 4u, false); \
+PROXY_BIT_CONFIG (Type, random, ConfigProp, "AnimC", 4u, false); \
 \
 PROXY_BIT_CONFIG (Type, bounce, ConfigProp, "CurveC", 16u, false); \
 PROXY_BIT_CONFIG (Type, bounce_once, ConfigProp, "AnimC", 8u, false); \
@@ -62,6 +63,7 @@ PROXY_BIT_CONFIG (Type, reversed, StateProp, "AnimS", 2u, false);
 	PROXY_INIT (jitter_low), \
 	PROXY_INIT (jitter_high), \
 	PROXY_INIT (jitter_multiply), \
+	PROXY_INIT (random), \
 	PROXY_INIT (bounce), \
 	PROXY_INIT (bounce_once), \
 	PROXY_INIT (pendulum), \
@@ -157,17 +159,74 @@ FlickerTweq::has_flicker_tweq () const
 
 
 
-/*TODO Create LockTweq and wrap the following properties:
- * Tweq\Lock = CfgTweqLock
- * Tweq\LockState = StTweqLock
- */
+// LockTweq
+
+TWEQ_COMMON_CONFIG (LockTweq, "CfgTweqLock", "StTweqLock");
+PROXY_CONFIG (LockTweq, joint, "CfgTweqLock", "Lock Joint", int, 0);
+PROXY_COMP_CONFIG (LockTweq, min_angle, "CfgTweqLock", "    rate-low-highJoint",
+	Component::Y, 0.0f);
+PROXY_COMP_CONFIG (LockTweq, max_angle, "CfgTweqLock", "    rate-low-highJoint",
+	Component::Z, 0.0f);
+PROXY_COMP_CONFIG (LockTweq, rate, "CfgTweqLock", "    rate-low-highJoint",
+	Component::X, 0.0f);
+PROXY_CONFIG (LockTweq, target_angle, "StTweqLock", "Target Angle", float, 0.0f);
+PROXY_CONFIG (LockTweq, current_stage, "StTweqLock", "Cur Stage", unsigned, 0u);
+
+OBJECT_TYPE_IMPL_ (LockTweq, Tweq (), TWEQ_COMMON_INIT,
+	PROXY_INIT (joint),
+	PROXY_INIT (min_angle),
+	PROXY_INIT (max_angle),
+	PROXY_INIT (rate),
+	PROXY_INIT (target_angle),
+	PROXY_INIT (current_stage)
+)
+
+bool
+LockTweq::has_lock_tweq () const
+{
+	return halt_action.exists ();
+}
 
 
 
-/*TODO Create ModelsTweq and wrap the following properties:
- * Tweq\Models = CfgTweqModels
- * Tweq\ModelsState = StTweqModels
- */
+// ModelsTweq
+
+TWEQ_COMMON_CONFIG (ModelsTweq, "CfgTweqModels", "StTweqModels");
+PROXY_CONFIG (ModelsTweq, rate, "CfgTweqModels", "Rate", Time, 0ul);
+PROXY_ARRAY_CONFIG (ModelsTweq, model, 6u, String,
+        PROXY_ARRAY_ITEM ("CfgTweqModels", "Model 0", ""),
+        PROXY_ARRAY_ITEM ("CfgTweqModels", "Model 1", ""),
+        PROXY_ARRAY_ITEM ("CfgTweqModels", "Model 2", ""),
+        PROXY_ARRAY_ITEM ("CfgTweqModels", "Model 3", ""),
+        PROXY_ARRAY_ITEM ("CfgTweqModels", "Model 4", ""),
+        PROXY_ARRAY_ITEM ("CfgTweqModels", "Model 5", ""));
+PROXY_BIT_CONFIG (ModelsTweq, anchor_bottom, "StTweqModels", "MiscC",
+	1u, false);
+PROXY_BIT_CONFIG (ModelsTweq, anchor_vhot, "StTweqModels", "MiscC",
+	1024u, false);
+PROXY_BIT_CONFIG (ModelsTweq, use_creature_scale, "StTweqModels", "MiscC",
+	4096u, false);
+PROXY_BIT_CONFIG (ModelsTweq, use_model_5, "StTweqModels", "MiscC",
+	8192u, false);
+PROXY_CONFIG (ModelsTweq, current_time, "StTweqModels", "Cur Time", Time, 0ul);
+PROXY_CONFIG (ModelsTweq, current_frame, "StTweqModels", "Frame #", unsigned, 0u);
+
+OBJECT_TYPE_IMPL_ (ModelsTweq, Tweq (), TWEQ_COMMON_INIT,
+	PROXY_INIT (rate),
+	PROXY_ARRAY_INIT (model, 6),
+	PROXY_INIT (anchor_bottom),
+	PROXY_INIT (anchor_vhot),
+	PROXY_INIT (use_creature_scale),
+	PROXY_INIT (use_model_5),
+	PROXY_INIT (current_time),
+	PROXY_INIT (current_frame)
+)
+
+bool
+ModelsTweq::has_models_tweq () const
+{
+	return halt_action.exists ();
+}
 
 
 

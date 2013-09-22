@@ -154,6 +154,11 @@ PROXY_CONFIG_ (Class, Member, Major, Minor, bool, Default, Mask, \
 	FieldProxyConfig<bool>::bitmask_getter, \
 	FieldProxyConfig<bool>::bitmask_setter)
 
+#define PROXY_COMP_CONFIG(Class, Member, Major, Minor, _Component, Default) \
+PROXY_CONFIG_ (Class, Member, Major, Minor, float, Default, Vector::_Component, \
+	FieldProxyConfig<float>::component_getter, \
+	FieldProxyConfig<float>::component_setter)
+
 #define PROXY_NEG_CONFIG(Class, Member, Major, Minor, TypeIsBool, Default) \
 PROXY_CONFIG_ (Class, Member, Major, Minor, bool, Default, -1, \
 	FieldProxyConfig<bool>::bitmask_getter, \

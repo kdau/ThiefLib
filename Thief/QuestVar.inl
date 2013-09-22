@@ -110,10 +110,8 @@ THIEF_FIELD_PROXY_TEMPLATE
 inline QuestVar
 THIEF_FIELD_PROXY_CLASS (QuestField)::qvar (bool major) const
 {
-	boost::format name (major ? config.items [index].major
-		: config.items [index].minor);
-	name % numbered.number;
-	return QuestVar (name.str (),
+	return QuestVar ((boost::format (major ? config.items [index].major
+		: config.items [index].minor) % numbered.number).str (),
 		QuestVar::Scope (config.items [index].detail));
 }
 

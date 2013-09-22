@@ -1,5 +1,6 @@
 Current
 	* Replace Parameter<Object> with Parameter<Object::Ref>, resolvable dynamically to an Object.
+	* Fix possible dangling pointer in posted or scheduled synthetic QuestMessage and ObjectiveMessage instances.
 
 ActReact.hh
 	interfaces:
@@ -34,6 +35,7 @@ TNH/NV/TW features
 	* TrapTrigger: NVScript-style features (on, off, count, capacitor, falloff, failchance, dest)
 
 Other
+	* Recheck NewDark modders' notes for any missed fields.
 	* AI, Types: split each into two or more units
 	* EnumCoding: encoding and decoding of bitmasks
 	* Objective: VictoryCheck(er)-equivalent functionality per lg/convict.h

@@ -208,16 +208,13 @@ Message::get_lg_typename () const
 
 MessageWrapError::MessageWrapError (const sScrMsg* message,
 	const char* wrap_type, const char* problem) noexcept
-{
-	boost::format _explanation ("Can't wrap a(n) \"%||\" message of engine "
-		"type %|| as a(n) %||: %||.");
-	_explanation
+	: explanation ((boost::format ("Can't wrap a(n) \"%||\" message of "
+		"engine type %|| as a(n) %||: %||.")
 		% ((message && message->message) ? message->message : "")
 		% (message ? message->Persistent_GetName () : "null")
 		% (wrap_type ? wrap_type : "Message")
-		% (problem ? problem : "an unknown error occurred");
-	explanation = _explanation.str ();
-}
+		% (problem ? problem : "an unknown error occurred")).str ())
+{}
 
 
 

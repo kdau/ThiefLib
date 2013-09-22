@@ -60,12 +60,10 @@ PROXY_NEG_CONFIG (AI, notices_other_ai, "AI_OnlyPlayer", nullptr, bool, true);
 PROXY_CONFIG (AI, notices_projectiles, "AI_SeesPrj", nullptr, bool, true);
 PROXY_CONFIG (AI, current_alert, "AI_Alertness", "Level", AI::Alert, Alert::NONE);
 PROXY_CONFIG (AI, peak_alert, "AI_Alertness", "Peak", AI::Alert, Alert::NONE);
-PROXY_CONFIG (AI, minimum_alert, "AI_AlertCap", "Min level",
-	AI::Alert, Alert::NONE);
-PROXY_CONFIG (AI, minimum_relax_alert, "AI_AlertCap", "Min relax after peak",
+PROXY_CONFIG (AI, min_alert, "AI_AlertCap", "Min level", AI::Alert, Alert::NONE);
+PROXY_CONFIG (AI, relax_alert, "AI_AlertCap", "Min relax after peak",
 	AI::Alert, Alert::LOW);
-PROXY_CONFIG (AI, maximum_alert, "AI_AlertCap", "Max level",
-	AI::Alert, Alert::HIGH);
+PROXY_CONFIG (AI, max_alert, "AI_AlertCap", "Max level", AI::Alert, Alert::HIGH);
 PROXY_CONFIG (AI, creature_type, "Creature", nullptr,
 	AI::CreatureType, CreatureType::NONE);
 PROXY_CONFIG (AI, creature_scale, "CretScale", nullptr, float, 1.0f);
@@ -111,9 +109,9 @@ OBJECT_TYPE_IMPL_ (AI, Rendered (), Interactive (), Physical (),
 	PROXY_INIT (notices_projectiles),
 	PROXY_INIT (current_alert),
 	PROXY_INIT (peak_alert),
-	PROXY_INIT (minimum_alert),
-	PROXY_INIT (minimum_relax_alert),
-	PROXY_INIT (maximum_alert),
+	PROXY_INIT (min_alert),
+	PROXY_INIT (relax_alert),
+	PROXY_INIT (max_alert),
 	PROXY_INIT (creature_type),
 	PROXY_INIT (creature_scale),
 	PROXY_INIT (is_small_creature),
@@ -515,12 +513,12 @@ AIAwarenessLink::update_contact (const Vector& location, Time time,
 }
 
 void
-AIAwarenessLink::update (Time time, bool _have_los)
+AIAwarenessLink::update (Time time, bool updated_los)
 {
-	have_los = _have_los;
 	sAIAwareness data = get_ai_awareness_data (*this);
 	data.TimeLastUpdate = time;
-	if (_have_los) data.TimeLastUpdateLOS = time;
+	if (updated_los)
+		data.TimeLastUpdateLOS = time;
 	set_data_raw (&data);
 }
 

@@ -585,8 +585,8 @@ inline Type
 FieldProxyConfig<Type>::default_getter (const Item& item,
 	const LGMultiBase& multi)
 {
-	return multi.empty () ? item.default_value
-		: Type (reinterpret_cast<const LGMulti<StorageType>&> (multi));
+	return multi.empty () ? item.default_value : Type (StorageType
+		(reinterpret_cast<const LGMulti<StorageType>&> (multi)));
 }
 
 template <typename Type> template <typename StorageType>
