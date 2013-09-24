@@ -148,6 +148,7 @@ private:
 	size_t index;
 };
 
+//! \relates PropField
 THIEF_FIELD_PROXY_TEMPLATE
 std::ostream& operator << (std::ostream&,
 	const THIEF_FIELD_PROXY_CLASS (PropField)&);

@@ -26,6 +26,7 @@
 
 
 
+//! \cond HIDDEN_SYMBOLS
 // Dark Engine version checks
 
 #if (_DARKGAME == 1)
@@ -69,7 +70,7 @@
 
 
 
-// C++ standard library headers used in ThiefLib
+// C++ standard library and Boost headers used in ThiefLib
 
 #include <algorithm>
 #include <array>
@@ -87,12 +88,9 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-
-
-// Boost headers used in ThiefLib
-
 #include <boost/format.hpp>
+
+//! \endcond
 
 
 
@@ -113,7 +111,9 @@ typedef std::string String;
 class CITraits;
 typedef std::basic_string<char, CITraits> CIString;
 
+//! \relates CIString
 bool operator == (const CIString&, const String&);
+//! \relates CIString
 std::ostream& operator << (std::ostream&, const CIString&);
 
 
@@ -139,6 +139,7 @@ struct RGBColor
 	explicit operator String () const;
 };
 
+//! \relates RGBColor
 std::ostream& operator << (std::ostream&, const RGBColor&);
 
 typedef RGBColor Color;
@@ -192,6 +193,7 @@ struct Time
 	explicit operator String () const;
 };
 
+//! \relates Time
 std::ostream& operator << (std::ostream&, const Time&);
 
 
@@ -243,6 +245,7 @@ struct Vector
 	const float& operator [] (Component) const;
 };
 
+//! \relates Vector
 std::ostream& operator << (std::ostream&, const Vector&);
 
 

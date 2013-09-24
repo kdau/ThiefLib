@@ -177,7 +177,9 @@ THIEF_FIELD_PROXY_CLASS (DoubleQuestField)::unsubscribe (const Object& host)
 
 // DifficultyQuestField
 
+//! \cond HIDDEN_SYMBOLS
 extern const FieldProxyConfig<Difficulty> F_objective_difficulty;
+//! \endcond
 
 class DifficultyQuestField
 	: public DoubleQuestField<Difficulty, F_objective_difficulty>
@@ -198,7 +200,9 @@ DifficultyQuestField::DifficultyQuestField (Numbered& _numbered, size_t _index)
 
 // SpecialsQuestField
 
+//! \cond HIDDEN_SYMBOLS
 extern const FieldProxyConfig<std::bitset<8>> F_objective_specials;
+//! \endcond
 
 class SpecialsQuestField
 	: public DoubleQuestField<std::bitset<8>, F_objective_specials>

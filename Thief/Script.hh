@@ -28,6 +28,7 @@
 
 #include <Thief/Base.hh>
 #include <Thief/Message.hh>
+#include <Thief/Parameter.hh>
 
 namespace Thief {
 

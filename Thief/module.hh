@@ -28,8 +28,9 @@
 
 
 
-// LG interface expects this format
-
+/*! \cond HIDDEN_SYMBOLS
+ * The LG interface expects this format for script information.
+ */
 struct sScrClassDesc
 {
 	const char* module_name;
@@ -39,6 +40,7 @@ struct sScrClassDesc
 	typedef IScript* (__cdecl *Factory) (const char*, int);
 	Factory factory;
 };
+//! \endcond
 
 
 

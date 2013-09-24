@@ -122,6 +122,7 @@ private:
 	mutable T value;
 };
 
+//! \relates Parameter
 template <typename T>
 std::ostream& operator << (std::ostream&, const Parameter<T>&);
 

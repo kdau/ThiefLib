@@ -27,20 +27,7 @@ namespace Thief {
 
 
 
-// Object: constants
-
-const Object::Number
-Object::NONE = 0;
-
-const Object::Number
-Object::ANY = 0;
-
-const Object::Number
-Object::SELF = INT_MAX;
-
-
-
-// Object: constructors and destructors
+// Locating and wrapping objects
 
 Object::Object (Number _number)
 	: number (_number)
@@ -50,10 +37,6 @@ Object::Object (const Object& copy)
 	: number (copy.number)
 {}
 
-Object::Object (const String& name)
-	: number (find (name))
-{}
-
 Object&
 Object::operator = (const Object& copy)
 {
@@ -61,12 +44,17 @@ Object::operator = (const Object& copy)
 	return *this;
 }
 
-Object::~Object ()
+Object::Object (const String& name)
+	: number (find (name))
 {}
 
-
-
-// Object: existence, creation and destruction
+bool
+Object::exists () const
+{
+	LGBool _exists;
+	SService<IObjectSrv> (LG)->Exists (_exists, number);
+	return _exists;
+}
 
 #ifdef IS_THIEF2
 Object
@@ -78,6 +66,10 @@ Object::find_closest (const Object& archetype, const Object& nearby)
 	return closest.id;
 }
 #endif // IS_THIEF2
+
+
+
+// Creating and destroying objects
 
 Object
 Object::create (const Object& archetype)
@@ -125,14 +117,6 @@ Object::create_metaprop (const Object& parent, const String& name)
 		(name.data (), parent.number);
 }
 
-bool
-Object::exists () const
-{
-	LGBool _exists;
-	SService<IObjectSrv> (LG)->Exists (_exists, number);
-	return _exists;
-}
-
 Object
 Object::clone () const
 {
@@ -162,7 +146,16 @@ Object::schedule_destruction (Time lifespan)
 
 
 
-// Object: identity
+// Object numbers and names
+
+const Object::Number
+Object::NONE = 0;
+
+const Object::Number
+Object::ANY = 0;
+
+const Object::Number
+Object::SELF = INT_MAX;
 
 bool
 Object::operator == (const Object& rhs) const
@@ -251,7 +244,7 @@ Object::get_description () const
 
 
 
-// Object: inheritance and transience
+// Inheritance and transience
 
 Object::Type
 Object::get_type () const
@@ -362,7 +355,7 @@ Object::set_transient (bool transient)
 
 
 
-// Object: position
+// World position
 
 Vector
 Object::get_location () const
@@ -412,7 +405,7 @@ Object::object_to_world (const Vector& relative) const
 
 
 
-// Object: miscellaneous
+// Miscellaneous
 
 Object
 Object::get_container () const
@@ -425,6 +418,9 @@ Object::has_refs () const
 {
 	return ObjectProperty ("HasRefs", *this).get (true);
 }
+
+Object::~Object ()
+{}
 
 Object::Number
 Object::find (const String& name)

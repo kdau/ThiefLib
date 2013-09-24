@@ -43,7 +43,7 @@ OSL_NAME = ThiefLib.osl
 
 
 
-.PHONY: default dirs all clean
+.PHONY: default dirs doc clean-doc all clean
 .PRECIOUS: %.o
 .INTERMEDIATE: ./Thief/Private.hh ./Thief/ParameterCache.hh ./Thief/OSL.hh
 default: all
@@ -129,8 +129,12 @@ COMMON_SOURCES = \
 	Tweq.cc \
 	Types.cc
 
+
+
 SOURCES = $(COMMON_SOURCES) \
 	Script.cc
+
+HEADERS = Thief/Thief.hh $(SOURCES:%.cc=Thief/%.hh)
 
 OBJECTS1N = $(SOURCES:%.cc=$(bindir1n)/%.o)
 OBJECTS1D = $(SOURCES:%.cc=$(bindir1d)/%.o)
@@ -242,8 +246,19 @@ $(OSL_NAME): $(OSL_OBJECTS) $(LIBSN)
 
 
 
-all: dirs $(LIBRARY1N) $(LIBRARY1D) $(LIBRARY2N) $(LIBRARY2D) $(OSL_NAME)
+doc/index.html: Doxyfile $(HEADERS)
+	doxygen Doxyfile
 
-clean:
+doc: doc/index.html
+
+clean-doc:
+	$(RM) -r doc/search
+	$(RM) doc/*
+
+
+
+all: dirs $(LIBRARY1N) $(LIBRARY1D) $(LIBRARY2N) $(LIBRARY2D) $(OSL_NAME) doc
+
+clean: clean-doc
 	$(RM) $(bindir1n)/*.o $(bindir1d)/*.o $(bindir2n)/*.o $(bindir2d)/*.o *.a $(bindir_osl)/*.o $(OSL_NAME)
 
