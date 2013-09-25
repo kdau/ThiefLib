@@ -56,20 +56,20 @@ Flavor::get_name () const
 
 // Link
 
-const Link::Number
-Link::NONE = 0;
+const Link
+Link::NONE { 0 };
 
 Link
 Link::create (Flavor flavor, const Object& source, const Object& dest,
 	const void* data)
 {
 	if (data)
-		return SInterface<ILinkManager> (LG)->AddFull
+		return Link (SInterface<ILinkManager> (LG)->AddFull
 			(source.number, dest.number, flavor.number,
-				const_cast<void*> (data));
+				const_cast<void*> (data)));
 	else
-		return SInterface<ILinkManager> (LG)->Add
-			(source.number, dest.number, flavor.number);
+		return Link (SInterface<ILinkManager> (LG)->Add
+			(source.number, dest.number, flavor.number));
 }
 
 bool
@@ -90,7 +90,7 @@ Link::get_source () const
 {
 	sLink info;
 	return SInterface<ILinkManager> (LG)->Get (number, &info)
-		? info.source.id : Object::NONE;
+		? Object (info.source) : Object::NONE;
 }
 
 Object
@@ -98,7 +98,7 @@ Link::get_dest () const
 {
 	sLink info;
 	return SInterface<ILinkManager> (LG)->Get (number, &info)
-		? info.dest.id : Object::NONE;
+		? Object (info.dest) : Object::NONE;
 }
 
 const void*
@@ -150,7 +150,8 @@ Link::get_one (Flavor flavor, const Object& source, const Object& dest)
 {
 	Number number = SInterface<ILinkManager> (LG)->GetSingleLink
 		(flavor.number, source.number, dest.number);
-	return flavor.is_reverse () ? Link (number).get_reverse () : number;
+	return flavor.is_reverse ()
+		? Link (number).get_reverse () : Link (number);
 }
 
 Link
@@ -186,8 +187,8 @@ Link::get_all (Flavor flavor, const Object& source, const Object& dest,
 		if (query)
 		{
 			for (; !query->Done (); query->Next ())
-				if (query->ID () != Link::NONE)
-					links.push_back (query->ID ());
+				if (query->ID () != NONE.number)
+					links.emplace_back (query->ID ());
 			query->Release ();
 		}
 

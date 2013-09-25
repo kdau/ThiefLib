@@ -61,14 +61,14 @@ Script::name () const
 inline ScriptHost
 Script::host () const
 {
-	return host_obj;
+	return ScriptHost (host_obj);
 }
 
-template <typename T>
+template <typename T, typename>
 inline T
 Script::host_as () const
 {
-	return host_obj;
+	return T (host_obj);
 }
 
 template <typename... Args>

@@ -74,6 +74,11 @@ Flavor::get_reverse () const
 // Link
 
 inline
+Link::Link ()
+	: number (NONE.number)
+{}
+
+inline
 Link::Link (Number _number)
 	: number (_number)
 {}
@@ -94,7 +99,7 @@ inline Link
 Link::get_reverse () const
 {
 	Flavor reverse_flavor = get_flavor ().get_reverse ();
-	return (reverse_flavor.number << 20) | (number & ((1 << 20) - 1));
+	return Link ((reverse_flavor.number << 20) | (number & ((1 << 20) - 1)));
 }
 
 inline Flavor
@@ -184,10 +189,11 @@ private: \
 	void check_valid () const; \
 public: \
 	static Flavor flavor (bool reverse = false); \
-	FlavorName##Link (Number = NONE); \
+	FlavorName##Link (); \
 	FlavorName##Link (const Link&); \
 	FlavorName##Link (const FlavorName##Link&); \
 	FlavorName##Link& operator = (const FlavorName##Link& copy); \
+	explicit FlavorName##Link (Number); \
 	static FlavorName##Links get_all \
 		(const Object& source = Object::ANY, \
 		const Object& dest = Object::ANY, \

@@ -67,7 +67,8 @@ ScriptModule::scripts[] = \
 		{ \
 			if (_stricmp (name, Name) != 0) \
 				return static_cast<IScript*> (nullptr); \
-			Class* script = new (std::nothrow) Class (Name, host); \
+			Class* script = new (std::nothrow) \
+				Class (Name, Object (host)); \
 			return script->get_interface (); \
 		} \
 	},

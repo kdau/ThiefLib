@@ -314,6 +314,10 @@ THIEF_ENUM_CODING (Container::Type, CODE, CODE,
 	THIEF_ENUM_VALUE (GENERIC, "generic"),
 )
 
+Container::Content::Content (Object _object, Type _type, Link _link)
+	: object (_object), type (_type), link (_link)
+{}
+
 PROXY_CONFIG (Container, inherit_contains, "ContainInherit", nullptr,
 	bool, false);
 PROXY_CONFIG (Container, is_loadout_store, "ItemStore", nullptr, bool, false);
@@ -345,8 +349,8 @@ Container::get_contents () const
 	Contents contents;
 	sContainIter* iter = SInterface<IContainSys> (LG)->IterStart (number);
 	do
-		contents.push_back
-			({ iter->Object, Type (iter->ContainType), iter->Link });
+		contents.emplace_back (Object (iter->Object),
+			Type (iter->ContainType), Link (iter->Link));
 	while (SInterface<IContainSys> (LG)->IterNext (iter));
 	SInterface<IContainSys> (LG)->IterEnd (iter);
 	return contents;

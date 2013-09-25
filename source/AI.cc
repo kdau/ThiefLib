@@ -145,7 +145,7 @@ AI::get_all_ais ()
 	AIs everyone;
 	tAIIter iter;
 	for (IAI* ai = AIM->GetFirst (&iter); ai; ai = AIM->GetNext (&iter))
-		everyone.push_back (ai->GetID ());
+		everyone.emplace_back (ai->GetID ());
 	AIM->GetDone (&iter);
 	return everyone;
 }
@@ -373,10 +373,10 @@ Conversation::start_conversation ()
 AI
 Conversation::get_actor (size_t _number) const
 {
-	Object::Number _actor = Object::NONE;
+	Object::Number _actor = Object::NONE.number;
 	return SInterface<IAIManager> (LG)->GetConversationManager ()->
 		GetActorObj (number, _number - 1, &_actor) // zero-based
-			? _actor : Object::NONE;
+			? Object (_actor) : Object::NONE;
 }
 
 void

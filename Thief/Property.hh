@@ -37,27 +37,49 @@ namespace Thief {
 class Property
 {
 public:
+	Property ();
+	Property (const Property&);
+	~Property ();
+
+	Property (const String& name);
+	Property (const char* name);
+	String get_name () const;
+
 	typedef int Number;
 	static const Number NONE;
 
-	Property (Number);
-	Property (const String& name);
-	Property (const char* name);
-	Property (const Property&);
-	~Property ();
+	explicit Property (Number);
+	Number get_number () const;
 
 	bool operator == (const Property&) const;
 	bool operator != (const Property&) const;
 	bool operator < (const Property&) const;
-
-	Number get_number () const;
-	String get_name () const;
 
 private:
 	friend class ObjectProperty;
 	friend class OSL;
 	IGenericProperty* iface;
 };
+
+
+
+// PropertyMessage
+
+class PropertyMessage : public Message // "PropertyChange"
+{
+public:
+	enum Event { CHANGE, ADD, REMOVE };
+
+	PropertyMessage (Event, bool inherited, const Property&,
+		const Object&);
+	THIEF_MESSAGE_WRAP (PropertyMessage);
+
+	const Event event; //TESTME
+	const bool inherited; //TESTME
+	const Property property;
+	const Object object;
+};
+
 
 
 // ObjectProperty: direct access to properties and property fields
@@ -152,25 +174,6 @@ private:
 THIEF_FIELD_PROXY_TEMPLATE
 std::ostream& operator << (std::ostream&,
 	const THIEF_FIELD_PROXY_CLASS (PropField)&);
-
-
-
-// PropertyMessage
-
-class PropertyMessage : public Message // "PropertyChange"
-{
-public:
-	enum Event { CHANGE, ADD, REMOVE };
-
-	PropertyMessage (Event, bool inherited, const Property&,
-		const Object&);
-	THIEF_MESSAGE_WRAP (PropertyMessage);
-
-	const Event event; //TESTME
-	const bool inherited; //TESTME
-	const Property property;
-	const Object object;
-};
 
 
 

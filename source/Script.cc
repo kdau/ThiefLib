@@ -149,7 +149,7 @@ Script::initialize ()
 {
 	// Adjust minimum logging level based on "debug" parameter or "debug"
 	// quest variable, if any.
-	Parameter<Log> min_level_param (host_obj, "debug", {});
+	Parameter<Log> min_level_param (host (), "debug", {});
 	if (min_level_param.exists ())
 		min_level = min_level_param;
 	else

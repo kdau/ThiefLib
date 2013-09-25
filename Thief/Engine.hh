@@ -248,15 +248,35 @@ public:
 
 		//! The object that was hit, if the #type is #OBJECT or #MESH.
 		Object object;
+
+		//! Returns whether a hit occurred.
+		operator bool () const { return type != NONE; }
 	};
 
-	//FIXME TEST AND DOCUMENT
-	static RaycastHit raycast (RaycastMode, const Vector& from,
-		const Vector& to, bool include_ai = true);
+	/*! Tests whether anything lies between two points in the game world.
+	 * This method performs a raycast between the given \a from and \a to
+	 * points. Ray casting tests for intersections between a ray (the line
+	 * segment between the points) and any terrain polygons or object models
+	 * which may lie within it. The result can be used to determine whether
+	 * two points have a line of sight to each other or to identify where
+	 * a straight-line projectile or light source might hit.
+	 *
+	 * The \a mode determines how detailed of a raycast is performed. If
+	 * \a include_mesh is \c false, mesh objects (which include AIs and
+	 * ropes) will not be considered in the raycast.
+	 *
+	 * Ray casting is an expensive operation, less so for the #TERRAIN mode
+	 * but especially for the #NEAREST mode. Use it in moderation. */
+	static RaycastHit raycast (RaycastMode mode, const Vector& from,
+		const Vector& to, bool include_mesh = true);
 
-	//FIXME TEST AND DOCUMENT
-	static RaycastHit raycast (RaycastMode, const Object& from,
-		const Object& to, bool include_ai = true);
+	/*! Tests whether anything lies between two objects in the game world.
+	 * This method is similar to the Vector override of raycast(), except
+	 * that it uses the centroids of objects \a from and \a to as the ends
+	 * of the ray. These two objects will also be ignored by the raycast.
+	 * See the Vector override for more information. */
+	static RaycastHit raycast (RaycastMode mode, const Object& from,
+		const Object& to, bool include_mesh = true);
 
 	//@}
 	//! \name Configuration

@@ -219,6 +219,7 @@ public:
 
 	struct Content
 	{
+		Content (Object, Type, Link);
 		Object object;
 		Type type;
 		Link link;

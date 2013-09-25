@@ -59,11 +59,12 @@ class Link
 {
 public:
 	typedef long Number;
-	static const Number NONE;
-
 	Number number;
 
-	Link (Number = NONE);
+	static const Link NONE;
+
+	Link ();
+	explicit Link (Number);
 
 	static Link create (Flavor, const Object& source,
 		const Object& dest, const void* data = nullptr);

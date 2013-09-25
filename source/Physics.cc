@@ -390,7 +390,7 @@ Projectile::launch (const Object& archetype, const Object& launcher,
 	LGObject projectile;
 	SService<IPhysSrv> (LG)->LaunchProjectile (projectile, launcher.number,
 		archetype.number, velocity_mult, flags, LGVector (velocity_add));
-	return projectile.id;
+	return projectile;
 }
 
 

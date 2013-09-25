@@ -85,13 +85,13 @@ Message::get_name () const
 Object
 Message::get_from () const
 {
-	return message->from;
+	return Object (message->from);
 }
 
 Object
 Message::get_to () const
 {
-	return message->to;
+	return Object (message->to);
 }
 
 Time

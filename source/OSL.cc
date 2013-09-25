@@ -305,17 +305,17 @@ OSL::on_link_event (sRelationListenMsg* _message, void*)
 	}
 
 	LinkMessage message (event, _message->flavor, _message->lLink,
-		_message->source, _message->dest);
+		Object (_message->source), Object (_message->dest));
 
 	// Send message to object-specific subscribers.
 	auto range = self->link_subscriptions.equal_range
-		({ _message->flavor, _message->source });
+		({ message.flavor, message.source });
 	for (auto iter = range.first; iter != range.second; ++iter)
 		message.send (Object::NONE, iter->second);
 
 	// Send message to generic subscribers.
 	range = self->link_subscriptions.equal_range
-		({ _message->flavor, Object::ANY });
+		({ message.flavor, Object::ANY });
 	for (auto iter = range.first; iter != range.second; ++iter)
 		message.send (Object::NONE, iter->second);
 }
@@ -404,17 +404,17 @@ OSL::on_property_event (sPropertyListenMsg* _message, PropListenerData)
 	}
 
 	PropertyMessage message (event, _message->event & kPropertyInherited,
-		_message->iPropId, _message->iObjId);
+		Property (_message->iPropId), Object (_message->iObjId));
 
 	// Send message to object-specific subscribers.
 	auto range = self->property_subscriptions.equal_range
-		({ _message->iPropId, _message->iObjId });
+		({ message.property, message.object });
 	for (auto iter = range.first; iter != range.second; ++iter)
 		message.send (Object::NONE, iter->second);
 
 	// Send message to generic subscribers.
 	range = self->property_subscriptions.equal_range
-		({ _message->iPropId, Object::ANY });
+		({ message.property, Object::ANY });
 	for (auto iter = range.first; iter != range.second; ++iter)
 		message.send (Object::NONE, iter->second);
 }
@@ -463,10 +463,11 @@ OSL::on_conversation_end (Object::Number conversation)
 {
 	if (!self) return;
 
-	ConversationMessage message (conversation);
+	ConversationMessage message { Object (conversation) };
 
 	// Send message to object-specific subscribers.
-	auto range = self->conversation_subscriptions.equal_range (conversation);
+	auto range = self->conversation_subscriptions.equal_range
+		(Object (conversation));
 	for (auto iter = range.first; iter != range.second; ++iter)
 		message.send (Object::NONE, iter->second);
 

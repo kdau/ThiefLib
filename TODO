@@ -39,7 +39,7 @@ Other
 	* AI, Types: split each into two or more units
 	* EnumCoding: encoding and decoding of bitmasks
 	* Objective: VictoryCheck(er)-equivalent functionality per lg/convict.h
-	* (all): use C++11 features added in G++ 4.8 once MinGW-w64 is upgraded
+	* (all): use C++11 features added in G++ 4.8 once MinGW-w64 is upgraded (including {map,multimap,set}::emplace)
 	* (all): use boost::bimap once 1.55 is released (supporting initializer_list)
 	* Create full documentation. (!!!)
 

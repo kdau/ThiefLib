@@ -82,7 +82,7 @@ public:
 	const String& name () const;
 
 	ScriptHost host () const;
-	template <typename T> T host_as () const;
+	template <typename T, typename = THIEF_IS_OBJECT> T host_as () const;
 
 	IScript* get_interface ();
 

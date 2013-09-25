@@ -33,11 +33,19 @@ namespace Thief {
 const Property::Number
 Property::NONE = -1;
 
-Property::Property (Number number)
-	: iface (static_cast<IGenericProperty*>
-		(SInterface<IPropertyManager> (LG)->GetProperty (number)))
+Property::Property ()
+	: iface (nullptr)
+{}
+
+Property::Property (const Property& copy)
+	: iface (copy.iface)
 {
 	if (iface) iface->AddRef ();
+}
+
+Property::~Property ()
+{
+	if (iface) iface->Release ();
 }
 
 Property::Property (const String& name)
@@ -55,15 +63,18 @@ Property::Property (const char* name)
 	if (iface) iface->AddRef ();
 }
 
-Property::Property (const Property& copy)
-	: iface (copy.iface)
+String
+Property::get_name () const
 {
-	if (iface) iface->AddRef ();
+	return (iface && iface->Describe ())
+		? iface->Describe ()->szName : String ();
 }
 
-Property::~Property ()
+Property::Property (Number number)
+	: iface (static_cast<IGenericProperty*>
+		(SInterface<IPropertyManager> (LG)->GetProperty (number)))
 {
-	if (iface) iface->Release ();
+	if (iface) iface->AddRef ();
 }
 
 Property::Number
@@ -72,11 +83,28 @@ Property::get_number () const
 	return iface ? iface->GetID () : NONE;
 }
 
-String
-Property::get_name () const
+
+
+// PropertyMessage
+
+MESSAGE_WRAPPER_IMPL_ (PropertyMessage,
+	MESSAGE_TYPENAME_TEST ("PropertyMessageImpl")),
+	event (MESSAGE_AS (PropertyMessageImpl)->event),
+	inherited (MESSAGE_AS (PropertyMessageImpl)->inherited),
+	property (MESSAGE_AS (PropertyMessageImpl)->property),
+	object (MESSAGE_AS (PropertyMessageImpl)->object)
+{}
+
+PropertyMessage::PropertyMessage (Event _event, bool _inherited,
+		const Property& _property, const Object& _object)
+	: Message (new PropertyMessageImpl ()), event (_event),
+	  inherited (_inherited), property (_property), object (_object)
 {
-	return (iface && iface->Describe ())
-		? iface->Describe ()->szName : String ();
+	message->message = "PropertyChange";
+	MESSAGE_AS (PropertyMessageImpl)->event = event;
+	MESSAGE_AS (PropertyMessageImpl)->inherited = inherited;
+	MESSAGE_AS (PropertyMessageImpl)->property = property;
+	MESSAGE_AS (PropertyMessageImpl)->object = object;
 }
 
 
@@ -229,30 +257,6 @@ PropFieldBase::set_raw (Object& object, const char* property, const void* raw)
 {
 	if (!ObjectProperty (property, object).set_raw (raw))
 		throw std::runtime_error ("could not set property field");
-}
-
-
-
-// PropertyMessage
-
-MESSAGE_WRAPPER_IMPL_ (PropertyMessage,
-	MESSAGE_TYPENAME_TEST ("PropertyMessageImpl")),
-	event (MESSAGE_AS (PropertyMessageImpl)->event),
-	inherited (MESSAGE_AS (PropertyMessageImpl)->inherited),
-	property (MESSAGE_AS (PropertyMessageImpl)->property),
-	object (MESSAGE_AS (PropertyMessageImpl)->object)
-{}
-
-PropertyMessage::PropertyMessage (Event _event, bool _inherited,
-		const Property& _property, const Object& _object)
-	: Message (new PropertyMessageImpl ()), event (_event),
-	  inherited (_inherited), property (_property), object (_object)
-{
-	message->message = "PropertyChange";
-	MESSAGE_AS (PropertyMessageImpl)->event = event;
-	MESSAGE_AS (PropertyMessageImpl)->inherited = inherited;
-	MESSAGE_AS (PropertyMessageImpl)->property = property;
-	MESSAGE_AS (PropertyMessageImpl)->object = object;
 }
 
 

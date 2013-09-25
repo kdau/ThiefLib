@@ -134,7 +134,7 @@ COMMON_SOURCES = \
 SOURCES = $(COMMON_SOURCES) \
 	Script.cc
 
-HEADERS = Thief/Thief.hh $(SOURCES:%.cc=Thief/%.hh)
+HEADERS = ./Thief/Thief.hh $(SOURCES:%.cc=./Thief/%.hh) ./Thief/module.hh
 
 OBJECTS1N = $(SOURCES:%.cc=$(bindir1n)/%.o)
 OBJECTS1D = $(SOURCES:%.cc=$(bindir1d)/%.o)
@@ -155,6 +155,8 @@ $(bindir2d)/%.o: $(srcdir)/%.cc ./Thief/%.hh $(srcdir)/Private.hh
 
 # doesn't exist; in ./source/ instead
 ./Thief/Private.hh:
+
+
 
 $(bindir1n)/Base.o: ./Thief/Base.inl
 $(bindir1d)/Base.o: ./Thief/Base.inl
@@ -179,6 +181,12 @@ $(bindir1d)/Link.o: ./Thief/Link.inl
 $(bindir2n)/Link.o: ./Thief/Link.inl
 $(bindir2d)/Link.o: ./Thief/Link.inl
 $(bindir_osl)/Link.o: ./Thief/Link.inl
+
+$(bindir1n)/Object.o: ./Thief/Object.inl
+$(bindir1d)/Object.o: ./Thief/Object.inl
+$(bindir2n)/Object.o: ./Thief/Object.inl
+$(bindir2d)/Object.o: ./Thief/Object.inl
+$(bindir_osl)/Object.o: ./Thief/Object.inl
 
 $(bindir1n)/Parameter.o: ./Thief/Parameter.inl
 $(bindir1d)/Parameter.o: ./Thief/Parameter.inl

@@ -29,25 +29,6 @@ namespace Thief {
 
 // Locating and wrapping objects
 
-Object::Object (Number _number)
-	: number (_number)
-{}
-
-Object::Object (const Object& copy)
-	: number (copy.number)
-{}
-
-Object&
-Object::operator = (const Object& copy)
-{
-	number = copy.number;
-	return *this;
-}
-
-Object::Object (const String& name)
-	: number (find (name))
-{}
-
 bool
 Object::exists () const
 {
@@ -63,7 +44,7 @@ Object::find_closest (const Object& archetype, const Object& nearby)
 	LGObject closest;
 	SService<IObjectSrv> (LG)->FindClosestObjectNamed (closest,
 		nearby.number, archetype.get_name ().data ());
-	return closest.id;
+	return closest;
 }
 #endif // IS_THIEF2
 
@@ -76,7 +57,7 @@ Object::create (const Object& archetype)
 {
 	LGObject created;
 	SService<IObjectSrv> (LG)->Create (created, archetype.number);
-	return created.id;
+	return created;
 }
 
 Object
@@ -84,7 +65,7 @@ Object::start_create (const Object& archetype)
 {
 	LGObject created;
 	SService<IObjectSrv> (LG)->BeginCreate (created, archetype.number);
-	return created.id;
+	return created;
 }
 
 bool
@@ -106,15 +87,15 @@ Object::create_temp_fnord (Time lifespan)
 Object
 Object::create_archetype (const Object& parent, const String& name)
 {
-	return SInterface<ITraitManager> (LG)->CreateArchetype
-		(name.data (), parent.number);
+	return Object (SInterface<ITraitManager> (LG)->CreateArchetype
+		(name.data (), parent.number));
 }
 
 Object
 Object::create_metaprop (const Object& parent, const String& name)
 {
-	return SInterface<ITraitManager> (LG)->CreateMetaProperty
-		(name.data (), parent.number);
+	return Object (SInterface<ITraitManager> (LG)->CreateMetaProperty
+		(name.data (), parent.number));
 }
 
 Object
@@ -148,44 +129,14 @@ Object::schedule_destruction (Time lifespan)
 
 // Object numbers and names
 
-const Object::Number
-Object::NONE = 0;
+const Object
+Object::NONE { 0 };
 
-const Object::Number
-Object::ANY = 0;
+const Object
+Object::ANY { 0 };
 
-const Object::Number
-Object::SELF = INT_MAX;
-
-bool
-Object::operator == (const Object& rhs) const
-{
-	return number == rhs.number;
-}
-
-bool
-Object::operator != (const Object& rhs) const
-{
-	return number != rhs.number;
-}
-
-bool
-Object::operator < (const Object& rhs) const
-{
-	return number < rhs.number;
-}
-
-bool
-Object::operator == (Number rhs) const
-{
-	return number == rhs;
-}
-
-bool
-Object::operator != (Number rhs) const
-{
-	return number != rhs;
-}
+const Object
+Object::SELF { INT_MAX };
 
 String
 Object::get_name () const
@@ -207,7 +158,7 @@ Object::get_editor_name () const
 	static const boost::format NAMED ("%|| (%||)"), UNNAMED ("A %|| (%||)");
 	boost::format editor_name;
 
-	String name = (number == NONE) ? "None"
+	String name = (*this == NONE) ? "None"
 		: exists () ? get_name () : "NONEXISTENT";
 
 	if (!name.empty ())
@@ -280,7 +231,7 @@ Object::get_ancestors () const
 	if (_ancestors)
 		for (_ancestors->Next (); // Skip this object itself.
 		     !_ancestors->Done (); _ancestors->Next ())
-			ancestors.push_back (_ancestors->Object ());
+			ancestors.emplace_back (_ancestors->Object ());
 
 	return ancestors;
 }
@@ -297,7 +248,7 @@ Object::get_descendants (bool include_indirect) const
 
 	if (_descendants)
 		for (; !_descendants->Done (); _descendants->Next ())
-			descendants.push_back (_descendants->Object ());
+			descendants.emplace_back (_descendants->Object ());
 
 	return descendants;
 }
@@ -305,7 +256,7 @@ Object::get_descendants (bool include_indirect) const
 Object
 Object::get_archetype () const
 {
-	return SInterface<ITraitManager> (LG)->GetArchetype (number);
+	return Object (SInterface<ITraitManager> (LG)->GetArchetype (number));
 }
 
 void
@@ -391,7 +342,7 @@ Object::set_position (const Vector& location, const Vector& rotation,
 {
 	SService<IObjectSrv> (LG)->Teleport (number,
 		LGVector (location), LGVector (rotation),
-		(relative.number == SELF) ? number : relative.number);
+		(relative == SELF) ? number : relative.number);
 }
 
 Vector
@@ -410,7 +361,7 @@ Object::object_to_world (const Vector& relative) const
 Object
 Object::get_container () const
 {
-	return SInterface<IContainSys> (LG)->GetContainer (number);
+	return Object (SInterface<IContainSys> (LG)->GetContainer (number));
 }
 
 bool
@@ -427,16 +378,16 @@ Object::find (const String& name)
 {
 	LGObject named;
 	SService<IObjectSrv> (LG)->Named (named, name.data ());
-	if (named) return named.id;
+	if (named) return named;
 
-	Number number = NONE;
+	Object numbered;
 	try
 	{
-		number = std::stoi (name, nullptr, 10);
+		numbered.number = std::stoi (name, nullptr, 10);
 	}
 	catch (...) {}
 
-	return Object (number).exists () ? number : NONE;
+	return numbered.exists () ? numbered.number : NONE.number;
 }
 
 std::ostream&

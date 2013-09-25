@@ -33,7 +33,6 @@ namespace Thief {
 extern IScriptMan* LG;
 
 typedef true_bool LGBool;
-typedef object LGObject;
 
 
 
@@ -77,6 +76,28 @@ struct XYZColor
 	explicit operator LabColor () const;
 
 	static const XYZColor D65_WHITE;
+};
+
+
+
+// LGObject
+
+class LGObject : public object
+{
+public:
+	LGObject ()
+	{}
+
+	operator Object () const
+	{
+		return Object (id);
+	}
+
+	template <typename T, typename = THIEF_IS_OBJECT>
+	operator T () const
+	{
+		return T (id);
+	}
 };
 
 
@@ -208,19 +229,21 @@ Member { BOOST_PP_REPEAT (Count, PROXY_ARRAY_INIT_ONE, junk) }
 // Object subclass convenience macros
 
 #define OBJECT_TYPE_IMPL_(ClassName, ...) \
-ClassName::ClassName (Number _number) : Object (_number), __VA_ARGS__ {} \
+ClassName::ClassName () : Object (), __VA_ARGS__ {} \
 ClassName::ClassName (const Object& object) : Object (object), __VA_ARGS__ {} \
 ClassName::ClassName (const ClassName& copy) : Object (copy), __VA_ARGS__ {} \
 ClassName& ClassName::operator = (const ClassName& copy) \
 	{ number = copy.number; return *this; } \
+ClassName::ClassName (Number _number) : Object (_number), __VA_ARGS__ {} \
 ClassName::ClassName (const String& name) : Object (name), __VA_ARGS__ {}
 
 #define OBJECT_TYPE_IMPL(ClassName) \
-ClassName::ClassName (Number _number) : Object (_number) {} \
+ClassName::ClassName () : Object () {} \
 ClassName::ClassName (const Object& object) : Object (object) {} \
 ClassName::ClassName (const ClassName& copy) : Object (copy) {} \
 ClassName& ClassName::operator = (const ClassName& copy) \
 	{ number = copy.number; return *this; } \
+ClassName::ClassName (Number _number) : Object (_number) {} \
 ClassName::ClassName (const String& name) : Object (name) {}
 
 
@@ -267,26 +290,32 @@ FlavorName##Link::get_all (const Object& source, const Object& dest, \
 #define FLAVORED_LINK_IMPL_(FlavorName, ...) \
 FLAVORED_LINK_IMPL_COMMON (FlavorName) \
 \
-FlavorName##Link::FlavorName##Link (Number _number) \
-	: Link (_number), __VA_ARGS__ { check_valid (); } \
+FlavorName##Link::FlavorName##Link () \
+	: Link (), __VA_ARGS__ { check_valid (); } \
 \
 FlavorName##Link::FlavorName##Link (const Link& link) \
 	: Link (link), __VA_ARGS__ { check_valid (); } \
 \
 FlavorName##Link::FlavorName##Link (const FlavorName##Link& link) \
-	: Link (link), __VA_ARGS__ { check_valid (); }
+	: Link (link), __VA_ARGS__ { check_valid (); } \
+\
+FlavorName##Link::FlavorName##Link (Number _number) \
+	: Link (_number), __VA_ARGS__ { check_valid (); }
 
 #define FLAVORED_LINK_IMPL(FlavorName) \
 FLAVORED_LINK_IMPL_COMMON (FlavorName) \
 \
-FlavorName##Link::FlavorName##Link (Number _number) \
-	: Link (_number) { check_valid (); } \
+FlavorName##Link::FlavorName##Link () \
+	: Link () { check_valid (); } \
 \
 FlavorName##Link::FlavorName##Link (const Link& link) \
 	: Link (link) { check_valid (); } \
 \
 FlavorName##Link::FlavorName##Link (const FlavorName##Link& link) \
-	: Link (link) { check_valid (); }
+	: Link (link) { check_valid (); } \
+\
+FlavorName##Link::FlavorName##Link (Number _number) \
+	: Link (_number) { check_valid (); }
 
 
 

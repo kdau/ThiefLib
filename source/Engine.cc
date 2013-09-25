@@ -313,7 +313,7 @@ Engine::rendered_this_frame (const Object& object)
 
 Engine::RaycastHit
 Engine::raycast (RaycastMode mode, const Vector& from, const Vector& to,
-	bool include_ai)
+	bool include_mesh)
 {
 	int type = RaycastHit::NONE;
 	LGVector location;
@@ -325,24 +325,29 @@ Engine::raycast (RaycastMode mode, const Vector& from, const Vector& to,
 	else
 		type = SService<IEngineSrv> (LG)->ObjRaycast (LGVector (from),
 			LGVector (to), location, object, eObjRaycast (mode),
-			!include_ai, Object::NONE, Object::NONE);
-	return { RaycastHit::Type (type), location, object.id };
+			!include_mesh, Object::NONE.number, Object::NONE.number);
+	return { RaycastHit::Type (type), location, object };
 }
 
 Engine::RaycastHit
 Engine::raycast (RaycastMode mode, const Object& from, const Object& to,
-	bool include_ai)
+	bool include_mesh)
 {
 	int type = RaycastHit::NONE;
 	LGVector location;
 	LGObject object;
-	if (mode != RaycastMode::TERRAIN)
+	if (mode == RaycastMode::TERRAIN)
+		type = SService<IEngineSrv> (LG)->PortalRaycast
+			(LGVector (from.get_location ()),
+			LGVector (to.get_location ()), location)
+				? RaycastHit::TERRAIN : RaycastHit::NONE;
+	else
 		type = SService<IEngineSrv> (LG)->ObjRaycast
 			(LGVector (from.get_location ()),
 			LGVector (to.get_location ()),
-			location, object, eObjRaycast (mode), !include_ai,
+			location, object, eObjRaycast (mode), !include_mesh,
 			from.number, to.number);
-	return { RaycastHit::Type (type), location, object.id };
+	return { RaycastHit::Type (type), location, object };
 }
 
 

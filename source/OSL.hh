@@ -89,7 +89,7 @@ struct LinkMessageImpl : public sScrMsg
 	LinkMessageImpl ()
 		: sScrMsg (),
 		  event (Event::CHANGE),
-		  flavor (Flavor::ANY), link (Link::NONE),
+		  flavor (Flavor::ANY), link (Link::NONE.number),
 		  source (), dest ()
 	{}
 

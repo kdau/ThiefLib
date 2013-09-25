@@ -74,7 +74,7 @@ struct DesignNote
 	};
 	unsigned state;
 
-	typedef std::vector<Object::Number> Ancestors;
+	typedef std::vector<Object> Ancestors;
 	Ancestors ancestors;
 
 	typedef std::map<CIString, String> RawValues;
@@ -137,17 +137,17 @@ private:
 
 	static void __stdcall on_trait_change (const sHierarchyMsg*, void*);
 
-	DesignNote* update_object (Object::Number number);
-	void update_ancestors (const Object& object, DesignNote& dn);
-	void unwatch_ancestor (Object::Number number);
+	DesignNote* update_object (const Object&);
+	void update_ancestors (const Object&, DesignNote&);
+	void unwatch_ancestor (const Object&);
 
-	void read_dn (Object::Number number);
-	bool write_dn (Object::Number number);
+	void read_dn (const Object&);
+	bool write_dn (const Object&);
 
-	typedef std::map<Object::Number, DesignNote> Data;
+	typedef std::map<Object, DesignNote> Data;
 	Data data;
 
-	Object::Number current;
+	Object current;
 };
 
 

@@ -190,7 +190,7 @@ operator << (std::ostream& out, const THIEF_FIELD_PROXY_CLASS (PropField)& field
 
 
 
-// Convenience macro for PropField members of Object subclasses
+// Convenience macros for PropField members of Object subclasses
 
 #define THIEF_PROP_FIELD(Type, Name) \
 THIEF_FIELD_PROXY (PropField, Type, , Name)

@@ -26,13 +26,11 @@
 
 namespace Thief {
 
-
-
 /*! Base class for all game object wrappers.
  * Virtually all dynamic, interactive, and scriptable elements of the Dark
- * %Engine game world exist as objects. The Object class and its many descendants
- * are wrappers for game objects, referring to them and providing access to
- * their many properties and behaviors.
+ * %Engine game world exist as objects. The Object class and its many
+ * descendants are wrappers for game objects, referring to them and providing
+ * access to their many properties and behaviors.
  *
  * An object wrapper refers to an object by its #number, and may or may not
  * reference a valid object at any time. (This can be checked with the exists()
@@ -50,7 +48,8 @@ namespace Thief {
  * from one direct, abstract ancestor, an archetype which identifies its type.
  * That archetype in turn inherits from other archetypes, up to one of several
  * root archetypes. In Thief, the root archetypes are \c Object, \c Stimulus,
- * <tt>Flow Group</tt>, \c MetaProperty, \c <tt>Base Room</tt>, and \c Texture.
+ * <tt>Flow Group</tt>, \c MetaProperty, \link Room <tt>Base %Room</tt>\endlink,
+ * and \c Texture.
  *
  * In addition to direct and indirect archetypes, both concrete and abstract
  * objects may hold any number of metaproperties. Metaproperties are abstract
@@ -72,21 +71,25 @@ namespace Thief {
 class Object
 {
 public:
-	//! %Object numbers uniquely identify objects within the mission and gamesys.
+	/*! %Object numbers uniquely identify objects, both concrete (positive)
+	 * and abstract (negative), within the mission and gamesys. */
 	typedef int Number;
 
 	//! \name Locating and wrapping objects
 	//@{
 
-	/*! Constructs an object wrapper referencing the numbered object.
-	 * The number will not be checked for validity. */
-	Object (Number = NONE);
+	//! Constructs an object wrapper not referencing any object.
+	Object ();
 
 	//! Constructs an object wrapper referencing the same object as another.
 	Object (const Object&);
 
 	//! Copies the reference of a given object wrapper to this wrapper.
 	Object& operator = (const Object&);
+
+	/*! Constructs an object wrapper referencing an object with the given
+	 * number. The number will not be checked for validity. */
+	explicit Object (Number);
 
 	/*! Constructs an object wrapper referencing the named object.
 	 * If no object with the given \a name exists, the wrapper references
@@ -167,29 +170,29 @@ public:
 	Number number;
 
 	/*! Indicates that no object is currently referenced.
-	 * This pseudo-number (not valid as an actual object number) is used to
-	 * indicate that an object wrapper does not currently reference an
-	 * object, or that a method that returns an object did not have any
+	 * This pseudo-reference (not valid as an actual object reference) is
+	 * used to indicate that an object wrapper does not currently reference
+	 * an object, or that a method that returns an object did not have any
 	 * object to return. */
-	static const Number NONE;
+	static const Object NONE;
 
-	/*! Refers to the set of all relevant objects when passed to certain methods.
-	 * This pseudo-number (not valid as an actual object number) can be used
-	 * as an argument to various methods, as indicated in their
-	 * documentation. It refers to every object that is relevant in a
-	 * certain context, such as links of a certain flavor from a specific
-	 * object to any other object. Its meaning is undefined when it is used
-	 * in a context for which it is not intended. */
-	static const Number ANY;
+	/*! Refers to the set of all relevant objects when passed to certain
+	 * methods. This pseudo-reference (not valid as an actual object
+	 * reference) can be used as an argument to certain methods, as
+	 * indicated in their documentation. It refers to every object that is
+	 * relevant in a certain context, such as links of a certain flavor from
+	 * a specific object to any other object. Its meaning is undefined when
+	 * it is used in a context for which it is not intended. */
+	static const Object ANY;
 
-	/*! Refers back to a context-relevant object when passed to certain methods.
-	 * This pseudo-number (not valid as an actual object number) can be used
-	 * as an argument to various methods, as indicated in their
-	 * documentation. It refers to an object that is relevant in context,
-	 * such as the object whose method is being called or the host of the
-	 * calling script. Its meaning is undefined when it is used in a context
-	 * for which it is not intended. */
-	static const Number SELF;
+	/*! Refers back to a context-relevant object when passed to certain
+	 * methods. This pseudo-reference (not valid as an actual object
+	 * reference) can be used as an argument to certain methods, as
+	 * indicated in their documentation. It refers to an object that is
+	 * relevant in context, such as the object whose method is being called
+	 * or the host of the calling script. Its meaning is undefined when it
+	 * is used in a context for which it is not intended. */
+	static const Object SELF;
 
 	//! Compares this object wrapper and another by #number.
 	bool operator == (const Object&) const;
@@ -239,10 +242,14 @@ public:
 	//! The type of an object within the overall object system.
 	enum class Type
 	{
-		NONE,		//!< A nonexistent object or the #NONE reference.
-		CONCRETE,	//!< A specific object that exists in the game world.
-		ARCHETYPE,	//!< An abstract object from which others may inherit.
-		METAPROPERTY	//!< A metaproperty which may be held by other objects.
+		NONE,		//!< A nonexistent object or empty reference.
+		CONCRETE,	/*!< A specific object that exists in a mission
+		                 * at a position in the game world. */
+		ARCHETYPE,	/*!< An abstract object from which concrete and
+		                 * other abstract objects may inherit. */
+		METAPROPERTY	/*!< An abstract bundle of properties which may
+		                 * be held by objects separate from their
+		                 * archetypes. */
 	};
 
 	//! Returns the type of the referenced object.
@@ -278,9 +285,9 @@ public:
 	 * likely to lead to unexpected issues. Use with caution. */
 	void set_archetype (const Object& archetype);
 
-	/*! Returns whether the referenced object directly holds the given metaproperty.
-	 * To include ancestors holding the metaproperty, use inherits_from ()
-	 * instead. */
+	/*! Returns whether the referenced object directly holds the given
+	 * metaproperty. To include ancestors holding the metaproperty, use
+	 * inherits_from() instead. */
 	bool has_metaprop (const Object& metaprop) const;
 
 	/*! Adds the given metaproperty to the referenced object.
@@ -360,38 +367,12 @@ private:
 };
 
 /*! Outputs the DromEd-style name of the referenced object to the given stream.
- * This is the output of the object's get_editor_name() method.
- * \relates Object */
+ * This is the output of the object's get_editor_name() method. \relates Object */
 std::ostream& operator << (std::ostream&, const Object&);
 
-
-
-
-/*! \cond HIDDEN_SYMBOLS
- * LGMulti specialization for Object types
- */
-template <typename T>
-class LGMulti<T, THIEF_IS_OBJECT> : public LGMultiBase
-{
-public:
-	LGMulti (const T& value = Object::NONE)
-		: LGMultiBase (int (value.number)) {}
-	operator T () const { return T (as_object ()); }
-};
-//! \endcond
-
-
-
-#define THIEF_OBJECT_TYPE(ClassName) \
-	ClassName (Number = NONE); \
-	ClassName (const Object&); \
-	ClassName (const ClassName&); \
-	ClassName& operator = (const ClassName&); \
-	explicit ClassName (const String& name);
-
-
-
 } // namespace Thief
+
+#include <Thief/Object.inl>
 
 #endif // THIEF_OBJECT_HH
 

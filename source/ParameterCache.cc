@@ -187,8 +187,7 @@ DesignNoteReader::DesignNoteReader (const char* dn, RawValues& _raw_values)
 ParameterCacheImpl::ParameterCacheImpl ()
 	: dn_prop (static_cast<IStringProperty*> (SInterface<IPropertyManager>
 		(LG)->GetPropertyNamed ("DesignNote"))),
-	  listen_handle (nullptr),
-	  current (Object::NONE)
+	  listen_handle (nullptr)
 {
 	if (!dn_prop) throw std::runtime_error ("no DesignNote property");
 	listen_handle = dn_prop->Listen (kPropertyFull, on_dn_change,
@@ -207,7 +206,7 @@ bool
 ParameterCacheImpl::exists (const Object& object, const CIString& parameter,
 	bool inherit)
 {
-	DesignNote* dn = update_object (object.number);
+	DesignNote* dn = update_object (object);
 	if (!dn) return false;
 
 	if (dn->state & DesignNote::RELEVANT)
@@ -236,7 +235,7 @@ const String*
 ParameterCacheImpl::get (const Object& object, const CIString& parameter,
 	bool inherit)
 {
-	DesignNote* dn = update_object (object.number);
+	DesignNote* dn = update_object (object);
 	if (!dn) return nullptr;
 
 	if (dn->state & DesignNote::RELEVANT)
@@ -265,11 +264,11 @@ bool
 ParameterCacheImpl::set (const Object& object, const CIString& parameter,
 	const String& value)
 {
-	DesignNote* dn = update_object (object.number);
+	DesignNote* dn = update_object (object);
 	if (!dn || !(dn->state & DesignNote::EXISTENT)) return false;
 	dn->state |= DesignNote::RELEVANT;
 	dn->raw_values [parameter] = value;
-	return write_dn (object.number);
+	return write_dn (object);
 }
 
 bool
@@ -277,8 +276,8 @@ ParameterCacheImpl::copy (const Object& _source, const Object& _dest,
 	const CIString& parameter)
 {
 	Parameter<String> keep_dest_watched (_dest, parameter, { "" });
-	DesignNote* source = update_object (_source.number);
-	DesignNote* dest = update_object (_dest.number);
+	DesignNote* source = update_object (_source);
+	DesignNote* dest = update_object (_dest);
 
 	if (!source || (source->state & DesignNote::RELEVANT) ||
 	    !dest || !(dest->state & DesignNote::EXISTENT))
@@ -290,24 +289,24 @@ ParameterCacheImpl::copy (const Object& _source, const Object& _dest,
 
 	dest->state |= DesignNote::RELEVANT;
 	dest->raw_values [parameter] = iter->second;
-	return write_dn (_dest.number);
+	return write_dn (_dest);
 }
 
 bool
 ParameterCacheImpl::remove (const Object& object, const CIString& parameter)
 {
-	DesignNote* dn = update_object (object.number);
+	DesignNote* dn = update_object (object);
 	if (!dn || !(dn->state & DesignNote::RELEVANT)) return false;
 	if (dn->raw_values.erase (parameter) == 0) return false;
-	return write_dn (object.number);
+	return write_dn (object);
 }
 
 void
 ParameterCacheImpl::watch_object (const Object& object,
 	const ParameterBase& watcher)
 {
-	data [object.number].direct_watchers.insert (&watcher);
-	update_object (object.number);
+	data [object].direct_watchers.insert (&watcher);
+	update_object (object);
 	watcher.reparse ();
 }
 
@@ -315,7 +314,7 @@ void
 ParameterCacheImpl::unwatch_object (const Object& object,
 	const ParameterBase& watcher)
 {
-	auto dn_iter = data.find (object.number);
+	auto dn_iter = data.find (object);
 	if (dn_iter != data.end ())
 	{
 		DesignNote& dn = dn_iter->second;
@@ -343,16 +342,16 @@ ParameterCacheImpl::on_dn_change (sPropertyListenMsg* message,
 	// Filter out an unidentified event type known to be irrelevant.
 	if (!message || !_self || message->event & 8) return;
 
-	Object object = message->iObjId;
+	Object object = Object (message->iObjId);
 	auto self = reinterpret_cast<ParameterCacheImpl*> (_self);
-	if (object.number == self->current) return;
+	if (object == self->current) return;
 
-	auto dn_iter = self->data.find (object.number);
+	auto dn_iter = self->data.find (object);
 	if (dn_iter != self->data.end ())
 	{
 		DesignNote& dn = dn_iter->second;
 		dn.state &= ~DesignNote::CACHED;
-		self->update_object (object.number);
+		self->update_object (object);
 
 		// Notify any directly watching parameters.
 		for (auto& watcher : dn.direct_watchers)
@@ -366,15 +365,15 @@ ParameterCacheImpl::on_trait_change (const sHierarchyMsg* message, void* _self)
 	if (!message || !_self) return;
 	auto self = reinterpret_cast<ParameterCacheImpl*> (_self);
 
-	auto iter = self->data.find (message->iSubjId);
+	auto iter = self->data.find (Object (message->iSubjId));
 	if (iter != self->data.end ())
 		self->update_ancestors (iter->first, iter->second);
 }
 
 DesignNote*
-ParameterCacheImpl::update_object (Object::Number number)
+ParameterCacheImpl::update_object (const Object& object)
 {
-	auto dn_iter = data.find (number);
+	auto dn_iter = data.find (object);
 	if (dn_iter == data.end ()) return nullptr;
 
 	DesignNote& dn = dn_iter->second;
@@ -385,16 +384,15 @@ ParameterCacheImpl::update_object (Object::Number number)
 	dn.raw_values.clear ();
 
 	// Check whether the object currently exists.
-	Object object (number);
 	if (object.exists ())
 	{
 		dn.state |= DesignNote::EXISTENT;
 
 		// Read the parameters, if a DN is present.
-		if (dn_prop && dn_prop->IsSimplyRelevant (number))
+		if (dn_prop && dn_prop->IsSimplyRelevant (object.number))
 		{
 			dn.state |= DesignNote::RELEVANT;
-			read_dn (number);
+			read_dn (object);
 		}
 	}
 
@@ -413,9 +411,9 @@ ParameterCacheImpl::update_ancestors (const Object& object, DesignNote& dn)
 	if (object.exists () && !dn.direct_watchers.empty ())
 		for (auto ancestor : object.get_ancestors ())
 		{
-			dn.ancestors.push_back (ancestor.number);
-			++data [ancestor.number].indirect_watchers;
-			update_object (ancestor.number);
+			dn.ancestors.push_back (ancestor);
+			++data [ancestor].indirect_watchers;
+			update_object (ancestor);
 		}
 
 	// Unwatch the old ancestors.
@@ -424,31 +422,31 @@ ParameterCacheImpl::update_ancestors (const Object& object, DesignNote& dn)
 }
 
 void
-ParameterCacheImpl::unwatch_ancestor (Object::Number number)
+ParameterCacheImpl::unwatch_ancestor (const Object& object)
 {
-	if (--data [number].indirect_watchers == 0 &&
-	    data [number].direct_watchers.empty ())
-		data.erase (number);
+	if (--data [object].indirect_watchers == 0 &&
+	    data [object].direct_watchers.empty ())
+		data.erase (object);
 }
 
 void
-ParameterCacheImpl::read_dn (Object::Number number)
+ParameterCacheImpl::read_dn (const Object& object)
 {
 	const char* dn = nullptr;
-	dn_prop->GetSimple (number, &dn);
-	if (dn) DesignNoteReader (dn, data [number].raw_values);
+	dn_prop->GetSimple (object.number, &dn);
+	if (dn) DesignNoteReader (dn, data [object].raw_values);
 }
 
 bool
-ParameterCacheImpl::write_dn (Object::Number number)
+ParameterCacheImpl::write_dn (const Object& object)
 {
-	current = number;
+	current = object;
 	try
 	{
 		String dn;
-		dn.reserve (20 * data [number].raw_values.size ());
+		dn.reserve (20 * data [object].raw_values.size ());
 
-		for (auto& raw_value : data [number].raw_values)
+		for (auto& raw_value : data [object].raw_values)
 		{
 			dn.append (raw_value.first.data ());
 			// No index needs to be written; the difficulty will not
@@ -464,7 +462,7 @@ ParameterCacheImpl::write_dn (Object::Number number)
 			dn.append ("\";");
 		}
 
-		dn_prop->Set (number, dn.data ());
+		dn_prop->Set (object.number, dn.data ());
 	}
 	catch (...)
 	{

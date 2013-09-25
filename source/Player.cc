@@ -95,7 +95,7 @@ Player::remove_from_inventory (const Object& object)
 Interactive
 Player::get_selected_item () const
 {
-	return SInterface<IInventory> (LG)->Selection (kInvItem);
+	return Object (SInterface<IInventory> (LG)->Selection (kInvItem));
 }
 
 bool
@@ -158,7 +158,7 @@ bool
 Player::has_touched (const Object& object) const
 {
 	// Consider the starting point as well.
-	Object player = exists () ? number
+	Object player = exists () ? Object (*this)
 		: Link::get_one ("PlayerFactory").get_source ();
 	if (!object.exists () || !player.exists ()) return false;
 
@@ -191,7 +191,7 @@ Player::has_touched (const Object& object) const
 Weapon
 Player::get_selected_weapon () const
 {
-	return SInterface<IInventory> (LG)->Selection (kInvWeapon);
+	return Object (SInterface<IInventory> (LG)->Selection (kInvWeapon));
 }
 
 bool
@@ -260,7 +260,7 @@ Player::get_climbing_object () const
 {
 	LGObject object;
 	SService<IPhysSrv> (LG)->GetClimbingObject (number, object);
-	return object.id;
+	return object;
 }
 
 void
