@@ -34,16 +34,32 @@ namespace Thief {
 
 template <typename T>
 inline T
-Message::get_data (Datum datum, const T& default_value) const
+Message::get_data (Slot slot) const
 {
-	if (has_data (datum))
+	LGMulti<T> multi;
+	_get_data (slot, multi);
+	return multi;
+}
+
+template <typename T>
+inline T
+Message::get_data (Slot slot, const T& default_value) const
+{
+	if (has_data (slot))
 	{
 		LGMulti<T> multi;
-		_get_data (datum, multi);
+		_get_data (slot, multi);
 		return multi;
 	}
 	else
 		return default_value;
+}
+
+template <typename T>
+inline void
+Message::set_data (Slot slot, const T& value)
+{
+	_set_data (slot, LGMulti<T> (value));
 }
 
 template <typename D1, typename D2, typename D3>

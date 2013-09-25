@@ -360,8 +360,8 @@ private:
 };
 
 /*! Outputs the DromEd-style name of the referenced object to the given stream.
- * This is the output of the object's get_editor_name() method. \relates Object
- */
+ * This is the output of the object's get_editor_name() method.
+ * \relates Object */
 std::ostream& operator << (std::ostream&, const Object&);
 
 

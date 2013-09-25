@@ -54,7 +54,7 @@
  * base library for <a href="http://kdau.github.io/KDScript/">KDScript</a> as of
  * version 0.7.0 of that module, but many elements not used there have not seen
  * extensive testing. See the TODO list for other work remaining to be done.
- * Particularly, the library is still almost entirely undocumented.
+ * Particularly, the library is still mostly undocumented.
  *
  * \section requirements Requirements
  *

@@ -82,6 +82,24 @@ Message::get_name () const
 	return message->message;
 }
 
+Object
+Message::get_from () const
+{
+	return message->from;
+}
+
+Object
+Message::get_to () const
+{
+	return message->to;
+}
+
+Time
+Message::get_time () const
+{
+	return message->time;
+}
+
 void
 Message::send (const Object& from, const Object& to)
 {
@@ -126,74 +144,52 @@ Message::broadcast (const Object& from, const Flavor& link_flavor, Time delay)
 	broadcast (Link::get_all (link_flavor, from), delay);
 }
 
-Object
-Message::get_from () const
-{
-	return message->from;
-}
-
-Object
-Message::get_to () const
-{
-	return message->to;
-}
-
-Time
-Message::get_time () const
-{
-	return message->time;
-}
-
 bool
-Message::has_data (Datum datum) const
+Message::has_data (Slot slot) const
 {
-	switch (datum)
+	switch (slot)
 	{
 	case DATA1: return message->data.type != kMT_Undef;
 	case DATA2: return message->data2.type != kMT_Undef;
 	case DATA3: return message->data3.type != kMT_Undef;
+	case REPLY: return reply_remote
+		? reply_remote->type != kMT_Undef
+		: reply_local.get_type () != LGMultiBase::Type::EMPTY;
 	default: return false;
 	}
 }
 
 void
-Message::_get_data (Datum datum, LGMultiBase& value) const
+Message::_get_data (Slot slot, LGMultiBase& value) const
 {
-	switch (datum)
+	switch (slot)
 	{
 	case DATA1: value = message->data; break;
 	case DATA2: value = message->data2; break;
 	case DATA3: value = message->data3; break;
+	case REPLY: value = reply_remote
+		? *reply_remote : (const sMultiParm&) reply_local; break;
 	default: value.clear ();
 	}
 }
 
 void
-Message::_set_data (Datum datum, const LGMultiBase& value)
+Message::_set_data (Slot slot, const LGMultiBase& value)
 {
-	switch (datum)
+	switch (slot)
 	{
 	case DATA1: message->data = value; break;
 	case DATA2: message->data2 = value; break;
 	case DATA3: message->data3 = value; break;
+	case REPLY:
+		if (reply_remote)
+			*reinterpret_cast<LGMultiBase*> (reply_remote) =
+				(const sMultiParm&) value;
+		else
+			reply_local = (const sMultiParm&) value;
+		break;
 	default: break;
 	}
-}
-
-void
-Message::_get_reply (LGMultiBase& value) const
-{
-	value = reply_remote ? *reply_remote : (const sMultiParm&) reply_local;
-}
-
-void
-Message::_set_reply (const LGMultiBase& value)
-{
-	if (reply_remote)
-		*reinterpret_cast<LGMultiBase*> (reply_remote) =
-			(const sMultiParm&) value;
-	else
-		reply_local = (const sMultiParm&) value;
 }
 
 const char*
@@ -204,7 +200,7 @@ Message::get_lg_typename () const
 
 
 
-// Message wrapping
+// MessageWrapError
 
 MessageWrapError::MessageWrapError (const sScrMsg* message,
 	const char* wrap_type, const char* problem) noexcept

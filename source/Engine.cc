@@ -144,7 +144,7 @@ Monolog::~Monolog ()
 void
 Monolog::attach (MPrintfProc proc)
 {
-	buf.reset (new Streambuf (proc));
+	buf.reset (proc ? new Streambuf (proc) : nullptr);
 	rdbuf (buf.get ());
 }
 
@@ -217,6 +217,13 @@ Version::operator >= (const Version& rhs) const
 	return major > rhs.major || (major == rhs.major && minor >= rhs.minor);
 }
 
+std::ostream&
+operator << (std::ostream& out, const Version& version)
+{
+        out << version.major << "." << version.minor;
+        return out;
+}
+
 
 
 // Engine
@@ -225,15 +232,15 @@ String
 Engine::get_app_name ()
 {
 	LGString name;
-	SService<IVersionSrv> (LG)->GetAppName (false, name);
+	SService<IVersionSrv> (LG)->GetAppName (true, name);
 	return name;
 }
 
 String
-Engine::get_short_app_name ()
+Engine::get_long_app_name ()
 {
 	LGString name;
-	SService<IVersionSrv> (LG)->GetAppName (true, name);
+	SService<IVersionSrv> (LG)->GetAppName (false, name);
 	return name;
 }
 
@@ -395,6 +402,8 @@ Engine::is_command_bound (const String& command)
 String
 Engine::get_command_binding (const String& command)
 {
+	if (!is_command_bound (command))
+		return String ();
 	LGString binding;
 	SService<IDarkUISrv> (LG)->DescribeKeyBinding (binding, command.data ());
 	return binding;
