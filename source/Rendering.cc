@@ -188,7 +188,7 @@ PROXY_CONFIG (Bitmapped, tile_size_y, "BitmapWorld", "y feet per tile",
 	float, 0.0f);
 PROXY_BIT_CONFIG (Bitmapped, apply_lighting, "BitmapWorld", "Flags", 4u, false);
 PROXY_CONFIG (Bitmapped, bitmap_color, "BitmapColor", nullptr, Color,
-	Color (0xffffff)); // see assignment operator override below
+	Color (0xffffff)); // see assignment operator specialization below
 PROXY_BIT_CONFIG (Bitmapped, double_sided, "BitmapWorld", "Flags", 1u, false);
 PROXY_BIT_CONFIG (Bitmapped, flip_backside_uv, "BitmapWorld", "Flags", 2u, false);
 PROXY_BIT_CONFIG (Bitmapped, face_camera, "BitmapWorld", "Flags", 8u, false);

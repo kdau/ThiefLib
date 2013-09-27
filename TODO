@@ -2,27 +2,6 @@ Current
 	* Replace Parameter<Object> with Parameter<Object::Ref>, resolvable dynamically to an Object.
 	* Fix possible dangling pointer in posted or scheduled synthetic QuestMessage and ObjectiveMessage instances.
 
-ActReact.hh
-	interfaces:
-		* IActReactSrv
-		* everything in <lg/actreact.h>
-		* class reaction_kind
-	messages:
-		* sStimMsg ("*Stimulus")
-	links:
-		* Receptron - sReceptron
-		* StimSensor - tSensorCount
-		* ReactParam - ReceptronID
-		* arSrc - sStimSourceData
-		* arSrcDesc - sStimSourceDesc
-		* FlowContact - sContact
-		* ScriptContact - sContact
-	properties:
-		* Act/React\Source Scale = arSrcScale
-		* AI: Utility\Is Knockout = StimKO
-		* Game: Dark\BloodCause = BloodCause
-		* Game: Dark\BloodMaxDamage = BloodMaxDmg
-
 Novel messages/wrappers
 	* HierarchyMessage: ITraitManager::Listen (per DH2)
 	* ObjectMessage: IObjectSystem::Listen (per DH2)

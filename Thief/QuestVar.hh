@@ -61,8 +61,11 @@ public:
 struct Numbered
 {
 	typedef unsigned int Number;
-	Numbered (Number _number) : number (_number) {}
 	Number number;
+
+	Numbered (Number);
+	Numbered& operator ++ ();
+	Numbered& operator -- ();
 };
 
 THIEF_FIELD_PROXY_TEMPLATE

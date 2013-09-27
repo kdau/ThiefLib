@@ -167,7 +167,7 @@ public:
 	THIEF_PROP_FIELD (bool, animation_loop); //TESTME
 };
 
-THIEF_OVERRIDE_FIELD_PROXY_SET (PropField, Color, Bitmapped, bitmap_color);
+THIEF_SPECIALIZE_FIELD_PROXY_SET (PropField, Color, Bitmapped, bitmap_color);
 
 
 

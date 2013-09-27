@@ -192,7 +192,6 @@ public:
 
 private:
 	static OSL* self;
-	bool sim;
 
 	friend bool ::ThiefLibOSLInit (IScriptMan*, MPrintfProc, IMalloc*);
 	OSL ();
@@ -203,6 +202,8 @@ private:
 	std::unique_ptr<ParameterCacheImpl> param_cache;
 
 	// HUD
+
+	bool is_hud_handler;
 
 	struct HUDElementInfo
 	{
@@ -217,7 +218,7 @@ private:
 	typedef std::set<HUDElementInfo> HUDElements;
 	HUDElements hud_elements;
 
-	typedef std::map<String, HUDBitmap::WeakPtr> HUDBitmaps;
+	typedef std::map<String, std::weak_ptr<HUDBitmap>> HUDBitmaps;
 	HUDBitmaps hud_bitmaps;
 
 	// LinkChange, LinkAdd, and LinkRemove messages

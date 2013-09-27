@@ -25,6 +25,7 @@
 #define THIEF_TYPES_HH
 
 #include <Thief/Base.hh>
+#include <Thief/ActReact.hh>
 #include <Thief/Link.hh>
 #include <Thief/Message.hh>
 #include <Thief/Mission.hh>
@@ -135,16 +136,16 @@ public:
 
 	enum FrobAction
 	{
-		INERT = 0,
-		ADD_TO_INVENTORY = 1,
-		FROB_SCRIPTS = 2,
-		DESTROY = 4,
-		IGNORE = 8,
-		FOCUS_SCRIPTS = 16,
-		USE_AS_TOOL = 32,
-		REDUCE_STACK = 64,
-		STIMULATE = 128,
-		DESELECT = 256
+		INERT = 0u,
+		ADD_TO_INVENTORY = 1u,
+		FROB_SCRIPTS = 2u,
+		DESTROY = 4u,
+		IGNORE = 8u,
+		FOCUS_SCRIPTS = 16u,
+		USE_AS_TOOL = 32u,
+		REDUCE_STACK = 64u,
+		STIMULATE = 128u,
+		DESELECT = 256u
 	};
 	THIEF_PROP_FIELD (unsigned, frob_world_action); //TESTME
 	THIEF_PROP_FIELD (unsigned, frob_inventory_action); //TESTME

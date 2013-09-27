@@ -24,6 +24,7 @@
 
 #include <Thief/Base.hh>
 #include <Thief/AI.hh>
+#include <Thief/ActReact.hh>
 #include <Thief/Combat.hh>
 #include <Thief/Engine.hh>
 #include <Thief/HUD.hh>

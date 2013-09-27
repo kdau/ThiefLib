@@ -111,6 +111,7 @@ COMMON_SOURCES = \
 	Base.cc \
 	Private.cc \
 	AI.cc \
+	ActReact.cc \
 	Combat.cc \
 	Engine.cc \
 	HUD.cc \

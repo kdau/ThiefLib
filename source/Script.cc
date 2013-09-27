@@ -267,7 +267,12 @@ Script::dispatch (sScrMsg& message, sMultiParm* reply, unsigned trace)
 	if (trace == kBreak)
 		asm ("int $0x3");
 
-	if (!initialized)
+	// The EndScript message can potentially be sent to scripts immediately
+	// *after* a load from a saved game, immediately followed by BeginScript.
+	// Since certain initialization tasks would fail in that environment,
+	// and others might be immediately undone by EndScript message handlers,
+	// EndScript cannot be used as an initialization trigger.
+	if (!initialized && _stricmp (message.message, "EndScript") != 0)
 	{
 		initialize ();
 		initialized = true;

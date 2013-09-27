@@ -65,13 +65,11 @@ OSL*
 OSL::self = nullptr;
 
 OSL::OSL ()
-	: sim (Engine::is_sim ())
+	: is_hud_handler (false)
 {
 	if (self)
 		throw std::runtime_error ("Thief::OSL already initialized.");
 	self = this;
-
-	SService<IDarkOverlaySrv> (LG)->SetHandler (self);
 
 	static sDispatchListenerDesc sim_listener
 		{ &IID_IOSLService, 0xF, on_sim, nullptr };
@@ -81,7 +79,8 @@ OSL::OSL ()
 OSL::~OSL ()
 {
 	self = nullptr;
-	SService<IDarkOverlaySrv> (LG)->SetHandler (nullptr);
+	if (is_hud_handler)
+		SService<IDarkOverlaySrv> (LG)->SetHandler (nullptr);
 	SInterface<ISimManager> (LG)->Unlisten (&IID_IOSLService);
 }
 
@@ -117,21 +116,23 @@ OSL::on_sim (const sDispatchMsg* message, const sDispatchListenerDesc*)
 	{
 
 	case kSimStart:
-		self->sim = true;
-		try
-		{
-			SService<IDarkOverlaySrv> (LG)->SetHandler (self);
-		}
-		catch (...) {}
+		if (!self->hud_elements.empty ())
+			try
+			{
+				SService<IDarkOverlaySrv> (LG)->SetHandler
+					(self);
+				self->is_hud_handler = true;
+			}
+			catch (...) {}
 		break;
 
 	case kSimStop:
-		self->sim = false;
 		try
 		{
 			if (self->param_cache)
 				self->param_cache->reset ();
 
+			self->is_hud_handler = false; // Doesn't survive the sim.
 			self->hud_elements.clear ();
 			self->hud_bitmaps.clear ();
 
@@ -182,6 +183,13 @@ STDMETHODIMP_ (bool)
 OSL::register_hud_element (HUDElementBase& element,
 	HUDElementBase::ZIndex priority)
 {
+	if (!is_hud_handler)
+		try
+		{
+			SService<IDarkOverlaySrv> (LG)->SetHandler (self);
+			is_hud_handler = true;
+		}
+		catch (...) { return false; }
 	hud_elements.insert (HUDElementInfo (element, priority));
 	return true;
 }

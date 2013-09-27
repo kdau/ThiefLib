@@ -271,10 +271,10 @@ public:
 		const Vector& to, bool include_mesh = true);
 
 	/*! Tests whether anything lies between two objects in the game world.
-	 * This method is similar to the Vector override of raycast(), except
+	 * This method is similar to the Vector overload of raycast(), except
 	 * that it uses the centroids of objects \a from and \a to as the ends
 	 * of the ray. These two objects will also be ignored by the raycast.
-	 * See the Vector override for more information. */
+	 * See the Vector overload for more information. */
 	static RaycastHit raycast (RaycastMode mode, const Object& from,
 		const Object& to, bool include_mesh = true);
 

@@ -46,8 +46,14 @@ CanvasPoint::OFFSCREEN = { -1, -1 };
 bool
 CanvasPoint::valid () const
 {
-	// This can't check whether the point is within the canvas size.
 	return x >= 0 && y >= 0;
+}
+
+bool
+CanvasPoint::onscreen () const
+{
+	CanvasSize canvas = Engine::get_canvas_size ();
+	return valid () && x < canvas.w && y < canvas.h;
 }
 
 CanvasPoint
@@ -111,6 +117,20 @@ CanvasRect::valid () const
 	// A rect may legitimately extend off the screen. This can't check
 	// whether at least part of the rect is onscreen.
 	return (*this == NOCLIP) || (w >= 0 && h >= 0);
+}
+
+bool
+CanvasRect::onscreen (bool allow_partial) const
+{
+	CanvasSize canvas = Engine::get_canvas_size ();
+	if (*this == NOCLIP)
+		return true;
+	else if (allow_partial)
+		return x < canvas.w && x + w > 0 &&
+			y < canvas.h && y + h > 0;
+	else
+		return x >= 0 && x + w <= canvas.w &&
+			y >= 0 && y + h <= canvas.h;
 }
 
 
@@ -275,12 +295,13 @@ HUDElement::is_overlay () const
 	return overlay > INVALID_HANDLE;
 }
 
+//TODO Fix the oddities with overlays and re-enable them, testing related methods.
+#ifdef THIEF_USE_BROKEN_HUD_OVERLAY
+
 bool
 HUDElement::create_overlay ()
 {
 	if (is_overlay ()) return true;
-
-	return false; //TODO Fix the oddities with overlays and re-enable them.
 
 	overlay = SService<IDarkOverlaySrv> (LG)->CreateTOverlayItem
 		(_position.x, _position.y, _size.w, _size.h, 255, true);
@@ -298,6 +319,8 @@ HUDElement::create_overlay ()
 	}
 }
 
+#endif // THIEF_USE_BROKEN_HUD_OVERLAY
+
 void
 HUDElement::destroy_overlay ()
 {
@@ -309,6 +332,8 @@ HUDElement::destroy_overlay ()
 	}
 }
 
+#ifdef THIEF_USE_BROKEN_HUD_OVERLAY
+
 void
 HUDElement::set_opacity (float _opacity)
 {
@@ -317,6 +342,8 @@ HUDElement::set_opacity (float _opacity)
 	SService<IDarkOverlaySrv> (LG)->UpdateTOverlayAlpha
 		(overlay, std::min (255, std::max (0, int (opacity * 255.0f))));
 }
+
+#endif // THIEF_USE_BROKEN_HUD_OVERLAY
 
 void
 HUDElement::set_position (CanvasPoint position)
@@ -338,6 +365,7 @@ HUDElement::set_size (CanvasSize size)
 	if (_size == size) return;
 	_size = size;
 
+#ifdef THIEF_USE_BROKEN_HUD_OVERLAY
 	// This is not desirable. Set the size before creating an overlay.
 	if (is_overlay ())
 	{
@@ -346,9 +374,12 @@ HUDElement::set_size (CanvasSize size)
 		if (scale != 1.0f) set_scale (scale); // Restore if needed.
 		schedule_redraw ();
 	}
+#endif // THIEF_USE_BROKEN_HUD_OVERLAY
 
 	// For non-overlay elements, size is ignored.
 }
+
+#ifdef THIEF_USE_BROKEN_HUD_OVERLAY
 
 void
 HUDElement::set_scale (float _scale)
@@ -358,6 +389,8 @@ HUDElement::set_scale (float _scale)
 	SService<IDarkOverlaySrv> (LG)->UpdateTOverlaySize
 		(overlay, _size.w * scale, _size.h * scale);
 }
+
+#endif // THIEF_USE_BROKEN_HUD_OVERLAY
 
 void
 HUDElement::set_drawing_color (const Color& color)
@@ -382,14 +415,18 @@ HUDElement::adjust_drawing_offset (CanvasPoint by)
 	drawing_offset += by;
 }
 
+#ifdef THIEF_USE_BROKEN_HUD_OVERLAY
+
 void
-HUDElement::fill_background (int color_index, float _opacity)
+HUDElement::fill_overlay (int color_index, float _opacity)
 {
 	CHECK_OVERLAY ();
 	CHECK_DRAWING ();
 	SService<IDarkOverlaySrv> (LG)->FillTOverlay (color_index,
 		std::min (255, std::max (0, int (_opacity * 255.0f))));
 }
+
+#endif // THIEF_USE_BROKEN_HUD_OVERLAY
 
 void
 HUDElement::fill_area (CanvasRect area)
@@ -424,16 +461,6 @@ HUDElement::draw_line (CanvasPoint from, CanvasPoint to)
 	SService<IDarkOverlaySrv> (LG)->DrawLine (from.x, from.y, to.x, to.y);
 }
 
-CanvasSize
-HUDElement::get_text_size (const String& text) const
-{
-	CanvasSize size;
-	CHECK_DRAWING ();
-	SService<IDarkOverlaySrv> (LG)->GetStringSize
-		(text.data (), size.w, size.h);
-	return size;
-}
-
 void
 HUDElement::draw_text (const String& text, CanvasPoint position)
 {
@@ -451,6 +478,16 @@ HUDElement::draw_bitmap (const HUDBitmap::Ptr& bitmap, HUDBitmap::Frame frame,
 	if (!bitmap) throw std::logic_error ("bitmap is null");
 	do_offset (position);
 	bitmap->draw (frame, position, clip);
+}
+
+CanvasSize
+HUDElement::get_text_size (const String& text) const
+{
+	CanvasSize size;
+	CHECK_DRAWING ();
+	SService<IDarkOverlaySrv> (LG)->GetStringSize
+		(text.data (), size.w, size.h);
+	return size;
 }
 
 CanvasPoint

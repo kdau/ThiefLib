@@ -49,6 +49,29 @@ QuestVar::operator = (int value)
 
 
 
+// Numbered
+
+inline
+Numbered::Numbered (Number _number)
+	: number (_number)
+{}
+
+inline Numbered&
+Numbered::operator ++ ()
+{
+	++number;
+	return *this;
+}
+
+inline Numbered&
+Numbered::operator -- ()
+{
+	++number;
+	return *this;
+}
+
+
+
 // QuestField
 
 #define THIEF_QUEST_FIELD(Type, Name) \
