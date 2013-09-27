@@ -1,7 +1,6 @@
-/******************************************************************************
- *  QuestVar.inl
- *
- *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
+//! \file QuestVar.inl.
+
+/*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
  *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
@@ -18,8 +17,7 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- *****************************************************************************/
+ */
 
 #ifndef THIEF_QUESTVAR_HH
 #error "This file should only be included from <Thief/QuestVar.hh>."
@@ -200,9 +198,11 @@ THIEF_FIELD_PROXY_CLASS (DoubleQuestField)::unsubscribe (const Object& host)
 
 // DifficultyQuestField
 
-//! \cond HIDDEN_SYMBOLS
+#ifdef IS_DOXYGEN
+#define DifficultyQuestField QuestField<Difficulty>
+#else
+
 extern const FieldProxyConfig<Difficulty> F_objective_difficulty;
-//! \endcond
 
 class DifficultyQuestField
 	: public DoubleQuestField<Difficulty, F_objective_difficulty>
@@ -219,13 +219,17 @@ DifficultyQuestField::DifficultyQuestField (Numbered& _numbered, size_t _index)
 	: DoubleQuestField<Difficulty, F_objective_difficulty> (_numbered, _index)
 {}
 
+#endif // !IS_DOXYGEN
+
 
 
 // SpecialsQuestField
 
-//! \cond HIDDEN_SYMBOLS
+#ifdef IS_DOXYGEN
+#define SpecialsQuestField QuestField<Objective::Specials>
+#else
+
 extern const FieldProxyConfig<std::bitset<8>> F_objective_specials;
-//! \endcond
 
 class SpecialsQuestField
 	: public DoubleQuestField<std::bitset<8>, F_objective_specials>
@@ -243,6 +247,7 @@ SpecialsQuestField::SpecialsQuestField (Numbered& _numbered, size_t _index)
 		_index)
 {}
 
+#endif // !IS_DOXYGEN
 
 
 

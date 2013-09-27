@@ -379,7 +379,13 @@ public:
 
 /*! %Message about a change in the simulation (mission) status.
  * A sim message is sent when the mission starts and when it ends.
- * \note %Message name: \c Sim */
+ * \note %Message name: \c Sim
+ * \note To supplement \c Sim, ThiefLib creates a generic message \c PostSim in
+ * the cycle immediately following the starting SimMessage (#event == #START).
+ * That corresponds to the time when other scripts' preparatory work, including
+ * the spawning of the \c Player object, is complete. This \c PostSim message is
+ * posted only to objects that host at least one ThiefLib script, though any
+ * scripts on those objects will receive it. */
 class SimMessage : public Message
 {
 public:

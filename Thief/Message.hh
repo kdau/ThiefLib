@@ -56,8 +56,9 @@ struct Timer
 	void cancel ();
 };
 
+//! \cond HIDDEN_SYMBOLS
 THIEF_LGMULTI_SPECIALIZE (Timer, Timer ())
-
+// ! \endcond
 
 
 
@@ -138,11 +139,10 @@ public:
 	Object get_to () const;
 
 	/*! Returns the time when the message was last propagated to a script.
-	 * This time is measured on the sim clock, the in-game clock which
-	 * measures time passed in game mode since the mission was started. It
-	 * is not equivalent to clock time. For post()ed or schedule()d messages,
-	 * this value may not be equal to the original conveyance time either.
-	 * The return value is undefined if the message has not been conveyed. */
+	 * This time is measured on the sim clock; see Time for more information.
+	 * For post()ed or schedule()d messages, this value may not be equal to
+	 * the original conveyance time. The return value is undefined if the
+	 * message has not been conveyed. */
 	Time get_time () const;
 
 	//! \name Conveyance
@@ -246,9 +246,11 @@ private:
 
 
 
-//! \cond HIDDEN_SYMBOLS
+#ifdef IS_DOXYGEN
+#define THIEF_MESSAGE_WRAP(Type)
+#else
 #define THIEF_MESSAGE_WRAP(Type) Type (sScrMsg*, sMultiParm*);
-//! \endcond
+#endif
 
 
 
@@ -284,7 +286,7 @@ private:
 
 
 
-/*! Non-specific message type that can be created by scripts.
+/*! Non-specific messages that can be created by scripts.
  * The GenericMessage class can be used by scripts to create messages that do
  * not have any specific type (that calls for fields other than #DATA1/2/3).
  * In message handler methods, however, these non-specific messages should be
@@ -314,7 +316,7 @@ public:
 
 
 
-/*! %Message type generated after a delay or at regular intervals.
+/*! %Message generated after a delay or at regular intervals.
  * Although any message type can be posted after a delay or repeated at regular
  * intervals, it is most common to use a \c %Timer message for this purpose. The
  * \c %Timer message has a timer name, separate from the message name, which

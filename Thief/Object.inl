@@ -1,7 +1,6 @@
-/******************************************************************************
- *  Object.inl
- *
- *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
+//! \file Object.inl
+
+/*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
  *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
@@ -18,8 +17,7 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- *****************************************************************************/
+ */
 
 #ifndef THIEF_OBJECT_HH
 #error "This file should only be included from <Thief/Object.hh>."

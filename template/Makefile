@@ -1,10 +1,7 @@
-#******************************************************************************
-#   Makefile
+# Makefile
 #
-#   Part of the template for ThiefLib script modules
-#   Copyright (C) 2012-2013 Kevin Daughtridge <kevin@kdau.com>
-#
-#******************************************************************************
+# Part of the template for ThiefLib script modules
+# Copyright (C) 2012-2013 Kevin Daughtridge <kevin@kdau.com>
 
 # CUSTOMIZE to the short name of your module.
 MODULE_NAME = SampleModule

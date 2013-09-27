@@ -1,10 +1,7 @@
-/******************************************************************************
- *  SampleScript.hh
- *
- *  Part of the template for ThiefLib script modules
- *  Copyright (C) 2012-2013 Kevin Daughtridge <kevin@kdau.com>
- *
- *****************************************************************************/
+/*! \file SampleScript.hh A very basic example script.
+ * Part of the template for ThiefLib script modules
+ * Copyright (C) 2012-2013 Kevin Daughtridge <kevin@kdau.com>
+ */
 
 #ifndef SAMPLESCRIPT_HH
 #define SAMPLESCRIPT_HH
@@ -18,6 +15,7 @@ public:
 	SampleScript (const String& name, const Object& host);
 
 private:
+	Message::Result on_sim (SimMessage&);
 	Message::Result on_frob_world_end (FrobMessage&);
 };
 
