@@ -366,7 +366,7 @@ public:
 		          * menu or at mission start. */
 	};
 
-	//! Constructs a new \c %DarkGameModeChange message for the given event.
+	//! Constructs a new \c DarkGameModeChange message for the given event.
 	GameModeMessage (Event);
 
 	THIEF_MESSAGE_WRAP (GameModeMessage);
@@ -396,7 +396,7 @@ public:
 		FINISH //!< The simulation (mission) is about to end.
 	};
 
-	//! Constructs a new \c %Sim message for the given event.
+	//! Constructs a new \c Sim message for the given event.
 	SimMessage (Event);
 
 	THIEF_MESSAGE_WRAP (SimMessage);

@@ -308,18 +308,15 @@ public:
 	THIEF_OBJECT_TYPE (Room)
 	bool is_room () const; //TESTME
 
-	THIEF_PROP_FIELD_CONST (AmbientLightZone, ambient_light_zone); //TESTME
-
 	THIEF_PROP_FIELD_CONST (int, automap_page); //TESTME
 	THIEF_PROP_FIELD_CONST (int, automap_location); //TESTME
 
-	THIEF_PROP_FIELD_CONST (EnvironmentMapZone, environment_map_zone); //TESTME
-
+	THIEF_PROP_FIELD_CONST (unsigned, ambient_light_zone); //TESTME
+	THIEF_PROP_FIELD_CONST (unsigned, environment_map_zone); //TESTME
 	THIEF_PROP_FIELD_CONST (Fog::Zone, fog_zone); //TESTME
+	THIEF_PROP_FIELD_CONST (bool, precipitation); //TESTME
 
 	THIEF_PROP_FIELD (int, gravity); //TESTME
-
-	THIEF_PROP_FIELD_CONST (bool, precipitation); //TESTME
 
 	THIEF_PROP_FIELD_CONST (bool, see_through); //TESTME, not const?
 };

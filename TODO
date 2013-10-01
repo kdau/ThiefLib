@@ -1,5 +1,4 @@
 Current
-	* Complete documentation of <Base.hh>.
 	* Eliminate the MULTI_* macros.
 	* Replace Parameter<Object> with Parameter<Object::Ref>, resolvable dynamically to an Object.
 	* Fix possible dangling pointer in posted or scheduled synthetic QuestMessage and ObjectiveMessage instances.

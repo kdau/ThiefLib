@@ -518,26 +518,25 @@ Room_fog_zone_setter (const FieldProxyConfig<Fog::Zone>::Item&,
 	reinterpret_cast<LGMulti<int>&> (multi) = int (value) + 1;
 }
 
-PROXY_CONFIG (Room, ambient_light_zone, "Weather", "ambient lighting",
-	AmbientLightZone, AmbientLightZone::GLOBAL);
 PROXY_CONFIG (Room, automap_page, "Automap", "Page", int, 0);
 PROXY_CONFIG (Room, automap_location, "Automap", "Location", int, 0);
-PROXY_CONFIG (Room, environment_map_zone, "RoomRend", "Env Zone",
-	EnvironmentMapZone, EnvironmentMapZone::GLOBAL);
+PROXY_CONFIG (Room, ambient_light_zone, "Weather", "ambient lighting",
+	unsigned, 0u);
+PROXY_CONFIG (Room, environment_map_zone, "RoomRend", "Env Zone", unsigned, 0u);
 PROXY_CONFIG_ (Room, fog_zone, "Weather", "fog", Fog::Zone, Fog::Zone::DISABLED,
 	0, Room_fog_zone_getter, Room_fog_zone_setter);
-PROXY_CONFIG (Room, gravity, "RoomGrav", nullptr, int, 100);
 PROXY_CONFIG (Room, precipitation, "Weather", "precipitation", bool, false);
+PROXY_CONFIG (Room, gravity, "RoomGrav", nullptr, int, 100);
 PROXY_BIT_CONFIG (Room, see_through, "RoomRend", "Flags", 1u, false);
 
 OBJECT_TYPE_IMPL_ (Room,
-	PROXY_INIT (ambient_light_zone),
 	PROXY_INIT (automap_page),
 	PROXY_INIT (automap_location),
+	PROXY_INIT (ambient_light_zone),
 	PROXY_INIT (environment_map_zone),
 	PROXY_INIT (fog_zone),
-	PROXY_INIT (gravity),
 	PROXY_INIT (precipitation),
+	PROXY_INIT (gravity),
 	PROXY_INIT (see_through)
 )
 

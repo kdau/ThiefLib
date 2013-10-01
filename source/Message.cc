@@ -204,8 +204,8 @@ Message::get_lg_typename () const
 
 MessageWrapError::MessageWrapError (const sScrMsg* message,
 	const char* wrap_type, const char* problem) noexcept
-	: explanation ((boost::format ("Can't wrap a(n) \"%||\" message of "
-		"engine type %|| as a(n) %||: %||.")
+	: explanation ((boost::format ("Can't wrap a \"%||\" message of engine "
+		"type %|| as a %||: %||.")
 		% ((message && message->message) ? message->message : "")
 		% (message ? message->Persistent_GetName () : "null")
 		% (wrap_type ? wrap_type : "Message")

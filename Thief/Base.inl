@@ -413,6 +413,7 @@ public: \
 #define THIEF_LGMULTI_SPECIALIZE(Type, Default) \
 THIEF_LGMULTI_SPECIALIZE_ (Type, LGMultiBase, Default)
 
+//TODO Document this. Move to Base.hh? Elsewhere? For that matter, document LGMulti overall somewhere (without exposing it directly).
 class LGMultiTypeError : public std::exception
 {
 public:

@@ -44,7 +44,8 @@ THIEF_ENUM_CODING (Difficulty, BOTH, VALUE,
 
 // DifficultyMessage
 
-MESSAGE_WRAPPER_IMPL (DifficultyMessage, sDiffScrMsg),
+// "Difficulty" reports as "sScrMsg", so it can't be tested by type.
+MESSAGE_WRAPPER_IMPL_ (DifficultyMessage, MESSAGE_NAME_TEST ("Difficulty")),
 	difficulty (Difficulty (MESSAGE_AS (sDiffScrMsg)->difficulty))
 {}
 
@@ -54,29 +55,6 @@ DifficultyMessage::DifficultyMessage (Difficulty _difficulty)
 	message->message = "Difficulty";
 	MESSAGE_AS (sDiffScrMsg)->difficulty = int (difficulty);
 }
-
-
-
-// AmbientLightZone
-
-THIEF_ENUM_CODING (AmbientLightZone, BOTH, VALUE,
-	THIEF_ENUM_VALUE (GLOBAL, "global"),
-	THIEF_ENUM_VALUE (ZONE_1, "zone1"),
-	THIEF_ENUM_VALUE (ZONE_2, "zone2"),
-	THIEF_ENUM_VALUE (ZONE_3, "zone3"),
-	THIEF_ENUM_VALUE (ZONE_4, "zone4"),
-	THIEF_ENUM_VALUE (ZONE_5, "zone5"),
-	THIEF_ENUM_VALUE (ZONE_6, "zone6"),
-	THIEF_ENUM_VALUE (ZONE_7, "zone7"),
-	THIEF_ENUM_VALUE (ZONE_8, "zone8"),
-)
-
-
-
-// EnvironmentMapZone
-
-// There isn't much value in making a 64-item list here.
-THIEF_ENUM_CODING (EnvironmentMapZone, VALUE, VALUE)
 
 
 
@@ -260,14 +238,17 @@ Mission::check_difficulty (Difficulty allowed)
 // Mission: rendering effects
 
 void
-Mission::set_envmap_texture (EnvironmentMapZone zone, const String& texture)
+Mission::set_envmap_texture (unsigned zone, const String& texture)
 {
 	if (Engine::get_version () < Version (1, 20))
 		throw std::runtime_error ("Mission::set_envmap_texture is not "
 			"implemented before engine version 1.20.");
 
+	if (zone >= 64u)
+		throw std::out_of_range ("bad environment map zone");
+
 	SService<IEngineSrv> (LG)->SetEnvMapZone
-		(int (zone), texture.empty () ? nullptr : texture.data ());
+		(zone, texture.empty () ? nullptr : texture.data ());
 }
 
 Fog
@@ -428,9 +409,9 @@ Mission::show_image (const String& image)
 }
 
 void
-Mission::show_movie (const String& movie)
+Mission::show_video (const String& video)
 {
-	Engine::run_command ("movie", movie);
+	Engine::run_command ("movie", video);
 }
 
 void

@@ -106,7 +106,7 @@ public:
 class QuestMessage : public Message
 {
 public:
-	/*! Constructs a new \c %QuestChange message for the named variable.
+	/*! Constructs a new \c QuestChange message for the named variable.
 	 * \warning Due to engine limitations, it is strongly recommended that
 	 * the \a quest_var string be a constant with static storage duration.
 	 * If a temporary or non-constant string must be used, ensure that it
@@ -388,7 +388,7 @@ public:
 #endif
 	};
 
-	/*! Constructs a new \c %ObjectiveChange message for the given objective
+	/*! Constructs a new \c ObjectiveChange message for the given objective
 	 * and field. */
 	ObjectiveMessage (const Objective&, Field, int new_raw_value,
 		int old_raw_value);

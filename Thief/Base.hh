@@ -104,22 +104,28 @@
 namespace Thief {
 
 class Object;
+//! A list of references to game objects.
 typedef std::vector<Object> Objects;
 
 struct Flavor;
 class Link;
+//! A list of references to links between objects.
 typedef std::vector<Link> Links;
 
 
 
 
+//! A string type used in case-sensitive comparison contexts.
 typedef std::string String;
 
 class CITraits;
+
+//! A string type used in case-insensitive comparison contexts.
 typedef std::basic_string<char, CITraits> CIString;
 
 //! \relates CIString
 bool operator == (const CIString&, const String&);
+
 //! \relates CIString
 std::ostream& operator << (std::ostream&, const CIString&);
 
@@ -179,6 +185,7 @@ struct RGBColor
  * This is the output of the color's String conversion. \relates RGBColor */
 std::ostream& operator << (std::ostream&, const RGBColor&);
 
+//! In most contexts, an sRGB value is expected for a color.
 typedef RGBColor Color;
 
 
@@ -372,24 +379,63 @@ struct Vector
 	//! Divides this vector by the given scalar.
 	Vector& operator /= (double);
 
+	/*! Returns the normalized, or unit, vector for this vector.
+	 * The normal is a unit-length (1 DU) with the same direction. */
 	Vector normal () const;
+
+	//! Sets this vector to its normalized (unit) form.
 	Vector& normalize ();
 
+	/*! Returns the magnitude of the vector.
+	 * The magnitude is the length along the vector between its ends. */
 	double magnitude () const;
+
+	/*! Returns the square of the magnitude of the vector.
+	 * This value is computationally simpler than the magnitude itself. */
 	double mag_squared () const;
 
+	//! Returns the dot product of this vector and another.
 	double dot (const Vector&) const;
+
+	//! Returns the cross product of this vector and another.
 	Vector cross (const Vector&) const;
+
+	/*! Returns the distance between this vector and another.
+	 * The distance is the magnitude of the vectors' difference. */
 	double distance (const Vector& from) const;
 
+	/*! Constructs a vector based on the given string.
+	 * See the String assignment operator. */
 	explicit Vector (const String&);
+
+	/*! Sets the vector based on the given string.
+	 * The string should be a comma-separated triplet of component values,
+	 * such as \c "-5.5,12,32.01". */
 	Vector& operator = (const String&);
+
+	/*! Returns a string representation of the vector.
+	 * This is the three vector components at a fixed precision of three
+	 * decimal places, separated by commas. */
 	explicit operator String () const;
 
+	/*! A component value below which values can be treated as zero.
+	 * This epsilon value is based on the useful resolution of location and
+	 * distance values in the Dark %Engine. %Vector components and related
+	 * scalars whose absolute values are below EPSILON can be treated as
+	 * equal to zero for most purposes. */
 	static const double EPSILON;
 
+	//! One of the three components of a vector.
 	enum class Component { NONE = -1, X, Y, Z};
+
+	/*! Returns the requested component of the vector.
+	 * This method can be used to select a component variably, such as
+	 * based on a Parameter. */
 	float& operator [] (Component);
+
+	/*! Returns the requested component of the vector.
+	 * This method can be used to select a component variably, such as
+	 * based on a Parameter. */
 	const float& operator [] (Component) const;
 };
 
@@ -399,15 +445,28 @@ std::ostream& operator << (std::ostream&, const Vector&);
 
 
 
+/*! A shape of curve for interpolation calculations.
+ * In the formulas, \f$t\f$ represents the input \a alpha to calculate_curve(),
+ * while \f$\alpha\f$ represents that function's return value. */
 enum class Curve
 {
-	LINEAR,
-	QUADRATIC, RADICAL,
-	LOG_10, POW_10,
-	LOG_E, POW_E
+	LINEAR,    //!< A straight line: \f$\alpha = t\f$
+	QUADRATIC, //!< A parabolic curve: \f$\alpha = t^2\f$
+	RADICAL,   //!< A radical curve: \f$\alpha = \sqrt{t}\f$
+	LOG_10,    //!< A logarithmic curve (base 10): \f$\alpha = log_{10} (0.9t + 0.1) + 1\f$
+	POW_10,    //!< A power curve (base 10): \f$\alpha = (10^t - 1) \div 9\f$
+	LOG_E,     //!< A logarithmic curve (base \f$e\f$): \f$\alpha = log_e ((1 - \frac{1}{e})t + \frac{1}{e}) + 1\f$
+	POW_E      //!< A power curve (base \f$e\f$): \f$\alpha = \frac{e^t - 1}{e - 1}\f$
 };
 
-double calculate_curve (double alpha, Curve);
+/*! Calculates a position along a curve of the given type.
+ * This function is used by interpolate() to calculate non-linear curves, but
+ * could be called by any other code that needs to make a similar calculation,
+ * including overloads of interpolate(). \param alpha The equivalent position
+ * along a linear curve, between 0.0 and 1.0. \param curve The type of curve to
+ * calculate. \return The position along a curve of the given type, between 0.0
+ * and 1.0. */
+double calculate_curve (double alpha, Curve curve);
 
 //! \cond HIDDEN_SYMBOLS
 #define THIEF_INTERPOLATE_RESULT(Type) typename \
