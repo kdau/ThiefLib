@@ -28,11 +28,15 @@
 
 
 
+//! \cond HIDDEN_SYMBOLS
+
 #define THIEF_IS_ENUM typename std::enable_if<std::is_enum<T>::value>::type
 #define THIEF_NOT_ENUM typename std::enable_if<!std::is_enum<T>::value>::type
 
 #define THIEF_IS_OBJECT \
 typename std::enable_if<std::is_base_of<Object, T>::value>::type
+
+//! \endcond
 
 
 
@@ -507,14 +511,6 @@ Method () const \
 	LGMulti<T> multi; \
 	_##Method (multi); \
 	return multi; \
-}
-
-#define MULTI_SET_ARG_RET(RetType, Method, ArgType, ArgName) \
-template <typename T> \
-inline RetType \
-Method (const ArgType& ArgName, const T& value) \
-{ \
-	return _##Method (ArgName, LGMulti<T> (value)); \
 }
 
 #define MULTI_SET_ARG(Method, ArgType, ArgName) \

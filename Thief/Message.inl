@@ -30,6 +30,10 @@
 
 namespace Thief {
 
+//! \cond HIDDEN_SYMBOLS
+THIEF_LGMULTI_SPECIALIZE (Timer, Timer ())
+// ! \endcond
+
 template <typename T>
 inline T
 Message::get_data (Slot slot) const

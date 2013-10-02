@@ -56,10 +56,6 @@ struct Timer
 	void cancel ();
 };
 
-//! \cond HIDDEN_SYMBOLS
-THIEF_LGMULTI_SPECIALIZE (Timer, Timer ())
-// ! \endcond
-
 
 
 /*! Base class for event notifications sent to and between scripts.
@@ -246,11 +242,9 @@ private:
 
 
 
-#ifdef IS_DOXYGEN
-#define THIEF_MESSAGE_WRAP(Type)
-#else
+//! \cond HIDDEN_SYMBOLS
 #define THIEF_MESSAGE_WRAP(Type) Type (sScrMsg*, sMultiParm*);
-#endif
+//! \endcond
 
 
 

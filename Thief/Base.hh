@@ -31,9 +31,9 @@
 #define IS_THIEF1
 #elif (_DARKGAME == 2)
 #define IS_THIEF2
-#elif defined(_DARKGAME)
+#elif defined (_DARKGAME)
 #error "ThiefLib does not support this game."
-#elif IS_DOXYGEN
+#elif defined (IS_DOXYGEN)
 /*! Defined if the current module is for %Thief: The Dark Project or %Thief Gold.
  * A module supporting both games can use this define to enable T1-specific code. */
 #define IS_THIEF1
@@ -103,15 +103,18 @@
 
 namespace Thief {
 
+
+
 class Object;
 //! A list of references to game objects.
 typedef std::vector<Object> Objects;
+
+
 
 struct Flavor;
 class Link;
 //! A list of references to links between objects.
 typedef std::vector<Link> Links;
-
 
 
 
@@ -123,15 +126,14 @@ class CITraits;
 //! A string type used in case-insensitive comparison contexts.
 typedef std::basic_string<char, CITraits> CIString;
 
-//! \relates CIString
+//! \cond HIDDEN_SYMBOLS
 bool operator == (const CIString&, const String&);
-
-//! \relates CIString
 std::ostream& operator << (std::ostream&, const CIString&);
+//! \endcond
 
 
 
-//! Represents a color in the sRGB space, as used by the engine.
+//! A color in the sRGB space, as used by the engine.
 struct RGBColor
 {
 	//! A component dimension of the sRGB color space.
@@ -190,7 +192,7 @@ typedef RGBColor Color;
 
 
 
-/*! Represents a color in the CIE L*a*b* space, ideal for calculations.
+/*! A color in the CIE L*a*b* space, ideal for calculations.
  * The CIE L*a*b* color space distributes colors based on human color perception,
  * so averaging and lightness adjustment operations are best performed in this
  * space. */
@@ -225,7 +227,7 @@ struct LabColor
 
 
 
-/*! Represents a span of time or position in time on the sim clock.
+/*! A span of time or position in time on the sim clock.
  * The sim clock is the in-game clock which measures time passed in game mode
  * since the mission was started. It is not equivalent to wall clock time. It
  * is affected by pauses in game mode (interface screens and load/save),
@@ -233,6 +235,7 @@ struct LabColor
  * DromEd), and to a small extent by hardware and performance constraints.  */
 struct Time
 {
+	//! A time value in milliseconds.
 	typedef unsigned long Value;
 
 	//! The base unit of milliseconds.
@@ -244,7 +247,7 @@ struct Time
 	//! The unit of minutes, as a multiple of the base millisecond unit.
 	static constexpr Value MINUTES = 60ul * SECONDS;
 
-	//! The time value, in milliseconds.
+	//! The time value in milliseconds.
 	Value value;
 
 	//! Constructs a time value with the given number of the given unit.
@@ -312,7 +315,7 @@ std::ostream& operator << (std::ostream&, const Time&);
 
 
 
-/*! Represents a location, rotation, size, or velocity in the game world.
+/*! A location, rotation, size, or velocity in the game world.
  * Vectors are three-dimensional coordinates in the game world. In most cases,
  * the components represent locations or lengths in DromEd units (DU), where
  * each DU is about 10 inches. For rotational vectors, the components are

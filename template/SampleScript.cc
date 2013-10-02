@@ -6,7 +6,8 @@
 #include "SampleScript.hh"
 
 SampleScript::SampleScript (const String& _name, const Object& _host)
-	: Script (_name, _host)
+	: Script (_name, _host),
+	  THIEF_PARAMETER (ticklish, true)
 {
 	listen_message ("Sim", &SampleScript::on_sim);
 	listen_message ("FrobWorldEnd", &SampleScript::on_frob_world_end);
@@ -23,9 +24,15 @@ SampleScript::on_sim (SimMessage& message)
 }
 
 Message::Result
-SampleScript::on_frob_world_end (FrobMessage&)
+SampleScript::on_frob_world_end (FrobMessage& message)
 {
-	Mission::show_text ("Stop, that tickles!");
+	if (ticklish && message.frobber == Player ())
+	{
+		Mission::show_text ("Stop, that tickles!");
+#ifdef IS_THIEF1
+		SoundSchema ("m06vikgig").play (host ());
+#endif
+	}
 	return Message::HALT;
 }
 

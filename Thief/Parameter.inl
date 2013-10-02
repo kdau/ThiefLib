@@ -1,7 +1,6 @@
-/******************************************************************************
- *  Parameter.inl
- *
- *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
+//! \file Parameter.inl
+
+/*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
  *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts, Object Script Library, and Dark Hook 2
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
@@ -18,8 +17,7 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- *****************************************************************************/
+ */
 
 #ifndef THIEF_PARAMETER_HH
 #error "This file should only be included from <Thief/Parameter.hh>."
@@ -32,10 +30,35 @@ namespace Thief {
 
 
 
-// ParameterBase::Config
+/*! \cond HIDDEN_SYMBOLS
+ * Specializations of Parameter::encode/decode for fundamental and class types */
+
+template<> bool Parameter<bool>::decode (const String& raw) const;
+template<> String Parameter<bool>::encode () const;
+
+template<> bool Parameter<int>::decode (const String& raw) const;
+
+template<> bool Parameter<float>::decode (const String& raw) const;
+
+template<> bool Parameter<Object>::decode (const String& raw) const;
+template<> String Parameter<Object>::encode () const;
+
+template<> bool Parameter<Objective>::decode (const String& raw) const;
+template<> String Parameter<Objective>::encode () const;
+
+template<> bool Parameter<String>::decode (const String& raw) const;
+template<> String Parameter<String>::encode () const;
+
+template<> bool Parameter<Time>::decode (const String& raw) const;
+
+//! \endcond
+
+
+
+// ParameterConfigBase
 
 inline
-ParameterBase::Config::Config (bool _inheritable)
+ParameterConfigBase::ParameterConfigBase (bool _inheritable)
 	: inheritable (_inheritable)
 {}
 
@@ -44,6 +67,7 @@ ParameterBase::Config::Config (bool _inheritable)
 // ParameterConfig
 
 template <typename T>
+inline
 ParameterConfig<T>::ParameterConfig (const T& _default_value, bool _inheritable)
 	: ParameterBase::Config (_inheritable),
 	  default_value (_default_value)
@@ -54,6 +78,7 @@ ParameterConfig<T>::ParameterConfig (const T& _default_value, bool _inheritable)
 // Parameter (for fundamental and class types)
 
 template <typename T>
+inline
 Parameter<T, THIEF_NOT_ENUM>::Parameter (const Object& _object,
 		const CIString& _name, const Config& _config)
 	: ParameterBase (_object, _name, config),

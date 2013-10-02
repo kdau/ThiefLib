@@ -366,7 +366,7 @@ Script::_start_timer (const char* timer, Time delay, bool repeating,
 TrapTrigger::TrapTrigger (const String& _name, const Object& _host, Log _level)
 	: Script (_name, _host, _level)
 #ifdef IS_THIEF1
-	  , PARAMETER (tcf)
+	  , THIEF_PARAMETER (tcf)
 #endif
 {
 	listen_message ("TurnOn", &TrapTrigger::on_turn_on);

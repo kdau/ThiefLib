@@ -248,7 +248,7 @@ EnumParameterBase::EnumParameterBase (const Object& _object,
 bool
 EnumParameterBase::decode (const String& raw) const
 {
-	if (coding.input_type != EnumCoding::Input::CODE) // values allowed
+	if (coding.input_type != EnumCoding::Type::CODE) // values allowed
 	{
 		value = decode_quest_ref (raw);
 		if (value != INT_MAX) return true;
@@ -276,15 +276,15 @@ EnumParameterBase::set_default () const
 int
 EnumCoding::decode (const String& raw) const
 {
-	// Try decoding as a code string.
-	if (input_type != Input::VALUE)
+	// Try decoding as a listed string representation.
+	if (input_type != Type::VALUE)
 		for (auto& enumerator : enumerators)
 			for (auto& code : enumerator.codes)
 				if (code == raw)
 					return enumerator.value;
 
-	// Try decoding as a value integer.
-	if (input_type != Input::CODE)
+	// Try decoding as a formatted numeric value.
+	if (input_type != Type::CODE)
 		try
 		{
 			int candidate = std::stoi (raw, nullptr, 0);
@@ -302,7 +302,8 @@ EnumCoding::decode (const String& raw) const
 String
 EnumCoding::encode (int value) const
 {
-	if (output_type == Output::CODE)
+	// Try encoding as a listed string representation.
+	if (output_type != Type::VALUE)
 		for (auto& enumerator : enumerators)
 			if (enumerator.value == value)
 			{

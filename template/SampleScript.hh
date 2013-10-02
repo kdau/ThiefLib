@@ -16,7 +16,9 @@ public:
 
 private:
 	Message::Result on_sim (SimMessage&);
+
 	Message::Result on_frob_world_end (FrobMessage&);
+	Parameter<bool> ticklish;
 };
 
 #endif // SAMPLESCRIPT_HH

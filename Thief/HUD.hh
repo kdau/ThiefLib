@@ -29,7 +29,7 @@ namespace Thief {
 
 
 
-//! Represents a point (pixel) on the canvas (screen).
+//! A point (pixel) on the canvas (screen).
 struct CanvasPoint
 {
 	//! The X-axis (horizontal) coordinate of the point, in pixels.
@@ -84,13 +84,13 @@ struct CanvasPoint
 	//! The origin of the canvas plane at (0, 0).
 	static const CanvasPoint ORIGIN;
 
-	//! Represents that the requested point is not within the canvas area.
+	//! Indicates that the requested point is not within the canvas area.
 	static const CanvasPoint OFFSCREEN;
 };
 
 
 
-//! Represents a rectangular portion of the canvas (screen).
+//! A rectangular portion of the canvas (screen).
 struct CanvasRect : public CanvasPoint, public CanvasSize
 {
 	//! Constructs a new rectangle of zero size at the origin.
@@ -132,14 +132,14 @@ struct CanvasRect : public CanvasPoint, public CanvasSize
 	//! Instructs certain methods to use the full area available to them.
 	static const CanvasRect NOCLIP;
 
-	/*! Represents that the requested rectangle would be entirely outside
+	/*! Indicates that the requested rectangle would be entirely outside
 	 * the canvas area. */
 	static const CanvasRect OFFSCREEN;
 };
 
 
 
-/*! Represents a bitmap image loaded into memory to be drawn on the HUD.
+/*! A bitmap image loaded into memory to be drawn on the HUD.
  * \note A maximum of 128 HUD bitmap frames can be loaded at any time (counting
  * frames of an animation individually). */
 class HUDBitmap
@@ -194,7 +194,7 @@ private:
 
 
 
-/*! Provides a minimal interface for creating HUD elements.
+/*! Minimal interface for creating HUD elements.
  * This class handles registration of a HUD element with the central HUD handler.
  * HUDElement provides the full set of methods needed to draw an element. */
 class HUDElementBase
@@ -238,12 +238,12 @@ private:
 
 
 
-/*! Draws a HUD (head-up display) element to the screen.
- * A head-up display (HUD) element is an interface element drawn on screen above
- * the rendered 3D world. In the standard Thief interface, the HUD elements are
- * the selected weapon, the selected item, the health bar, the visibility gem,
- * the breath bar, and any on-screen text message. By inheriting from this class,
- * a script may supplement or replace these elements.
+/*! A head-up display (HUD) element drawn above the world.
+ * A head-up display element is an interface element drawn on screen above the
+ * rendered 3D world. In the standard Thief interface, the HUD elements are the
+ * selected weapon, the selected item, the health bar, the visibility gem, the
+ * breath bar, and any on-screen text message. By inheriting from this class, a
+ * script may supplement or replace these elements.
  *
  * At a minimum, a derived class must implement the redraw() method to draw
  * itself to the screen when needed, as well as calling the initialize() method

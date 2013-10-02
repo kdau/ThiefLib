@@ -31,11 +31,20 @@ namespace Thief {
 
 
 #define THIEF_OBJECT_TYPE(ClassName) \
+	/*! Constructs a ClassName wrapper not referencing any object. */ \
 	ClassName (); \
+	/*! Constructs a ClassName wrapper referencing the given object. */ \
 	ClassName (const Object&); \
+	/*! Constructs a ClassName wrapper referencing the given ClassName. */ \
 	ClassName (const ClassName&); \
+	/*! Copies the reference of a given ClassName wrapper to this wrapper. */ \
 	ClassName& operator = (const ClassName&); \
+	/*! Constructs a ClassName wrapper referencing an object with the given
+	 number. The number will not be checked for validity. */ \
 	explicit ClassName (Number); \
+	/*! Constructs a ClassName wrapper referencing the named object.
+	 If no object with the given \a name exists, the wrapper will
+	 reference #NONE. */ \
 	explicit ClassName (const String& name);
 
 

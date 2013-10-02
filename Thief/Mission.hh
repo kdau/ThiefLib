@@ -144,6 +144,7 @@ struct Precipitation
 	//! Constructs default precipitation settings.
 	Precipitation ();
 
+	//! A type of precipitation appearance and behavior.
 	enum class Type
 	{
 		SNOW, /*!< The precipitation drops should fall like snow.

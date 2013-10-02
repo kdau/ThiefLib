@@ -38,8 +38,8 @@ public:
 
 	bool is_stimulus () const;
 
-	THIEF_PROP_FIELD (bool, cause_blood); //TESTME
-	THIEF_PROP_FIELD (bool, cause_knockout); //TESTME
+	THIEF_PROP_FIELD (bool, causes_blood); //TESTME
+	THIEF_PROP_FIELD (bool, causes_knockout); //TESTME
 };
 
 

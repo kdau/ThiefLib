@@ -32,12 +32,12 @@ namespace Thief {
 // Stimulus
 //TODO wrap property: Game: Dark\BloodMaxDamage = BloodMaxDmg
 
-PROXY_CONFIG (Stimulus, cause_blood, "BloodCause", nullptr, bool, false);
-PROXY_CONFIG (Stimulus, cause_knockout, "StimKO", nullptr, bool, false);
+PROXY_CONFIG (Stimulus, causes_blood, "BloodCause", nullptr, bool, false);
+PROXY_CONFIG (Stimulus, causes_knockout, "StimKO", nullptr, bool, false);
 
 OBJECT_TYPE_IMPL_ (Stimulus,
-	PROXY_INIT (cause_blood),
-	PROXY_INIT (cause_knockout)
+	PROXY_INIT (causes_blood),
+	PROXY_INIT (causes_knockout)
 )
 
 bool

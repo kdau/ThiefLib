@@ -82,7 +82,7 @@ extern Monolog null_mono;
 
 
 
-//! Represents the size of an area of the canvas (screen) or the canvas itself.
+//! The size of an area of the canvas (screen) or the canvas itself.
 struct CanvasSize
 {
 	//! The width of the area, in pixels.
@@ -109,7 +109,7 @@ struct CanvasSize
 
 
 
-//! Represents the version number of the Dark %Engine or a supporting module.
+//! The version number of the Dark %Engine or a supporting module.
 struct Version
 {
 	//! Constructs a new version number as specified.
@@ -228,10 +228,11 @@ public:
 		FAST          //!< Find any blocking terrain or object.
 	};
 
-	/*! Represents a hit, or lack thereof, while raycasting between points.
+	/*! A hit, or lack thereof, while raycasting between points.
 	 * Returned by the Engine::raycast methods. */
 	struct RaycastHit
 	{
+		//! A type of raycast hit.
 		enum Type
 		{
 			NONE,    //!< Nothing was hit.

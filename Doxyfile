@@ -197,7 +197,7 @@ TAB_SIZE               = 8
 # will result in a user-defined paragraph with heading "Side Effects:".
 # You can put \n's in the value part of an alias to insert newlines.
 
-ALIASES += t1only="\pre Only available for %Thief: The Dark Project and Thief Gold (\c IS_THIEF1)."
+ALIASES += t1only="\pre Only available for %Thief: The Dark Project and %Thief Gold (\c IS_THIEF1)."
 ALIASES += t2only="\pre Only available for %Thief II: The Metal Age (\c IS_THIEF2)."
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
@@ -544,7 +544,7 @@ ENABLED_SECTIONS       =
 # documentation can be controlled using \showinitializer or \hideinitializer
 # command in the documentation regardless of this setting.
 
-MAX_INITIALIZER_LINES  = 30
+MAX_INITIALIZER_LINES  = 0
 
 # Set the SHOW_USED_FILES tag to NO to disable the list of files generated
 # at the bottom of the documentation of classes and structs. If set to YES the
@@ -614,8 +614,7 @@ WARNINGS               = YES
 # for undocumented members. If EXTRACT_ALL is set to YES then this flag will
 # automatically be disabled.
 
-WARN_IF_UNDOCUMENTED   = NO
-#TODO Return to YES once documentation is >50% complete.
+WARN_IF_UNDOCUMENTED   = YES
 
 # If WARN_IF_DOC_ERROR is set to YES, doxygen will generate warnings for
 # potential errors in the documentation, such as not documenting some
@@ -1616,13 +1615,14 @@ PREDEFINED += IS_THIEF1
 PREDEFINED += IS_THIEF2
 PREDEFINED += THIEF_FIELD_PROXY(a,b,c,d):="c a<b> d"
 PREDEFINED += THIEF_FIELD_PROXY_ARRAY(a,b,c,d,e):="d a<b> e [c]"
-PREDEFINED += THIEF_FIELD_PROXY_TEMPLATE:="template <typename Type>"
 PREDEFINED += THIEF_FIELD_PROXY_CLASS(a):="a<Type>"
-PREDEFINED += THIEF_INTERPOLATE_RESULT(a):=a
+PREDEFINED += THIEF_FIELD_PROXY_TEMPLATE:="template <typename Type>"
 PREDEFINED += THIEF_FLAVORED_LINK(a):="class a##Link : public Link"
+PREDEFINED += THIEF_INTERPOLATE_RESULT(a):=a
 PREDEFINED += THIEF_MESSAGE_WRAP(a):=
 PREDEFINED += THIEF_OVERRIDE_FIELD_PROXY_GET(a,b,c,d):=
 PREDEFINED += THIEF_OVERRIDE_FIELD_PROXY_SET(a,b,c,d):=
+PREDEFINED += THIEF_PROP_FIELD(a,b):="PropField<a> b"
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.
@@ -1712,7 +1712,6 @@ MSCGEN_PATH            =
 # or is not a class.
 
 HIDE_UNDOC_RELATIONS   = NO
-#TODO Possibly set this to YES once documentation is further along.
 
 # If you set the HAVE_DOT tag to YES then doxygen will assume the dot tool is
 # available from the path. This tool is part of Graphviz, a graph visualization
@@ -1736,7 +1735,7 @@ DOT_NUM_THREADS        = 0
 # the DOTFONTPATH environment variable or by setting DOT_FONTPATH to the
 # directory containing the font.
 
-DOT_FONTNAME           = Helvetica
+DOT_FONTNAME           = Sans
 
 # The DOT_FONTSIZE tag can be used to set the size of the font of dot graphs.
 # The default size is 10pt.

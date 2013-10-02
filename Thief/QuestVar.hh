@@ -29,7 +29,7 @@ namespace Thief {
 
 
 
-/*! Represents a numeric variable in the quest database.
+/*! A numeric variable in the quest database.
  * The quest variable database is used to store objective configuration, mission
  * and campaign statistics, and other numeric values that pertain to the mission
  * or campaign as a whole. Though it supports only integers, it is the only
@@ -203,7 +203,7 @@ namespace Thief {
 
 
 
-/*! Represents an objective to be completed in a mission.
+/*! A task to be completed or requirement to be satisfied in a mission.
  * The objective system shapes the progress of a %Thief mission, defining who or
  * what the player must, must not, or may steal, kill, reach, or otherwise deal
  * with. This class offers structured access to all the quest variables which
@@ -229,6 +229,7 @@ public:
 	 * An objective exists if its state variable exists. */
 	bool exists () const;
 
+	//! A level of satisfaction of an objective's conditions.
 	enum class State
 	{
 		INCOMPLETE, //!< The objective's conditions are yet to be met.
@@ -285,6 +286,7 @@ public:
 	 * At other difficulties, the objective will be invisible and inert. */
 	DifficultyQuestField difficulty;
 
+	//! A type of condition required by an objective.
 	enum class Type
 	{
 		NONE, /*!< The objective will not be automatically completed
@@ -304,7 +306,7 @@ public:
 		       * exits the room. */
 	};
 
-	/*! The type of conditions which must be satisfied to complete the
+	/*! The type of condition which must be satisfied to complete the
 	 * referenced objective. */
 	THIEF_QUEST_FIELD (Type, type);
 

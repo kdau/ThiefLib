@@ -92,8 +92,8 @@ public:
 	explicit Object (Number);
 
 	/*! Constructs an object wrapper referencing the named object.
-	 * If no object with the given \a name exists, the wrapper references
-	 * #NONE. */
+	 * If no object with the given \a name exists, the wrapper will
+	 * reference #NONE. */
 	explicit Object (const String& name);
 
 	//! Returns whether the wrapper's currently references a valid object.

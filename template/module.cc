@@ -7,7 +7,7 @@
 #include "SampleScript.hh"
 
 #include "version.rc"
-#include <Thief/module.hh>
+#include <Thief/Module.hh>
 
 THIEF_MODULE_BEGIN (MODULE_NAME)
 	// CUSTOMIZE to a list of THIEF_SCRIPT calls for each of your scripts.
