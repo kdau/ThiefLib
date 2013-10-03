@@ -149,7 +149,17 @@ struct ParameterConfig : public ParameterConfigBase
 
 
 /*! A script configuration variable for mission authors (with a non-enumeration
- * value type). FIXME */
+ * value type). While the original developers were able to create new properties
+ * to support the Thief games' stock scripts, fan developers do not have that
+ * option for custom scripts. Instead, a standard syntax has been developed that
+ * uses the <i>Editor/Design Note</i> property to store an arbitrary number of
+ * parametes to configure custom scripts. As KDScript is based on ThiefLib,
+ * <a href="http://kdau.github.io/KDScript/parameters.html">its documentation
+ * on parameters</a> is the best description of the syntax as implemented here.
+ *
+ * This class accesses one parameter on one object. The syntactic details,
+ * including the new individual inheritance and difficulty-index features, are
+ * handled internally. */
 template <typename T>
 class Parameter<T, THIEF_NOT_ENUM> : public ParameterBase
 {
@@ -245,7 +255,9 @@ private:
 };
 
 /*! A script configuration variable for mission authors (with an enumeration
- * value type). FIXME */
+ * value type). This specialization uses the EnumCoding system to support
+ * enumeration value types. See the non-enum specialization for more general
+ * information. */
 template <typename T>
 class Parameter<T, THIEF_IS_ENUM> : public EnumParameterBase
 {

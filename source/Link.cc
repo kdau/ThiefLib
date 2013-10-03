@@ -52,6 +52,13 @@ Flavor::get_name () const
 	return name;
 }
 
+std::ostream&
+operator << (std::ostream& out, const Flavor& flavor)
+{
+	out << flavor.get_name ();
+	return out;
+}
+
 
 
 // Link
@@ -203,7 +210,7 @@ Link::dump_links (Flavor flavor, const Object& source, const Object& dest,
 
 	mono << "Dumping";
 	if (flavor != Flavor::ANY)
-		mono << ' ' << flavor.get_name ();
+		mono << ' ' << flavor;
 	mono << " links";
 	if (source != Object::ANY)
 	{
@@ -224,8 +231,7 @@ Link::dump_links (Flavor flavor, const Object& source, const Object& dest,
 
 	static const boost::format format ("%|-8|   %|-20|   %|-20|   %|-20\n");
 	for (auto& link : get_all (flavor, source, dest, inheritance))
-		mono << boost::format (format) % link.number
-			% link.get_flavor ().get_name ()
+		mono << boost::format (format) % link.number % link.get_flavor ()
 			% link.get_source () % link.get_dest ();
 
 	mono << std::flush << std::internal;

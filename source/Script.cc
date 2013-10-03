@@ -24,17 +24,8 @@
  *****************************************************************************/
 
 #include "Private.hh"
-#include "OSL.hh"
-
-#include <windef.h>
-#include <winbase.h>
 
 namespace Thief {
-
-IScriptMan*
-LG = nullptr;
-
-extern "C" const GUID IID_IOSLService = THIEF_IOSLService_GUID;
 
 
 
@@ -48,9 +39,17 @@ MessageHandler::~MessageHandler ()
 // ScriptHost
 
 PROXY_CONFIG (ScriptHost, script_timing, "ScriptTiming", nullptr, Time, 0ul);
+PROXY_NEG_BIT_CONFIG (ScriptHost, trap_on, "TrapFlags", nullptr, 4u, true);
+PROXY_NEG_BIT_CONFIG (ScriptHost, trap_off, "TrapFlags", nullptr, 8u, true);
+PROXY_BIT_CONFIG (ScriptHost, trap_invert, "TrapFlags", nullptr, 2u, false);
+PROXY_BIT_CONFIG (ScriptHost, trap_once, "TrapFlags", nullptr, 1u, false);
 
-OBJECT_TYPE_IMPL_ (ScriptHost,
-	PROXY_INIT (script_timing)
+OBJECT_TYPE_IMPL_ (ScriptHost, Lockable (),
+	PROXY_INIT (script_timing),
+	PROXY_INIT (trap_on),
+	PROXY_INIT (trap_off),
+	PROXY_INIT (trap_invert),
+	PROXY_INIT (trap_once)
 )
 
 
@@ -204,36 +203,6 @@ Script::mono (Log level) const
 	return Thief::mono;
 }
 
-bool
-Script::has_persistent (const String& datum) const
-{
-	sScrDatumTag tag { host_obj, script_name.data (), datum.data () };
-	return LG->IsScriptDataSet (&tag);
-}
-
-void
-Script::_get_persistent (const String& datum, LGMultiBase& value) const
-{
-	sScrDatumTag tag { host_obj, script_name.data (), datum.data () };
-	if (LG->GetScriptData (&tag, &(sMultiParm&)value) != S_OK)
-		throw std::runtime_error ("could not get persistent variable");
-}
-
-bool
-Script::_set_persistent (const String& datum, const LGMultiBase& value)
-{
-	sScrDatumTag tag { host_obj, script_name.data (), datum.data () };
-	return LG->SetScriptData (&tag, &(const sMultiParm&)value) == S_OK;
-}
-
-bool
-Script::unset_persistent (const String& datum)
-{
-	LGMulti<Empty> junk;
-	sScrDatumTag tag { host_obj, script_name.data (), datum.data () };
-	return LG->ClearScriptData (&tag, &(sMultiParm&)junk) == S_OK;
-}
-
 void
 Script::fix_player_links ()
 {
@@ -243,6 +212,9 @@ Script::fix_player_links ()
 
 	for (auto& link : Link::get_all (Flavor::ANY, host (), start))
 	{
+		log (Log::NORMAL, "Transferring a %|| link with source %|| from "
+			"destination %|| to %||.", link.get_flavor (), host (),
+			start, player);
 		Link::create (link.get_flavor (), host (), player,
 			link.get_data_raw ());
 		link.destroy ();
@@ -361,53 +333,104 @@ Script::_start_timer (const char* timer, Time delay, bool repeating,
 
 
 
+// PersistentBase
+
+PersistentBase::PersistentBase (Script& _script, const String& _name)
+	: script (_script), name (_name)
+{}
+
+bool
+PersistentBase::exists () const
+{
+	sScrDatumTag tag
+		{ script.host ().number, script.name ().data (), name.data () };
+	return LG->IsScriptDataSet (&tag);
+}
+
+bool
+PersistentBase::remove ()
+{
+	LGMulti<Empty> junk;
+	sScrDatumTag tag
+		{ script.host ().number, script.name ().data (), name.data () };
+	return LG->ClearScriptData (&tag, &(sMultiParm&)junk) == S_OK;
+}
+
+void
+PersistentBase::get (LGMultiBase& value) const
+{
+	sScrDatumTag tag
+		{ script.host ().number, script.name ().data (), name.data () };
+	if (LG->GetScriptData (&tag, &(sMultiParm&)value) != S_OK)
+		throw std::runtime_error ("could not get persistent variable");
+}
+
+void
+PersistentBase::set (const LGMultiBase& value)
+{
+	sScrDatumTag tag
+		{ script.host ().number, script.name ().data (), name.data () };
+	if (LG->SetScriptData (&tag, &(const sMultiParm&)value) != S_OK)
+		throw std::runtime_error ("could not set persistent variable");
+}
+
+
+
 // TrapTrigger
 
-TrapTrigger::TrapTrigger (const String& _name, const Object& _host, Log _level)
-	: Script (_name, _host, _level)
-#ifdef IS_THIEF1
-	  , THIEF_PARAMETER (tcf)
-#endif
+TrapTrigger::TrapTrigger (const String& _name, const Object& _host, Log _level,
+		bool _delayed_revert)
+	: Script (_name, _host, _level), delayed_revert (_delayed_revert)
 {
 	listen_message ("TurnOn", &TrapTrigger::on_turn_on);
+	listen_timer ("TurnOn", &TrapTrigger::on_turn_on);
+
 	listen_message ("TurnOff", &TrapTrigger::on_turn_off);
-	listen_timer ("Revert", &TrapTrigger::on_revert);
+	listen_timer ("TurnOff", &TrapTrigger::on_turn_off);
+
+	if (delayed_revert)
+		listen_timer ("Revert", &TrapTrigger::on_revert);
 }
 
 TrapTrigger::~TrapTrigger ()
 {}
 
-unsigned
-TrapTrigger::get_flags () const
+void
+TrapTrigger::initialize ()
 {
-	unsigned flags = FLAGS_NONE;
-#if defined (IS_THIEF2)
-	ObjectProperty _flags ("TrapFlags", host ());
-	if (_flags.exists ())
-		flags = _flags.get<unsigned> ();
-#elif defined (IS_THIEF1)
-	if (tcf.exists ())
+	Script::initialize ();
+
+#ifdef IS_THIEF1
+	Parameter<String> tcf (host (), "tcf", {});
+	if (tcf.exists () && !host ().trap_on.exists ())
 	{
-		if (tcf->find ("01") != String::npos) flags |= FLAG_ONCE;
-		if (tcf->find ("<>") != String::npos) flags |= FLAG_INVERT;
-		if (tcf->find ("!+") != String::npos) flags |= FLAG_NO_ON;
-		if (tcf->find ("!-") != String::npos) flags |= FLAG_NO_OFF;
+		log (Log::NORMAL, "Translating tcf parameter \"%||\" to "
+			"TrapFlags property.", tcf);
+		host ().trap_on = tcf->find ("!+") == String::npos;
+		host ().trap_off = tcf->find ("!-") == String::npos;
+		host ().trap_invert = tcf->find ("<>") != String::npos;
+		host ().trap_once = tcf->find ("01") != String::npos;
+		tcf.remove ();
 	}
-#endif // IS_THIEF2 : IS_THIEF1
-	return flags;
+#endif // IS_THIEF1
 }
 
 void
-TrapTrigger::trigger (bool on, bool unconditional)
+TrapTrigger::trigger (bool on, bool conditional, bool filtered)
 {
-	if (!unconditional && host_as<Lockable> ().is_locked ())
+	if ((conditional && host ().is_locked ()) ||
+	    (filtered && on && !host ().trap_on) ||
+	    (filtered && !on && !host ().trap_off))
 		return;
+
+	if (host ().trap_invert)
+		on = !on;
 
 	GenericMessage (on ? "TurnOn" : "TurnOff").broadcast
 		(host (), "ControlDevice");
 
-	if (!unconditional && (get_flags () & FLAG_ONCE))
-		host_as<Lockable> ().set_locked (true);
+	if (conditional && host ().trap_once)
+		host ().set_locked (true);
 }
 
 Message::Result
@@ -419,20 +442,18 @@ TrapTrigger::on_trap (bool, Message&)
 Message::Result
 TrapTrigger::on_turn_on (Message& message)
 {
-	unsigned flags = get_flags ();
+	if (!host ().trap_on) return Message::HALT;
+	if (host ().is_locked ()) return Message::HALT;
 
-	if (flags & FLAG_NO_ON) return Message::HALT;
-	if (host_as<Lockable> ().is_locked ()) return Message::HALT;
-
-	bool on = (flags & FLAG_INVERT) ? false : true;
+	bool on = host ().trap_invert ? false : true;
 	Message::Result result = on_trap (on, message);
 
-	Time revert = host ().script_timing;
-	if (result == Message::CONTINUE && revert != 0ul)
-		start_timer ("Revert", revert, false, !on);
+	if (delayed_revert && result == Message::CONTINUE &&
+	    host ().script_timing != 0ul)
+		start_timer ("Revert", host ().script_timing, false, !on);
 
-	if (result != Message::ERROR && (flags & FLAG_ONCE))
-		host_as<Lockable> ().set_locked (true);
+	if (result != Message::ERROR && host ().trap_once)
+		host ().set_locked (true);
 
 	return result;
 }
@@ -440,15 +461,13 @@ TrapTrigger::on_turn_on (Message& message)
 Message::Result
 TrapTrigger::on_turn_off (Message& message)
 {
-	unsigned flags = get_flags ();
+	if (!host ().trap_off) return Message::HALT;
+	if (host ().is_locked ()) return Message::HALT;
 
-	if (flags & FLAG_NO_OFF) return Message::HALT;
-	if (host_as<Lockable> ().is_locked ()) return Message::HALT;
-
-	bool on = (flags & FLAG_INVERT) ? true : false;
+	bool on = host ().trap_invert ? true : false;
 	Message::Result result = on_trap (on, message);
 
-	if (result != Message::ERROR && (flags & FLAG_ONCE))
+	if (result != Message::ERROR && host ().trap_once)
 		host_as<Lockable> ().set_locked (true);
 
 	return result;
@@ -484,17 +503,17 @@ Transition::~Transition ()
 void
 Transition::initialize ()
 {
-	// Creating a unique_ptr to @this is horrible. This only works
-	// because Transition's destructor removes and releases the pointer
-	// before Script's destructor can get to it. The alternative is a
-	// unique_ptr wrapper with conditional deletion, which seems excessive.
+	/* Creating a unique_ptr to this is horrible. It only works because
+	 * Transition's destructor removes and releases the pointer before
+	 * Script's destructor can get to it. The alternative is a unique_ptr
+	 * wrapper with conditional deletion, which seems excessive. */
 	host.timer_handlers.insert (std::make_pair ("TransitionStep", this));
 }
 
 void
 Transition::start ()
 {
-	if (timer.exists ()) // Stop any previous transition.
+	if (timer.exists ()) // Stop any previous cycle.
 	{
 		timer->cancel ();
 		timer.remove ();
@@ -552,147 +571,5 @@ Transition::handle (Script&, sScrMsg* _message, sMultiParm* reply)
 
 
 
-// ScriptModule
-
-ScriptModule::ScriptModule ()
-	: name (nullptr)
-{
-	set_name ();
-}
-
-ScriptModule::~ScriptModule ()
-{}
-
-void
-ScriptModule::set_name (const char* _name)
-{
-	if (name && name != real_name)
-		delete[] name;
-	if (_name)
-	{
-		name = new char[strlen (_name) + 1];
-		strcpy (name, _name);
-	}
-	else
-		name = const_cast<char*> (real_name);
-}
-
-
-
-// ScriptModuleImpl
-
-class ScriptModuleImpl : public cInterfaceImp<IScriptModule,
-	IID_Def<IScriptModule>, kInterfaceImpStatic>, public ScriptModule
-{
-public:
-	ScriptModuleImpl () {}
-	virtual ~ScriptModuleImpl () {}
-
-	void set_name (const char* name);
-
-	// IScriptModule
-	STDMETHOD_ (const char*, GetName) ();
-	STDMETHOD_ (const sScrClassDesc*, GetFirstClass) (tScrIter*);
-	STDMETHOD_ (const sScrClassDesc*, GetNextClass) (tScrIter*);
-	STDMETHOD_ (void, EndClassIter) (tScrIter*);
-} module;
-
-void
-ScriptModuleImpl::set_name (const char* _name)
-{
-	ScriptModule::set_name (_name);
-}
-
-STDMETHODIMP_ (const char*)
-ScriptModuleImpl::GetName ()
-{
-	return name;
-}
-
-STDMETHODIMP_ (const sScrClassDesc*)
-ScriptModuleImpl::GetFirstClass (tScrIter* iter)
-{
-	*reinterpret_cast<size_t*> (iter) = 0u;
-	return (script_count > 0u) ? &scripts [0] : nullptr;
-}
-
-STDMETHODIMP_ (const sScrClassDesc*)
-ScriptModuleImpl::GetNextClass (tScrIter* iter)
-{
-	size_t& index = *reinterpret_cast<size_t*> (iter);
-	return (++index < script_count) ? &scripts [index] : nullptr;
-}
-
-STDMETHODIMP_ (void)
-ScriptModuleImpl::EndClassIter (tScrIter*)
-{}
-
-
-
 } // namespace Thief
-
-
-
-// Exported functions
-
-extern "C"
-int __declspec(dllexport) __stdcall
-ScriptModuleInit (const char* name, IScriptMan* manager, MPrintfProc mprintf,
-	IMalloc* allocator, IScriptModule** module_ptr)
-{
-	if (!manager || !allocator) return false;
-
-	// Confirm that this is NewDark by checking for the new IEngineSrv.
-	try
-	{
-		SService<IEngineSrv> engine (manager);
-	}
-	catch (no_interface&)
-	{
-		if (mprintf)
-			mprintf ("ERROR: %s cannot be used with this version of "
-				"the Dark Engine. Upgrade to NewDark.\n",
-				Thief::module.get_name ());
-		return false;
-	}
-
-	// Attach various ThiefLib components to the engine.
-	Thief::LG = manager;
-	Thief::alloc.attach (allocator, name);
-	Thief::mono.attach (mprintf);
-
-	// Load the OSL.
-	HMODULE osl = ::GetModuleHandleA (OSL_NAME);
-	if (!osl) osl = ::LoadLibraryA (OSL_NAME);
-	if (!osl)
-	{
-		if (mprintf)
-			mprintf ("ERROR: Could not load the ThiefLib support "
-				"library " OSL_NAME ".\n");
-		return false;
-	}
-
-	// Initialize the OSL.
-	auto osl_init = reinterpret_cast<Thief::OSLInitProc>
-		(::GetProcAddress (osl, OSL_INIT_PROC));
-	if (!osl_init || !osl_init (manager, mprintf, allocator))
-		return false;
-
-	// Prepare the ScriptModule.
-	Thief::module.set_name (name);
-	Thief::module.QueryInterface (IID_IScriptModule,
-		reinterpret_cast<void**> (module_ptr));
-
-	return true;
-}
-
-extern "C"
-BOOL WINAPI
-DllMain (HINSTANCE dll, DWORD reason, PVOID reserved)
-{
-	if (reason == DLL_PROCESS_ATTACH)
-		DisableThreadLibraryCalls (dll);
-	(void) reserved;
-	return true;
-}
 

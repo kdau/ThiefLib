@@ -31,6 +31,7 @@
 #include <Thief/Link.hh>
 #include <Thief/Message.hh>
 #include <Thief/Mission.hh>
+#include <Thief/Module.hh>
 #include <Thief/Object.hh>
 #include <Thief/Parameter.hh>
 #include <Thief/Player.hh>
@@ -70,7 +71,7 @@
  * to be compiled. To run, they require:
  *   - either Windows (XP or later) or Linux (with a recent version of Wine)
  *   - TMA and/or TG/TDP, depending on build options
- *   - the NewDark patch (This requirement might be relaxed in the future.)
+ *   - the NewDark patch (preferably the latest version)
  *
  * \section credits Credits and legal information
  *

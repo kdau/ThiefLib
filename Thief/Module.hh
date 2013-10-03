@@ -1,7 +1,6 @@
-/******************************************************************************
- *  module.hh
- *
- *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
+//! \file Module.hh Management of a custom script module as a whole.
+
+/*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
  *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
@@ -18,20 +17,20 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- *****************************************************************************/
+ */
 
 #ifndef THIEF_MODULE_HH
 #define THIEF_MODULE_HH
 
+#include <Thief/Base.hh>
 #include <Thief/Script.hh>
 
+namespace Thief {
 
 
-/*! \cond HIDDEN_SYMBOLS
- * The LG interface expects this format for script information.
- */
-struct sScrClassDesc
+
+//! \cond HIDDEN_SYMBOLS
+struct ScriptInfo
 {
 	const char* module_name;
 	const char* class_name;
@@ -44,49 +43,63 @@ struct sScrClassDesc
 
 
 
-// Begin the module definition: open namespace Thief and
-//	define ScriptModule::real_name and ScriptModule::scripts
+/*! The custom script module.
+ * This class and associated global functions initialize the script module when
+ * it is loaded and register the module's scripts with the engine. Use the
+ * #THIEF_MODULE macro to configure it. The only useful public member is
+ * get_name(). */
+class ScriptModule
+{
+public:
+	//! Destroys a script module.
+	virtual ~ScriptModule ();
 
-#define THIEF_MODULE_BEGIN(ModuleName) \
+	//! Returns the name of the script module as exposed to mission authors.
+	const char* get_name () const { return name; }
+
+protected:
+	//! \cond HIDDEN_SYMBOLS
+
+	ScriptModule ();
+
+	void set_name (const char* name = nullptr);
+
+	char* name;
+	static const char* const real_name;
+
+	static const ScriptInfo scripts[];
+	static const size_t script_count;
+
+	//! \endcond
+};
+
+
+
+/*! Declares the custom script module and allows the engine to instantiate it.
+ * This macro should be called exactly once, and in the global namespace.
+ * \param ModuleName A string literal naming the module as it will be listed in
+ * the \c script_load command. \param ... The scripts in the module. Each of
+ * these arguments should be a call to the #THIEF_SCRIPT macro. */
+#define THIEF_MODULE(ModuleName, ...) \
 namespace Thief { \
 \
 const char* const \
 ScriptModule::real_name = ModuleName; \
 \
-const sScrClassDesc \
+const ScriptInfo \
 ScriptModule::scripts[] = \
-{
-
-
-
-// Declare a script: list it and its factory lambda in ScriptModule::scripts
-
-#define THIEF_SCRIPT(Name, Parent, Class) \
-	{ ScriptModule::real_name, Name, Parent, \
-	  [] (const char* name, int host) __cdecl \
-		{ \
-			if (_stricmp (name, Name) != 0) \
-				return static_cast<IScript*> (nullptr); \
-			Class* script = new (std::nothrow) \
-				Class (Name, Object (host)); \
-			return script->get_interface (); \
-		} \
-	},
-
-
-
-// End the module definition: close ScriptModule::scripts,
-//	define ScriptModule::script_count, and close namespace Thief
-
-#define THIEF_MODULE_END \
+{ \
+	__VA_ARGS__ \
 }; \
 \
 const size_t \
-ScriptModule::script_count = sizeof (scripts) / sizeof (sScrClassDesc); \
+ScriptModule::script_count = sizeof (scripts) / sizeof (ScriptInfo); \
 \
 }
 
 
+
+} // namespace Thief
 
 #endif // THIEF_MODULE_HH
 

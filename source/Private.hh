@@ -270,7 +270,7 @@ FlavorName##Link::check_valid () const \
 	{ \
 		boost::format error ("Link %|| is of flavor %|| instead of " \
 			"expected " #FlavorName " or ~" #FlavorName "."); \
-		error % number % get_flavor ().get_name (); \
+		error % number % get_flavor (); \
 		throw std::runtime_error (error.str ()); \
 	} \
 } \

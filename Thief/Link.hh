@@ -53,6 +53,9 @@ struct Flavor
 	String get_name () const;
 };
 
+//! \relates Flavor
+std::ostream& operator << (std::ostream&, const Flavor&);
+
 
 
 class Link

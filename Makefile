@@ -133,9 +133,10 @@ COMMON_SOURCES = \
 
 
 SOURCES = $(COMMON_SOURCES) \
-	Script.cc
+	Script.cc \
+	Module.cc
 
-HEADERS = ./Thief/Thief.hh $(SOURCES:%.cc=./Thief/%.hh) ./Thief/module.hh
+HEADERS = ./Thief/Thief.hh $(SOURCES:%.cc=./Thief/%.hh)
 
 OBJECTS1N = $(SOURCES:%.cc=$(bindir1n)/%.o)
 OBJECTS1D = $(SOURCES:%.cc=$(bindir1d)/%.o)

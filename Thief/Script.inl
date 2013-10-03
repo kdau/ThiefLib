@@ -1,10 +1,11 @@
-/******************************************************************************
- *  Script.inl
- *
- *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
+//! \file Script.inl
+
+/*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
  *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
+ *  Adapted in part from TWScript
+ *  Copyright (C) 2012-2013 Chris Page <chris@starforge.co.uk>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -18,8 +19,7 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- *****************************************************************************/
+ */
 
 #ifndef THIEF_SCRIPT_HH
 #error "This file should only be included from <Thief/Script.hh>."
@@ -33,6 +33,17 @@ namespace Thief {
 
 
 // ScriptMessageHandler
+
+template <typename _Script, typename _Message>
+struct ScriptMessageHandler : public MessageHandler,
+	private std::function<Message::Result (_Script&, _Message&)>
+{
+	typedef Message::Result (_Script::*Method) (_Message&);
+
+	ScriptMessageHandler (Method method);
+
+	virtual Message::Result handle (Script&, sScrMsg*, sMultiParm*);
+};
 
 template <typename _Script, typename _Message>
 ScriptMessageHandler<_Script, _Message>::ScriptMessageHandler (Method method)
@@ -142,23 +153,18 @@ Script::start_timer (const char* timer, Time delay, bool repeating,
 // Persistent
 
 template <typename T>
+inline
 Persistent<T>::Persistent (Script& _script, const String& _name)
-	: script (_script), name (_name), has_default_value (false)
+	: PersistentBase (_script, _name), has_default_value (false)
 {}
 
 template <typename T>
+inline
 Persistent<T>::Persistent (Script& _script, const String& _name,
 		const T& _default_value)
-	: script (_script), name (_name), has_default_value (false)
+	: PersistentBase (_script, _name), has_default_value (false)
 {
 	set_default_value (_default_value);
-}
-
-template <typename T>
-inline bool
-Persistent<T>::exists () const
-{
-	return script.has_persistent (name);
 }
 
 template <typename T>
@@ -206,16 +212,8 @@ inline Persistent<T>&
 Persistent<T>::operator = (const T& _value)
 {
 	value = _value;
-	if (!script._set_persistent (name, LGMulti<T> (value)))
-		throw std::runtime_error ("could not set persistent variable");
+	set (LGMulti<T> (value));
 	return *this;
-}
-
-template <typename T>
-inline bool
-Persistent<T>::remove ()
-{
-	return script.unset_persistent (name);
 }
 
 template <typename T>
@@ -230,16 +228,14 @@ template <typename T>
 inline void
 Persistent<T>::get_value () const
 {
-	if (exists ())
-	{
-		LGMulti<T> _value;
-		script._get_persistent (name, _value);
-		value = _value;
-	}
-	else if (has_default_value)
+	if (has_default_value && !exists ())
 		value = default_value;
 	else
-		throw std::runtime_error ("persistent variable does not exist");
+	{
+		LGMulti<T> _value;
+		get (_value);
+		value = _value;
+	}
 }
 
 
