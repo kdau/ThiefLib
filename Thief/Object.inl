@@ -37,7 +37,7 @@ namespace Thief {
 	ClassName (const Object&); \
 	/*! Constructs a ClassName wrapper referencing the given ClassName. */ \
 	ClassName (const ClassName&); \
-	/*! Copies the reference of a given ClassName wrapper to this wrapper. */ \
+	/*! Copies the reference of the given ClassName wrapper to this wrapper. */ \
 	ClassName& operator = (const ClassName&); \
 	/*! Constructs a ClassName wrapper referencing an object with the given
 	 number. The number will not be checked for validity. */ \

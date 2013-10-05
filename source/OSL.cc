@@ -241,7 +241,7 @@ OSL::load_hud_bitmap (const String& path, bool animation)
 
 
 
-// OSL: LinkChange, LinkAdd, and LinkRemove messages
+// OSL: LinkCreate, LinkChange, and LinkDestroy messages
 
 OSL::ListenedFlavors
 OSL::listened_flavors;
@@ -307,12 +307,14 @@ OSL::on_link_event (sRelationListenMsg* _message, void*)
 		event = LinkMessage::CHANGE; break;
 	case kRelationAdd:
 	case kRelationAdd | kRelationChange:
-		event = LinkMessage::ADD; break;
+		event = LinkMessage::CREATE; break;
+	case kRelationDelete:
+		event = LinkMessage::DESTROY; break;
 	default:
-		event = LinkMessage::REMOVE; break;
+		return;
 	}
 
-	LinkMessage message (event, _message->flavor, _message->lLink,
+	LinkMessage message (event, Flavor (_message->flavor), _message->lLink,
 		Object (_message->source), Object (_message->dest));
 
 	// Send message to object-specific subscribers.

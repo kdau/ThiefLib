@@ -78,6 +78,9 @@ public:
 	const bool inherited; //TESTME
 	const Property property;
 	const Object object;
+
+private:
+	virtual bool is_postable () const;
 };
 
 

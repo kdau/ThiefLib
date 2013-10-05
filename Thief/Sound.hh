@@ -156,9 +156,10 @@ public:
 
 // VoiceOverLink
 
-THIEF_FLAVORED_LINK (VoiceOver) //TESTME
+class VoiceOverLink : public Link //TESTME
 {
-	THIEF_FLAVORED_LINK_COMMON (VoiceOver)
+public:
+	THIEF_LINK_FLAVOR (VoiceOver)
 
 	static VoiceOverLink create (const Object& source, const Object& dest,
 		bool play_when_focused, bool play_when_contained);

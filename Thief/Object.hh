@@ -26,7 +26,7 @@
 
 namespace Thief {
 
-/*! Base class for all game object wrappers.
+/*! A reference to a manipulable object in the game world.
  * Virtually all dynamic, interactive, and scriptable elements of the Dark
  * %Engine game world exist as objects. The Object class and its many
  * descendants are wrappers for game objects, referring to them and providing
@@ -71,6 +71,9 @@ namespace Thief {
 class Object
 {
 public:
+	//! A list of references to game objects.
+	typedef std::vector<Object> List;
+
 	/*! %Object numbers uniquely identify objects, both concrete (positive)
 	 * and abstract (negative), within the mission and gamesys. */
 	typedef int Number;
@@ -84,7 +87,7 @@ public:
 	//! Constructs an object wrapper referencing the same object as another.
 	Object (const Object&);
 
-	//! Copies the reference of a given object wrapper to this wrapper.
+	//! Copies the reference of the given object wrapper to this wrapper.
 	Object& operator = (const Object&);
 
 	/*! Constructs an object wrapper referencing an object with the given
@@ -96,7 +99,7 @@ public:
 	 * reference #NONE. */
 	explicit Object (const String& name);
 
-	//! Returns whether the wrapper's currently references a valid object.
+	//! Returns whether the wrapper currently references a valid object.
 	bool exists () const;
 
 #ifdef IS_THIEF2
@@ -194,20 +197,19 @@ public:
 	 * is used in a context for which it is not intended. */
 	static const Object SELF;
 
-	//! Compares this object wrapper and another by #number.
+	//! Returns whether this wrapper and another reference the same object.
 	bool operator == (const Object&) const;
 
-	//! Contrasts this object wrapper and another by #number.
+	//! Returns whether this wrapper and another reference different objects.
 	bool operator != (const Object&) const;
 
-	/*! Orders this object wrapper and another by object #number.
-	 * For use in containers that must order object wrappers. */
+	//! Sorts this object wrapper and another by object #number.
 	bool operator < (const Object&) const;
 
-	//! Compares this object wrapper's #number with another.
+	//! Compares this object wrapper's #number with the given number.
 	bool operator == (Number) const;
 
-	//! Contrasts this object wrapper's #number with another.
+	//! Contrasts this object wrapper's #number with the given number.
 	bool operator != (Number) const;
 
 	/*! Returns the engine-internal name of the referenced object, if any.
@@ -267,7 +269,7 @@ public:
 	 * held by the object itself or any direct or indirect parent. The list
 	 * is in inheritance order: the highest-priority ancestor for property
 	 * inheritance is first in the list, and the lowest-priority is last. */
-	Objects get_ancestors () const;
+	List get_ancestors () const;
 
 	/*! Returns a list of all descendants of the referenced object.
 	 * The referenced object must be an archetype or metaproperty. If \a
@@ -275,7 +277,7 @@ public:
 	 * descendants at unlimited depth; if it is \c false, the list will
 	 * only include direct children of an archetype or direct holders of a
 	 * metaproperty. */
-	Objects get_descendants (bool include_indirect) const;
+	List get_descendants (bool include_indirect) const;
 
 	//! Returns the immediate parent archetype of the referenced object.
 	Object get_archetype () const;

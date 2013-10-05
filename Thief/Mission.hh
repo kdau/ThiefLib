@@ -56,7 +56,7 @@ enum class Difficulty
 
 
 
-/*! %Message indicating the chosen difficulty level for the mission.
+/*! A message indicating the chosen difficulty level for the mission.
  * The message is sent immediately after mission load, before even the
  * \c BeginScript message. It is only sent to scripts hosted on objects whose
  * \c %Difficulty\\%Script property has the chosen difficulty enabled.
@@ -78,7 +78,7 @@ public:
 
 
 
-/*! Settings for the fog rendering effect.
+/*! A group of settings for the fog rendering effect.
  * In NewDark, each room may be in one of eight fog zones, use the mission's
  * global fog, or have no fog at all, as set by Room::fog_zone. The global fog
  * and each of the fog zones may be configured individually. Use the
@@ -133,7 +133,7 @@ struct Fog
 
 
 
-/*! Settings for the precipitation (weather) particle effect.
+/*! A group of settings for the precipitation (weather) particle effect.
  * %Precipitation is a relatively efficient particle effect that may configured
  * at the mission level. Individual rooms may enable or disable it
  * (Room::precipitation). %Precipitation will only fall from the "sky hack"

@@ -67,7 +67,7 @@ Lockable::set_locked (bool locked)
 PROXY_CONFIG (LockLink, interaction, nullptr, nullptr,
 	LockLink::Require, Require::ALL);
 
-FLAVORED_LINK_IMPL_ (Lock,
+LINK_FLAVOR_IMPL (Lock,
 	PROXY_INIT (interaction)
 )
 
@@ -75,7 +75,8 @@ LockLink
 LockLink::create (const Object& source, const Object& dest, Require interaction)
 {
 	LockLink link = Link::create (flavor (), source, dest);
-	link.interaction = interaction;
+	if (link != Link::NONE)
+		link.interaction = interaction;
 	return link;
 }
 

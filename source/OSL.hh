@@ -221,7 +221,7 @@ private:
 	typedef std::map<String, std::weak_ptr<HUDBitmap>> HUDBitmaps;
 	HUDBitmaps hud_bitmaps;
 
-	// LinkChange, LinkAdd, and LinkRemove messages
+	// LinkCreate, LinkChange, and LinkDestroy messages
 
 	static void __stdcall on_link_event (sRelationListenMsg*, void*);
 

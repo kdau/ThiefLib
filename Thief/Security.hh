@@ -51,9 +51,10 @@ public:
 
 // LockLink
 
-THIEF_FLAVORED_LINK (Lock) //TESTME
+class LockLink : public Link //TESTME
 {
-	THIEF_FLAVORED_LINK_COMMON (Lock)
+public:
+	THIEF_LINK_FLAVOR (Lock)
 
 	enum class Require { ALL, ANY };
 

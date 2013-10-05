@@ -189,7 +189,9 @@ ParameterCacheImpl::ParameterCacheImpl ()
 		(LG)->GetPropertyNamed ("DesignNote"))),
 	  listen_handle (nullptr)
 {
-	if (!dn_prop) throw std::runtime_error ("no DesignNote property");
+	if (!dn_prop)
+		throw MissingResource (MissingResource::PROPERTY, "DesignNote",
+			Object::NONE);
 	listen_handle = dn_prop->Listen (kPropertyFull, on_dn_change,
 		reinterpret_cast<PropListenerData> (this));
 	SInterface<ITraitManager> (LG)->Listen (on_trait_change, this);

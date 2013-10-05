@@ -274,7 +274,7 @@ PROXY_BIT_CONFIG (VoiceOverLink, play_when_focused, "Events", nullptr,
 PROXY_BIT_CONFIG (VoiceOverLink, play_when_contained, "Events", nullptr,
 	2u, false);
 
-FLAVORED_LINK_IMPL_ (VoiceOver,
+LINK_FLAVOR_IMPL (VoiceOver,
 	PROXY_INIT (play_when_focused),
 	PROXY_INIT (play_when_contained)
 )
@@ -284,8 +284,11 @@ VoiceOverLink::create (const Object& source, const Object& dest,
 	bool play_when_focused, bool play_when_contained)
 {
 	VoiceOverLink link = Link::create (flavor (), source, dest);
-	link.play_when_focused = play_when_focused;
-	link.play_when_contained = play_when_contained;
+	if (link != Link::NONE)
+	{
+		link.play_when_focused = play_when_focused;
+		link.play_when_contained = play_when_contained;
+	}
 	return link;
 }
 

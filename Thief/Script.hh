@@ -143,9 +143,8 @@ public:
  * as by displaying on-screen messages (Mission::show_text ()) and other HUD
  * elements (HUDElement). They can provide logging for mission authors by
  * writing to the Monolog (see also mono() and log() in this class). Mission
- * authors can configure custom scripts using the fan-created parameter system
- * (Parameter). For scripts' internal use, a persistent data store (Persistent)
- * is available. */
+ * authors can configure custom scripts using the fan-created parameter system.
+ * For scripts' internal use, a persistent data store (Persistent) is available. */
 class Script
 {
 public:
@@ -345,7 +344,7 @@ private:
 
 
 
-/*! Common methods and variables for all persistent variable value types.
+/*! Base class for all Persistent specializations.
  * This class cannot be used directly. See Persistent for more information. */
 class PersistentBase
 {
@@ -481,15 +480,14 @@ protected:
 	/*! Constructs a trap/trigger script of the given name on the given host
 	 * object. If \a delayed_revert is \c true and the host object has a
 	 * ScriptHost::script_timing, each time the trap is turned on it will
-	 * be turned off again after the timing duration. See Script::Script()
-	 * for more general information. */
+	 * be turned off again after the timing duration.
+	 *
+	 * See Script::Script() for more general information. */
 	TrapTrigger (const String& name, const Object& host,
 		Log min_level = THIEF_DEFAULT_LOG_LEVEL,
 		bool delayed_revert = false);
 
 	/*! Prepares the script to handle messages.
-	 * See Script::initialize() for more information.
-	 *
 	 * In %Thief: The Dark Project and %Thief Gold (\c IS_THIEF1) only,
 	 * TrapTrigger checks for the existence of a \c tcf parameter on the
 	 * host object. If it is present and the \c TrapFlags property is not,

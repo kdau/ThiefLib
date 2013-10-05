@@ -219,14 +219,14 @@ Object::inherits_from (const Object& ancestor) const
 	return inherits;
 }
 
-Objects
+Object::List
 Object::get_ancestors () const
 {
 	SInterface<IObjectQuery> _ancestors =
 		SInterface<ITraitManager> (LG)->Query
 			(number, kTraitQueryMetaProps | kTraitQueryFull);
 
-	Objects ancestors;
+	List ancestors;
 
 	if (_ancestors)
 		for (_ancestors->Next (); // Skip this object itself.
@@ -236,7 +236,7 @@ Object::get_ancestors () const
 	return ancestors;
 }
 
-Objects
+Object::List
 Object::get_descendants (bool include_indirect) const
 {
 	unsigned flags = kTraitQueryChildren;
@@ -244,7 +244,7 @@ Object::get_descendants (bool include_indirect) const
 	SInterface<IObjectQuery> _descendants =
 		SInterface<ITraitManager> (LG)->Query (number, flags);
 
-	Objects descendants;
+	List descendants;
 
 	if (_descendants)
 		for (; !_descendants->Done (); _descendants->Next ())

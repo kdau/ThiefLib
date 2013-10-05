@@ -64,9 +64,10 @@ public:
 
 // AIAttackLink
 
-THIEF_FLAVORED_LINK (AIAttack) //TESTME
+class AIAttackLink : public Link //TESTME
 {
-	THIEF_FLAVORED_LINK_COMMON (AIAttack)
+public:
+	THIEF_LINK_FLAVOR (AIAttack)
 
 	static AIAttackLink create (const Object& source, const Object& dest,
 		AI::Priority = AI::Priority::DEFAULT);
@@ -143,9 +144,10 @@ public:
 
 // AIProjectileLink
 
-THIEF_FLAVORED_LINK (AIProjectile) //TESTME
+class AIProjectileLink : public Link //TESTME
 {
-	THIEF_FLAVORED_LINK_COMMON (AIProjectile)
+public:
+	THIEF_LINK_FLAVOR (AIProjectile)
 
 	enum class Method { STRAIGHT_LINE, ARCING, REFLECTING, OVERHEAD };
 

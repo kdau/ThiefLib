@@ -203,7 +203,7 @@ OBJECT_TYPE_IMPL_ (OBBPhysical, Physical (),
 
 PROXY_CONFIG (PhysAttachLink, offset, "Offset", nullptr, Vector, Vector ());
 
-FLAVORED_LINK_IMPL_ (PhysAttach,
+LINK_FLAVOR_IMPL (PhysAttach,
 	PROXY_INIT (offset)
 )
 
@@ -212,7 +212,8 @@ PhysAttachLink::create (const Object& source, const Object& dest,
 	const Vector& offset)
 {
 	PhysAttachLink link = Link::create (flavor (), source, dest);
-	link.offset = offset;
+	if (link != Link::NONE)
+		link.offset = offset;
 	return link;
 }
 
@@ -243,7 +244,7 @@ PROXY_CONFIG (TPathLink, speed, "Speed", nullptr, float, 0.0f);
 PROXY_CONFIG (TPathLink, pause, "Pause (ms)", nullptr, Time, 0ul);
 PROXY_CONFIG (TPathLink, path_limit, "Path Limit?", nullptr, bool, false);
 
-FLAVORED_LINK_IMPL_ (TPath,
+LINK_FLAVOR_IMPL (TPath,
 	PROXY_INIT (speed),
 	PROXY_INIT (pause),
 	PROXY_INIT (path_limit)
@@ -254,9 +255,12 @@ TPathLink::create (const Object& source, const Object& dest,
 	float speed, Time pause, bool path_limit)
 {
 	TPathLink link = Link::create (flavor (), source, dest);
-	link.speed = speed;
-	link.pause = pause;
-	link.path_limit = path_limit;
+	if (link != Link::NONE)
+	{
+		link.speed = speed;
+		link.pause = pause;
+		link.path_limit = path_limit;
+	}
 	return link;
 }
 

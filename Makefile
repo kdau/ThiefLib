@@ -160,6 +160,17 @@ $(bindir2d)/%.o: $(srcdir)/%.cc ./Thief/%.hh $(srcdir)/Private.hh
 
 
 
+INLINES = \
+	./Thief/Base.inl \
+	./Thief/AI.inl \
+	./Thief/HUD.inl \
+	./Thief/Link.inl \
+	./Thief/Object.inl \
+	./Thief/Parameter.inl \
+	./Thief/Property.inl \
+	./Thief/QuestVar.inl \
+	./Thief/Script.inl
+
 $(bindir1n)/Base.o: ./Thief/Base.inl
 $(bindir1d)/Base.o: ./Thief/Base.inl
 $(bindir2n)/Base.o: ./Thief/Base.inl
@@ -256,7 +267,7 @@ $(OSL_NAME): $(OSL_OBJECTS) $(LIBSN)
 
 
 
-doc/index.html: Doxyfile $(HEADERS)
+doc/index.html: Doxyfile $(HEADERS) $(INLINES)
 	doxygen Doxyfile
 
 doc: doc/index.html

@@ -138,11 +138,11 @@ AI::count_ais ()
 	return SInterface<IAIManager> (LG)->CountAIs ();
 }
 
-AIs
+AI::List
 AI::get_all_ais ()
 {
 	SInterface<IAIManager> AIM (LG);
-	AIs everyone;
+	List everyone;
 	tAIIter iter;
 	for (IAI* ai = AIM->GetFirst (&iter); ai; ai = AIM->GetNext (&iter))
 		everyone.emplace_back (ai->GetID ());
@@ -443,7 +443,7 @@ PROXY_CONFIG (AIAwarenessLink, update_time, "Time last update", nullptr,
 PROXY_CONFIG (AIAwarenessLink, los_update_time, "Time last update LOS", nullptr,
 	Time, 0ul);
 
-FLAVORED_LINK_IMPL_ (AIAwareness,
+LINK_FLAVOR_IMPL (AIAwareness,
 	PROXY_INIT (seen),
 	PROXY_INIT (heard),
 	PROXY_INIT (can_raycast),
@@ -529,7 +529,7 @@ AIAwarenessLink::update (Time time, bool updated_los)
 PROXY_CONFIG (CreatureAttachmentLink, joint, "Joint", nullptr,
 	AI::Joint, AI::Joint::NONE);
 
-FLAVORED_LINK_IMPL_ (CreatureAttachment,
+LINK_FLAVOR_IMPL (CreatureAttachment,
 	PROXY_INIT (joint)
 )
 
@@ -538,7 +538,8 @@ CreatureAttachmentLink::create (const Object& source, const Object& dest,
 	AI::Joint joint)
 {
 	CreatureAttachmentLink link = Link::create (flavor (), source, dest);
-	link.joint = joint;
+	if (link != Link::NONE)
+		link.joint = joint;
 	return link;
 }
 
@@ -561,7 +562,7 @@ PROXY_CONFIG (DetailAttachementLink, decal_normal, "decal plane norm", nullptr,
 PROXY_CONFIG (DetailAttachementLink, decal_dist, "decal plane dist", nullptr,
 	float, 0.0f);
 
-FLAVORED_LINK_IMPL_ (DetailAttachement,
+LINK_FLAVOR_IMPL (DetailAttachement,
 	PROXY_INIT (type),
 	PROXY_INIT (vhot_submodel),
 	PROXY_INIT (joint),
@@ -577,13 +578,16 @@ DetailAttachementLink::create (const Object& source, const Object& dest,
 	Vector rel_rotation, Vector decal_normal, float decal_dist)
 {
 	DetailAttachementLink link = Link::create (flavor (), source, dest);
-	link.type = type;
-	link.vhot_submodel = vhot_submodel;
-	link.joint = joint;
-	link.rel_location = rel_location;
-	link.rel_rotation = rel_rotation;
-	link.decal_normal = decal_normal;
-	link.decal_dist = decal_dist;
+	if (link != Link::NONE)
+	{
+		link.type = type;
+		link.vhot_submodel = vhot_submodel;
+		link.joint = joint;
+		link.rel_location = rel_location;
+		link.rel_rotation = rel_rotation;
+		link.decal_normal = decal_normal;
+		link.decal_dist = decal_dist;
+	}
 	return link;
 }
 
@@ -745,6 +749,12 @@ ConversationMessage::ConversationMessage (const Object& _conversation)
 {
 	message->message = "ConversationEnd";
 	MESSAGE_AS (ConversationMessageImpl)->conversation = conversation;
+}
+
+bool
+ConversationMessage::is_postable () const
+{
+	return false;
 }
 
 

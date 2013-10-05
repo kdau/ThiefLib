@@ -175,7 +175,8 @@ HUDBitmap::HUDBitmap (const String& _path, bool animation)
 	}
 
 	if (frames.empty ())
-		throw std::runtime_error ("bitmap file invalid or not found");
+		throw MissingResource (MissingResource::BITMAP, _path,
+			Object::NONE);
 }
 
 HUDBitmap::~HUDBitmap ()
@@ -475,7 +476,9 @@ HUDElement::draw_bitmap (const HUDBitmap::Ptr& bitmap, HUDBitmap::Frame frame,
 	CanvasPoint position, CanvasRect clip)
 {
 	CHECK_DRAWING ();
-	if (!bitmap) throw std::logic_error ("bitmap is null");
+	if (!bitmap)
+		throw MissingResource (MissingResource::BITMAP, "(null)",
+			Object::NONE);
 	do_offset (position);
 	bitmap->draw (frame, position, clip);
 }

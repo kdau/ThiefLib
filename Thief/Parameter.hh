@@ -38,7 +38,7 @@ class Parameter;
 
 
 
-/*! Common variables for all ParameterConfig specializations.
+/*! Base class for all ParameterConfig specializations.
  * This structure is normally not used directly. See ParameterConfig for
  * more information. */
 struct ParameterConfigBase
@@ -53,7 +53,7 @@ struct ParameterConfigBase
 
 
 
-/*! Common methods and variables for all parameter value types.
+/*! Base class for all Parameter specializations.
  * This abstract class is the base of all Parameter specializations. See those
  * specializations for more information. */
 class ParameterBase
@@ -150,7 +150,7 @@ struct ParameterConfig : public ParameterConfigBase
 
 /*! A script configuration variable for mission authors (with a non-enumeration
  * value type). While the original developers were able to create new properties
- * to support the Thief games' stock scripts, fan developers do not have that
+ * to support the %Thief games' stock scripts, fan developers do not have that
  * option for custom scripts. Instead, a standard syntax has been developed that
  * uses the <i>Editor/Design Note</i> property to store an arbitrary number of
  * parametes to configure custom scripts. As KDScript is based on ThiefLib,
@@ -228,7 +228,7 @@ VarName (host (), Name, { __VA_ARGS__ })
 
 
 
-/*! Common methods and variables for parameters with enumeration value types.
+/*! Base class for specializations of Parameter with enumeration value types.
  * This class is the base of the Parameter<T, THIEF_IS_ENUM> specialization. See
  * that specialization for more information. */
 class EnumParameterBase : public ParameterBase
@@ -296,7 +296,7 @@ public:
 
 
 
-/*! Translates between enumeration values and string representations of them.
+/*! A translation between enumeration values and their string representations.
  * Use the #THIEF_ENUM_CODING macro to define this structure for an enumeration
  * type . This structure and its associated macros are used by the parameter
  * system, but may also be used in any other suitable context. */

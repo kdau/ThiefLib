@@ -236,9 +236,10 @@ public:
 	THIEF_PROP_FIELD (bool, is_loadout_store); //TESTME
 };
 
-THIEF_FLAVORED_LINK (Contains)
+class ContainsLink : public Link
 {
-	THIEF_FLAVORED_LINK_COMMON (Contains)
+public:
+	THIEF_LINK_FLAVOR (Contains)
 
 	static ContainsLink create (const Object& source,
 		const Object& dest, Container::Type = Container::Type::GENERIC);

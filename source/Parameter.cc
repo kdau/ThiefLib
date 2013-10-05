@@ -75,7 +75,8 @@ ParameterBase::get_raw () const
 	if (result)
 		return *result;
 	else
-		throw std::runtime_error ("parameter not set for object");
+		throw MissingResource (MissingResource::PARAMETER, name.data (),
+			object);
 }
 
 bool

@@ -25,12 +25,13 @@
 #define THIEF_MESSAGE_HH
 
 #include <Thief/Base.hh>
+#include <Thief/Link.hh>
 
 namespace Thief {
 
 
 
-/*! Reference to a scheduled message's timer.
+/*! A reference to the future scheduling of a Message.
  * When a Message is scheduled for later posting with Message::schedule(), a
  * Timer is returned that represents the countdown (whether one-time or
  * repeating) to the posting of that message. The Timer, which can be persisted,
@@ -58,7 +59,7 @@ struct Timer
 
 
 
-/*! Base class for event notifications sent to and between scripts.
+/*! An event notification sent to or between scripts.
  * Messages are used to notify Dark %Engine scripts of game and interface events.
  * They are sent both between scripts and from the engine itself. Virtually all
  * script activity originates from message-handling methods. This class is a
@@ -165,17 +166,17 @@ public:
 	Timer schedule (const Object& from, const Object& to,
 		Time delay, bool repeating);
 
-	/*! Sends or schedules a message along a given list of links.
+	/*! Sends or schedules a message along the given list of links.
 	 * For each link in the \a links list, the message will be conveyed
 	 * from the source of the link to the destination of the link. If \a
 	 * delay is greater than zero, the message will be schedule()d to each
 	 * recipient, otherwise it will be sent. */
-	void broadcast (const Links& links, Time delay = 0ul);
+	void broadcast (const Link::List& links, Time delay = 0ul);
 
-	/*! Sends or schedules a message along links from a given object.
+	/*! Sends or schedules a message along links from the given object.
 	 * This is a convenience for calling broadcast() on a list of links
 	 * with a specific source (\a from) and flavor (\a link_flavor). See the
-	 * Links overload of broadcast() for more information. */
+	 * Link::List overload of broadcast() for more information. */
 	void broadcast (const Object& from, const Flavor& link_flavor,
 		Time delay = 0ul);
 
@@ -225,6 +226,8 @@ protected:
 
 	const char* get_lg_typename () const;
 
+	virtual bool is_postable () const;
+
 	template <typename, typename> friend struct ScriptMessageHandler;
 
 	//! \endcond
@@ -248,7 +251,7 @@ private:
 
 
 
-/*! Exception thrown when a message is not of the expected type.
+/*! An exception thrown when a message is not of the expected type.
  * When a script listens for a certain message with Script::listen_message()
  * or Script::listen_timer(), the argument type of the handler function passed
  * to one of those methods determine the expected type of message objects. If a
@@ -280,7 +283,7 @@ private:
 
 
 
-/*! Non-specific messages that can be created by scripts.
+/*! A non-specific message that can be created by scripts.
  * The GenericMessage class can be used by scripts to create messages that do
  * not have any specific type (that calls for fields other than #DATA1/2/3).
  * In message handler methods, however, these non-specific messages should be
@@ -310,7 +313,7 @@ public:
 
 
 
-/*! %Message generated after a delay or at regular intervals.
+/*! A message generated after a delay or at regular intervals.
  * Although any message type can be posted after a delay or repeated at regular
  * intervals, it is most common to use a \c %Timer message for this purpose. The
  * \c %Timer message has a timer name, separate from the message name, which
@@ -334,6 +337,55 @@ public:
 	template <typename D1, typename D2 = Empty, typename D3 = Empty>
 	static TimerMessage with_data (const String& timer_name, const D1& data1,
 		const D2& data2 = D2 (), const D3& data3 = D3 ());
+};
+
+
+
+/*! A message about a change to a Link.
+ * A link-related message is sent whenver a link between game objects is created,
+ * changed, or destroyed. It is sent only to scripts hosted by objects that have
+ * subscribed to a link's flavor, either for its source object or for all
+ * objects. This is a message created by ThiefLib, but it is available to all
+ * scripts. \warning LinkMessage instances cannot be post()ed or schedule()d
+ * (including broadcast() with a delay time).
+ * \note %Message names: \c LinkCreate, \c LinkChange, \c LinkDestroy */
+class LinkMessage : public Message
+{
+public:
+	//! A link-related event.
+	enum Event
+	{
+		CREATE, //!< The link was created.
+		CHANGE, //!< The link's data was changed.
+		DESTROY //!< The link was destroyed.
+	};
+
+	/*! Constructs a new link-related message for the given event.
+	 * Note that \a source and \a dest pertain to the affected link, not
+	 * the sender(s) and recipient(s) of this message. */
+	LinkMessage (Event, Flavor, Link::Number,
+		const Object& source, const Object& dest);
+
+	THIEF_MESSAGE_WRAP (LinkMessage);
+
+	//! The event that occurred on the affected link.
+	const Event event;
+
+	//! The flavor of the affected link.
+	const Flavor flavor;
+
+	/*! The number of the affected link.
+	 * If the event is #DESTROY, the number will no longer be valid. */
+	const Link::Number link;
+
+	//! The source object of the affected link.
+	const Object source;
+
+	//! The destination object of the affected link.
+	const Object dest;
+
+private:
+	virtual bool is_postable () const;
 };
 
 

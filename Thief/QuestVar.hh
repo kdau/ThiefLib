@@ -98,7 +98,7 @@ public:
 
 
 
-/*! %Message about a change to a quest variable.
+/*! A message about a change to a quest variable.
  * A quest message is sent whenever a quest variable is set or cleared. It is
  * sent only to scripts hosted by objects that are subscribed to the variable
  * (see QuestVariable::subscribe and QuestVariable::unsubscribe). \note
@@ -151,7 +151,7 @@ struct Numbered
 
 
 
-/*! Accesses a class field that is stored in the quest database.
+/*! An Objective field that is stored in the quest database.
  * This class serves as a proxy to the QuestVar (one or more) that underlies
  * a field on a class such as Objective. Like all field proxies, it is not
  * intended for construction by ThiefLib users. */
@@ -355,7 +355,7 @@ public:
 
 
 
-/*! %Message about a change to an objective.
+/*! A message about a change to an objective.
  * An objective message is sent whenever an objective-related quest variable is
  * set or cleared. It is sent only to scripts hosted by objects that are
  * subscribed to the variable (through the QuestField::subscribe method on the

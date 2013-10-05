@@ -383,7 +383,7 @@ Container::move_contents (const Object& new_container, bool combine)
 PROXY_CONFIG (ContainsLink, type, nullptr, nullptr,
 	Container::Type, Container::Type::NONE);
 
-FLAVORED_LINK_IMPL_ (Contains,
+LINK_FLAVOR_IMPL (Contains,
 	PROXY_INIT (type)
 )
 
@@ -392,7 +392,8 @@ ContainsLink::create (const Object& source, const Object& dest,
 	Container::Type type)
 {
 	ContainsLink link = Link::create (flavor (), source, dest);
-	link.type = type;
+	if (link != Link::NONE)
+		link.type = type;
 	return link;
 }
 

@@ -332,6 +332,33 @@ interpolate (const Color& _from, const Color& _to, float _alpha, Curve curve)
 
 
 
+// MissingResource
+
+MissingResource::MissingResource (Type _type, const String& name,
+	const Object& object) noexcept
+{
+	const char* type = "";
+	switch (_type)
+	{
+	case OBJECT: type = "object"; break;
+	case PROPERTY: type = "property"; break;
+	case FLAVOR: type = "link flavor"; break;
+	case LINK: type = "link"; break;
+	case PARAMETER: type = "parameter"; break;
+	case BITMAP: type = "HUD bitmap"; break;
+	}
+
+	boost::format _explanation
+		("The requested %|| \"%||\" does not exist%||%||.");
+	_explanation % type % name;
+	if (object != Object::NONE)
+		_explanation % " for object " % object;
+	else
+		_explanation % "" % "";
+	explanation = _explanation.str ();
+}
+
+
 
 // LGMultiBase
 

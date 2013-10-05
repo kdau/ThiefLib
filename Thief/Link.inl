@@ -1,7 +1,6 @@
-/******************************************************************************
- *  Link.inl
- *
- *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
+//! \file Link.inl
+
+/*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
  *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
@@ -18,8 +17,7 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- *****************************************************************************/
+ */
 
 #ifndef THIEF_LINK_HH
 #error "This file should only be included from <Thief/Link.hh>."
@@ -60,13 +58,13 @@ Flavor::operator < (const Flavor& rhs) const
 inline bool
 Flavor::is_reverse () const
 {
-	return number < ANY;
+	return number < ANY.number;
 }
 
 inline Flavor
 Flavor::get_reverse () const
 {
-	return -number;
+	return Flavor (-number);
 }
 
 
@@ -108,16 +106,21 @@ Link::get_flavor () const
 	return Flavor (number >> 20);
 }
 
-inline void
-Link::_get_data_field (const String& field, LGMultiBase& multi) const
+template <typename T>
+inline T
+Link::get_data_field (const String& field) const
 {
+	LGMulti<T> multi;
 	_get_data_field (field.empty () ? nullptr : field.data (), multi);
+	return multi;
 }
 
+template <typename T>
 inline void
-Link::_set_data_field (const String& field, const LGMultiBase& multi)
+Link::set_data_field (const String& field, const T& value)
 {
-	_set_data_field (field.empty () ? nullptr : field.data (), multi);
+	_set_data_field (field.empty () ? nullptr : field.data (),
+		LGMulti<T> (value));
 }
 
 
@@ -179,25 +182,39 @@ operator << (std::ostream& out, const THIEF_FIELD_PROXY_CLASS (LinkField)& field
 
 // Convenience macros for flavor-specific Link subclasses
 
-#define THIEF_FLAVORED_LINK(FlavorName) \
-class FlavorName##Link; \
-typedef std::vector<FlavorName##Link> FlavorName##Links; \
-class FlavorName##Link : public Link
-
-#define THIEF_FLAVORED_LINK_COMMON(FlavorName) \
+#define THIEF_LINK_FLAVOR(FlavorName) \
 private: \
 	void check_valid () const; \
 public: \
+	/*! A list of references to links with the "FlavorName" flavor. */ \
+	typedef std::vector<FlavorName##Link> List; \
+	/*! Returns the flavor of FlavorName links.
+	   \param reverse Whether to return the forward ("FlavorName", \c false)
+	   or reverse ("~FlavorName", \c true) form of the flavor. */ \
 	static Flavor flavor (bool reverse = false); \
+	/*! Constructs a FlavorName##Link wrapper not referencing any link. */ \
 	FlavorName##Link (); \
+	/*! Constructs a FlavorName##Link wrapper referencing the given link.
+	   \throw std::runtime_error if the link is not of this flavor. */ \
 	FlavorName##Link (const Link&); \
+	/*! Constructs a FlavorName##Link wrapper referencing the given link. */ \
 	FlavorName##Link (const FlavorName##Link&); \
+	/*! Copies the reference of the given FlavorName##Link wrapper to this
+	   wrapper. */ \
 	FlavorName##Link& operator = (const FlavorName##Link& copy); \
+	/*! Constructs a FlavorName##Link wrapper referencing the given link.
+	   \throw std::runtime_error if the link is not of this flavor. */ \
 	explicit FlavorName##Link (Number); \
-	static FlavorName##Links get_all \
-		(const Object& source = Object::ANY, \
+	/*! Returns a list of FlavorName links matching the given criteria.
+	   \param source The source object of the links, or Object::ANY to
+	   include links from any object. \param dest The destination object of
+	   the links, or Object::ANY to include links to any object. \param
+	   inheritance Whether to include links from ancestors of the given
+	   source and/or destination. \param reverse Whether to search for
+	   ~FlavorName links instead of FlavorName links. */ \
+	static List get_all (const Object& source = Object::ANY, \
 		const Object& dest = Object::ANY, \
-		Inheritance = Inheritance::NONE, \
+		Inheritance inheritance = Inheritance::NONE, \
 		bool reverse = false);
 
 #define THIEF_LINK_FIELD(Type, Name) \

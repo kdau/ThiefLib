@@ -24,6 +24,7 @@
  *****************************************************************************/
 
 #include "Private.hh"
+#include "OSL.hh"
 
 namespace Thief {
 
@@ -112,6 +113,8 @@ Message::send (const Object& from, const Object& to)
 void
 Message::post (const Object& from, const Object& to)
 {
+	if (!is_postable ())
+		throw std::logic_error ("This message type cannot be posted.");
 	message->from = from.number;
 	message->to = to.number;
 	LG->PostMessage (message);
@@ -121,6 +124,8 @@ Timer
 Message::schedule (const Object& from, const Object& to,
 	Time delay, bool repeating)
 {
+	if (!is_postable ())
+		throw std::logic_error ("This message type cannot be scheduled.");
 	message->from = from.number;
 	message->to = to.number;
 	return Timer (LG->SetTimedMessage (message, delay,
@@ -128,7 +133,7 @@ Message::schedule (const Object& from, const Object& to,
 }
 
 void
-Message::broadcast (const Links& links, Time delay)
+Message::broadcast (const Link::List& links, Time delay)
 {
 	for (auto& link : links)
 		if (delay > 0ul)
@@ -198,6 +203,12 @@ Message::get_lg_typename () const
 	return message->Persistent_GetName ();
 }
 
+bool
+Message::is_postable () const
+{
+	return true;
+}
+
 
 
 // MessageWrapError
@@ -238,6 +249,42 @@ TimerMessage::TimerMessage (const String& _timer_name)
 {
 	message->message = "Timer";
 	MESSAGE_AS (sScrTimerMsg)->name = timer_name.data ();
+}
+
+
+
+// LinkMessage
+
+MESSAGE_WRAPPER_IMPL_ (LinkMessage, MESSAGE_TYPENAME_TEST ("LinkMessageImpl")),
+	event (MESSAGE_AS (LinkMessageImpl)->event),
+	flavor (MESSAGE_AS (LinkMessageImpl)->flavor),
+	link (MESSAGE_AS (LinkMessageImpl)->link),
+	source (MESSAGE_AS (LinkMessageImpl)->source),
+	dest (MESSAGE_AS (LinkMessageImpl)->dest)
+{}
+
+LinkMessage::LinkMessage (Event _event, Flavor _flavor, Link::Number _link,
+		const Object& _source, const Object& _dest)
+	: Message (new LinkMessageImpl ()), event (_event), flavor (_flavor),
+	  link (_link), source (_source), dest (_dest)
+{
+	switch (event)
+	{
+	case CREATE: message->message = "LinkCreate"; break;
+	case CHANGE: default: message->message = "LinkChange"; break;
+	case DESTROY: message->message = "LinkDestroy"; break;
+	}
+	MESSAGE_AS (LinkMessageImpl)->event = event;
+	MESSAGE_AS (LinkMessageImpl)->flavor = flavor;
+	MESSAGE_AS (LinkMessageImpl)->link = link;
+	MESSAGE_AS (LinkMessageImpl)->source = source;
+	MESSAGE_AS (LinkMessageImpl)->dest = dest;
+}
+
+bool
+LinkMessage::is_postable () const
+{
+	return false;
 }
 
 

@@ -1613,16 +1613,24 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED += IS_DOXYGEN
 PREDEFINED += IS_THIEF1
 PREDEFINED += IS_THIEF2
+
+# exclude the I_... and F_... members
 PREDEFINED += THIEF_FIELD_PROXY(a,b,c,d):="c a<b> d"
 PREDEFINED += THIEF_FIELD_PROXY_ARRAY(a,b,c,d,e):="d a<b> e [c]"
+
+# exclude the config parameter
 PREDEFINED += THIEF_FIELD_PROXY_CLASS(a):="a<Type>"
 PREDEFINED += THIEF_FIELD_PROXY_TEMPLATE:="template <typename Type>"
-PREDEFINED += THIEF_FLAVORED_LINK(a):="class a##Link : public Link"
+
+# other hidden internals
 PREDEFINED += THIEF_INTERPOLATE_RESULT(a):=a
 PREDEFINED += THIEF_MESSAGE_WRAP(a):=
 PREDEFINED += THIEF_OVERRIDE_FIELD_PROXY_GET(a,b,c,d):=
 PREDEFINED += THIEF_OVERRIDE_FIELD_PROXY_SET(a,b,c,d):=
+
+# some uses don't expand without this
 PREDEFINED += THIEF_PROP_FIELD(a,b):="PropField<a> b"
+PREDEFINED += THIEF_PROP_FIELD_ARRAY(a,b,c):="PropField<a> b [c]"
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.

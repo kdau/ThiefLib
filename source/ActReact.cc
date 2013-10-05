@@ -56,7 +56,7 @@ Stimulus::is_stimulus () const
 
 
 
-// ARParticipant
+// Reactor
 
 //TODO Create, after finding a better name.
 //TODO wrap method: IActReactSrv->React

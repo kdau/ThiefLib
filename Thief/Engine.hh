@@ -30,7 +30,7 @@ namespace Thief {
 
 
 
-/*! Handles all logging output intended for mission authors.
+/*! A logging output stream that records information for mission authors.
  * This class is an output stream for logging messages about ThiefLib and script
  * activity that are intended for those creating, editing, and testing missions
  * in DromEd. It should not be used for messages intended for players. */
@@ -82,7 +82,7 @@ extern Monolog null_mono;
 
 
 
-//! The size of an area of the canvas (screen) or the canvas itself.
+//! A size of an area of the canvas (screen) or the canvas itself.
 struct CanvasSize
 {
 	//! The width of the area, in pixels.
@@ -109,7 +109,7 @@ struct CanvasSize
 
 
 
-//! The version number of the Dark %Engine or a supporting module.
+//! A version number of the Dark %Engine or a supporting module.
 struct Version
 {
 	//! Constructs a new version number as specified.
@@ -139,7 +139,7 @@ std::ostream& operator << (std::ostream&, const Version&);
 
 
 
-/*! Provides access to low-level Dark %Engine functions and status.
+/*! Access to low-level Dark %Engine functions and status.
  * The Engine class is not instantiable; all members are static.
  *
  * Dark %Engine configuration variables are distributed across the following
@@ -351,7 +351,7 @@ template<> String Engine::get_config (const String& variable);
 
 
 
-/*! %Message about a change in the game mode.
+/*! A message about a change in the game mode.
  * A game mode message is sent whenever the user enters or leaves game mode due
  * to a menu or other interface screen being viewed, including at mission start
  * and end. \note %Message name: \c DarkGameModeChange */
@@ -378,7 +378,7 @@ public:
 
 
 
-/*! %Message about a change in the simulation (mission) status.
+/*! A message about a change in the simulation (mission) status.
  * A sim message is sent when the mission starts and when it ends.
  * \note %Message name: \c Sim
  * \note To supplement \c Sim, ThiefLib creates a generic message \c PostSim in

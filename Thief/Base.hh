@@ -105,16 +105,9 @@ namespace Thief {
 
 
 
+// Forward declarations of ThiefLib types
+
 class Object;
-//! A list of references to game objects.
-typedef std::vector<Object> Objects;
-
-
-
-struct Flavor;
-class Link;
-//! A list of references to links between objects.
-typedef std::vector<Link> Links;
 
 
 
@@ -490,6 +483,47 @@ THIEF_INTERPOLATE_RESULT (T) interpolate (const T& from, const T& to,
 Color interpolate (const Color& from, const Color& to, float alpha = 0.5f,
 	Curve = Curve::LINEAR);
 //! \endcond
+
+
+
+/*! An exception thrown when a requested game resource does not exist.
+ * This exception is thrown by various ThiefLib methods when they are passed
+ * a null reference, are passed a reference to a nonexistent resource, or fail
+ * to locate or load a requested resource. */
+class MissingResource : public std::exception
+{
+public:
+	//! A type of game resource.
+	enum Type
+	{
+		OBJECT,    //!< A game Object.
+		PROPERTY,  //!< An object Property.
+		FLAVOR,    //!< A link Flavor.
+		LINK,      //!< A Link between objects.
+		PARAMETER, //!< A Parameter in an object's Design Note.
+		BITMAP     //!< A HUDBitmap image.
+	};
+
+	/*! Constructs a new missing resource exception.
+	 * \param type The type of resource that does not exist.
+	 * \param name The name of the requested resource, or its number in
+	 * string form.
+	 * \param object An object related to the missing resource, or
+	 * Object::NONE if not applicable.
+	 */
+	MissingResource (Type type, const String& name,
+		const Object& object) noexcept;
+
+	//! Destroys a missing resource exception.
+	virtual ~MissingResource () noexcept {}
+
+	//! Returns a string describing the exception.
+	virtual const char* what () const noexcept
+		{ return explanation.data (); }
+
+private:
+	String explanation;
+};
 
 
 

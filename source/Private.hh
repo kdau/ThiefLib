@@ -250,7 +250,7 @@ ClassName::ClassName (const String& name) : Object (name) {}
 
 // Link subclass convenience macros
 
-#define FLAVORED_LINK_IMPL_COMMON(FlavorName) \
+#define LINK_FLAVOR_IMPL(FlavorName, ...) \
 Flavor \
 FlavorName##Link::flavor (bool reverse) \
 { \
@@ -275,48 +275,29 @@ FlavorName##Link::check_valid () const \
 	} \
 } \
 \
-FlavorName##Links \
+FlavorName##Link::List \
 FlavorName##Link::get_all (const Object& source, const Object& dest, \
 	Inheritance inheritance, bool reverse) \
 { \
-	Links _links = \
+	auto _links = \
 		Link::get_all (flavor (reverse), source, dest, inheritance); \
-	FlavorName##Links links; \
+	List links; \
 	for (auto& link : _links) \
 		links.push_back (link); \
 	return links; \
 } \
-
-#define FLAVORED_LINK_IMPL_(FlavorName, ...) \
-FLAVORED_LINK_IMPL_COMMON (FlavorName) \
 \
 FlavorName##Link::FlavorName##Link () \
-	: Link (), __VA_ARGS__ { check_valid (); } \
+	: Link (), __VA_ARGS__ {} \
 \
 FlavorName##Link::FlavorName##Link (const Link& link) \
 	: Link (link), __VA_ARGS__ { check_valid (); } \
 \
 FlavorName##Link::FlavorName##Link (const FlavorName##Link& link) \
-	: Link (link), __VA_ARGS__ { check_valid (); } \
+	: Link (link), __VA_ARGS__ {} \
 \
 FlavorName##Link::FlavorName##Link (Number _number) \
 	: Link (_number), __VA_ARGS__ { check_valid (); }
-
-#define FLAVORED_LINK_IMPL(FlavorName) \
-FLAVORED_LINK_IMPL_COMMON (FlavorName) \
-\
-FlavorName##Link::FlavorName##Link () \
-	: Link () { check_valid (); } \
-\
-FlavorName##Link::FlavorName##Link (const Link& link) \
-	: Link (link) { check_valid (); } \
-\
-FlavorName##Link::FlavorName##Link (const FlavorName##Link& link) \
-	: Link (link) { check_valid (); } \
-\
-FlavorName##Link::FlavorName##Link (Number _number) \
-	: Link (_number) { check_valid (); }
-
 
 
 

@@ -107,6 +107,12 @@ PropertyMessage::PropertyMessage (Event _event, bool _inherited,
 	MESSAGE_AS (PropertyMessageImpl)->object = object;
 }
 
+bool
+PropertyMessage::is_postable () const
+{
+	return false;
+}
+
 
 
 // ObjectProperty

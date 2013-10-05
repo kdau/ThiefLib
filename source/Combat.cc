@@ -71,7 +71,7 @@ Weapon::is_weapon () const
 PROXY_CONFIG (AIAttackLink, priority, nullptr, nullptr,
 	AI::Priority, AI::Priority::DEFAULT);
 
-FLAVORED_LINK_IMPL_ (AIAttack,
+LINK_FLAVOR_IMPL (AIAttack,
 	PROXY_INIT (priority)
 )
 
@@ -80,7 +80,8 @@ AIAttackLink::create (const Object& source, const Object& dest,
 	AI::Priority priority)
 {
 	AIAttackLink link = Link::create (flavor (), source, dest);
-	link.priority = priority;
+	if (link != Link::NONE)
+		link.priority = priority;
 	return link;
 }
 
@@ -263,7 +264,7 @@ PROXY_CONFIG (AIProjectileLink, launch_joint, "Launch Joint", nullptr,
 	AI::Joint, AI::Joint::NONE);
 
 
-FLAVORED_LINK_IMPL_ (AIProjectile,
+LINK_FLAVOR_IMPL (AIProjectile,
 	PROXY_INIT (selection_desire),
 	PROXY_INIT (ignore_if_enough_friends),
 	PROXY_INIT (min_friends_nearby),
@@ -282,10 +283,13 @@ AIProjectileLink::create (const Object& source, const Object& dest,
 	RangedCombatant::RCPriority accuracy, AI::Joint launch_joint)
 {
 	AIProjectileLink link = Link::create (flavor (), source, dest);
-	link.selection_desire = selection_desire;
-	link.targeting_method = targeting_method;
-	link.accuracy = accuracy;
-	link.launch_joint = launch_joint;
+	if (link != Link::NONE)
+	{
+		link.selection_desire = selection_desire;
+		link.targeting_method = targeting_method;
+		link.accuracy = accuracy;
+		link.launch_joint = launch_joint;
+	}
 	return link;
 }
 

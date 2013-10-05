@@ -19,6 +19,7 @@ Other
 	* Document all yet-undocumented units.
 	* Add more general documentation including examples.
 	* Recheck NewDark modders' notes for any missed fields.
+	* Use MissingResource and other custom exceptions more consistently.
 	* AI, Types: split each into two or more units.
 	* EnumCoding: support encoding and decoding of bitmasks.
 	* Objective: add VictoryCheck(er)-equivalent functionality per <lg/convict.h>.

@@ -33,9 +33,6 @@
 
 namespace Thief {
 
-class AI;
-typedef std::vector<AI> AIs;
-
 
 
 class AI : public virtual Interactive, public Being, public Container
@@ -44,8 +41,10 @@ public:
 	THIEF_OBJECT_TYPE (AI)
 	bool is_ai () const;
 
+	typedef std::vector<AI> List;
+
 	static size_t count_ais ();
-	static AIs get_all_ais ();
+	static List get_all_ais ();
 
 	// State
 
@@ -228,9 +227,10 @@ public:
 
 
 
-THIEF_FLAVORED_LINK (AIAwareness) //TESTME
+class AIAwarenessLink : public Link //TESTME
 {
-	THIEF_FLAVORED_LINK_COMMON (AIAwareness)
+public:
+	THIEF_LINK_FLAVOR (AIAwareness)
 
 	enum Flags
 	{
@@ -274,9 +274,10 @@ THIEF_FLAVORED_LINK (AIAwareness) //TESTME
 
 
 
-THIEF_FLAVORED_LINK (CreatureAttachment)
+class CreatureAttachmentLink : public Link
 {
-	THIEF_FLAVORED_LINK_COMMON (CreatureAttachment)
+public:
+	THIEF_LINK_FLAVOR (CreatureAttachment)
 
 	static CreatureAttachmentLink create (const Object& source,
 		const Object& dest, AI::Joint = AI::Joint::NONE);
@@ -286,9 +287,10 @@ THIEF_FLAVORED_LINK (CreatureAttachment)
 
 
 
-THIEF_FLAVORED_LINK (DetailAttachement)
+class DetailAttachementLink : public Link
 {
-	THIEF_FLAVORED_LINK_COMMON (DetailAttachement)
+public:
+	THIEF_LINK_FLAVOR (DetailAttachement)
 
 	enum class Type { OBJECT, VHOT, JOINT, SUBMODEL, SUBOBJECT, DECAL };
 
@@ -405,6 +407,9 @@ public:
 	THIEF_MESSAGE_WRAP (ConversationMessage);
 
 	const Conversation conversation;
+
+private:
+	virtual bool is_postable () const;
 };
 
 

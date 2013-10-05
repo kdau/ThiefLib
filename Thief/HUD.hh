@@ -194,7 +194,7 @@ private:
 
 
 
-/*! Minimal interface for creating HUD elements.
+/*! A minimal interface for creating HUD elements.
  * This class handles registration of a HUD element with the central HUD handler.
  * HUDElement provides the full set of methods needed to draw an element. */
 class HUDElementBase

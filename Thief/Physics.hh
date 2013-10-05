@@ -147,12 +147,13 @@ public:
 	THIEF_PROP_FIELD (float, conveyor_velocity); //TESTME
 };
 
-THIEF_FLAVORED_LINK (PhysAttach) //TESTME
+class PhysAttachLink : public Link //TESTME
 {
-	THIEF_FLAVORED_LINK_COMMON (PhysAttach)
+public:
+	THIEF_LINK_FLAVOR (PhysAttach)
 
 	static PhysAttachLink create (const Object& source, const Object& dest,
-		const Vector& offset);
+		const Vector& offset = Vector ());
 
 	THIEF_LINK_FIELD (Vector, offset);
 };
@@ -172,9 +173,10 @@ public:
 	THIEF_PROP_FIELD (bool, push_attachments); //TESTME
 };
 
-THIEF_FLAVORED_LINK (TPath) //TESTME
+class TPathLink : public Link //TESTME
 {
-	THIEF_FLAVORED_LINK_COMMON (TPath)
+public:
+	THIEF_LINK_FLAVOR (TPath)
 
 	static TPathLink create (const Object& source, const Object& dest,
 		float speed, Time pause, bool path_limit);
