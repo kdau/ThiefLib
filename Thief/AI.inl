@@ -30,6 +30,10 @@
 
 namespace Thief {
 
+
+
+// AI
+
 inline bool
 AI::go_to_location (const Object& nearby, Speed speed, ActionPriority priority)
 {
@@ -59,6 +63,21 @@ AI::frob_object (const Object& target, const Object& tool,
 {
 	return _frob_object (target, tool, priority, LGMulti<T> (result_data));
 }
+
+
+
+// AIActionResultMessage
+
+template <typename T>
+inline T
+AIActionResultMessage::get_result_data () const
+{
+	LGMulti<T> multi;
+	_get_result_data (multi);
+	return multi;
+}
+
+
 
 } // namespace Thief
 

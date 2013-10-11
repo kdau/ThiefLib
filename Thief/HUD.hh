@@ -219,13 +219,13 @@ public:
 protected:
 	/*! Registers the element with the central HUD handler.
 	 * No check is performed for a redundant call. \param priority The
-	 * Z-index of the element relative to others. \return Whether the
-	 * registration was successful. */
-	bool initialize (ZIndex priority);
+	 * Z-index of the element relative to others. \throw std::runtime_error
+	 * if the registration fails. */
+	void initialize (ZIndex priority);
 
 	/*! Deregisters the element with the central HUD handler.
 	 * No check is performed for a redundant call. \return Whether the
-	 * deregistration was successful. */
+	 * element had been registered. */
 	bool deinitialize ();
 
 	/*! Handles a HUD event.
@@ -282,8 +282,7 @@ protected:
 	 * \param priority Determines how the element will be stacked on screen.
 	 * An element with a higher priority than another will be drawn above it.
 	 * Elements of the same priority will be stacked in a random but stable
-	 * order. \return \c true the first time the element is successfully
-	 * initialized, \c false otherwise. */
+	 * order. \return Whether the element needed to be initialized. */
 	bool initialize (ZIndex priority);
 
 	/*! Frees resources associated with the element.

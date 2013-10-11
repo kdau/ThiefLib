@@ -159,7 +159,7 @@ Message::has_data (Slot slot) const
 	case DATA3: return message->data3.type != kMT_Undef;
 	case REPLY: return reply_remote
 		? reply_remote->type != kMT_Undef
-		: reply_local.get_type () != LGMultiBase::Type::EMPTY;
+		: !reply_local.empty ();
 	default: return false;
 	}
 }

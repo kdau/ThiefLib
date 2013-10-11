@@ -408,7 +408,7 @@ OSL::on_property_event (sPropertyListenMsg* _message, PropListenerData)
 		event = PropertyMessage::CHANGE; break;
 	case kPropertyAdd:
 	case kPropertyAdd | kPropertyChange:
-		event = PropertyMessage::ADD; break;
+		event = PropertyMessage::INSTANTIATE; break;
 	default:
 		event = PropertyMessage::REMOVE; break;
 	}

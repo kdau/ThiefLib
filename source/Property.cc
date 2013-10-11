@@ -53,14 +53,22 @@ Property::Property (const String& name)
 		(SInterface<IPropertyManager> (LG)->GetPropertyNamed
 			(name.data ())))
 {
-	if (iface) iface->AddRef ();
+	if (iface)
+		iface->AddRef ();
+	else
+		throw MissingResource (MissingResource::PROPERTY, name,
+			Object::NONE);
 }
 
 Property::Property (const char* name)
 	: iface (static_cast<IGenericProperty*>
 		(SInterface<IPropertyManager> (LG)->GetPropertyNamed (name)))
 {
-	if (iface) iface->AddRef ();
+	if (iface)
+		iface->AddRef ();
+	else if (name)
+		throw MissingResource (MissingResource::PROPERTY, name,
+			Object::NONE);
 }
 
 String
@@ -137,31 +145,56 @@ ObjectProperty::exists (bool inherited) const
 bool
 ObjectProperty::instantiate ()
 {
-	if (!object.exists () || !property.iface) return false;
-	return property.iface->Create (object.number) == S_OK;
+	if (!object.exists ())
+		throw MissingResource (object);
+	if (!property.iface)
+		throw MissingResource (MissingResource::PROPERTY, "(null)",
+			Object::NONE);
+	if (exists (false))
+		return false;
+	if (property.iface->Create (object.number) != S_OK)
+		throw std::runtime_error ("could not instantiate property on "
+			"object");
+	return true;
 }
 
-bool
+void
 ObjectProperty::copy_from (const Object& source)
 {
-	if (!object.exists () || !source.exists () || !property.iface)
-		return false;
-	return property.iface->Copy (object.number, source.number) == S_OK;
+	if (!object.exists ())
+		throw MissingResource (object);
+	if (!source.exists ())
+		throw MissingResource (source);
+	if (!property.iface)
+		throw MissingResource (MissingResource::PROPERTY, "(null)",
+			Object::NONE);
+	if (property.iface->Copy (object.number, source.number) != S_OK)
+		throw std::runtime_error ("could not copy property value");
 }
 
 bool
 ObjectProperty::remove ()
 {
-	if (!object.exists () || !property.iface) return false;
-	return property.iface->Delete (object.number) == S_OK;
+	if (!object.exists ())
+		throw MissingResource (object);
+	if (!property.iface)
+		throw MissingResource (MissingResource::PROPERTY, "(null)",
+			Object::NONE);
+	if (!exists (false))
+		return false;
+	if (property.iface->Delete (object.number) != S_OK)
+		throw std::runtime_error ("could not remove property from "
+			"object");
+	return true;
 }
 
-bool
+void
 ObjectProperty::subscribe (const Property& property, const Object& object,
 	const Object& host)
 {
-	return SService<IOSLService> (LG)->subscribe_property
-		(property, object, host);
+	if (!SService<IOSLService> (LG)->subscribe_property
+			(property, object, host))
+		throw std::runtime_error ("could not subscribe to property");
 }
 
 bool
@@ -175,41 +208,69 @@ ObjectProperty::unsubscribe (const Property& property, const Object& object,
 void
 ObjectProperty::_get (LGMultiBase& value) const
 {
-	if (!object.exists () || !property.iface)
-		value.clear ();
-	else
-		SService<IPropertySrv> (LG)->Get (value, object.number,
-			property.iface->Describe ()->szName, nullptr);
+	if (!object.exists ())
+		throw MissingResource (object);
+	if (!property.iface)
+		throw MissingResource (MissingResource::PROPERTY, "(null)",
+			Object::NONE);
+	SService<IPropertySrv> (LG)->Get (value, object.number,
+		property.iface->Describe ()->szName, nullptr);
+	if (value.empty ())
+		throw MissingResource (MissingResource::PROPERTY,
+			property.get_name (), object);
 }
 
-bool
+void
 ObjectProperty::_set (const LGMultiBase& value)
 {
-	if (!object.exists () || !property.iface) return false;
-	if (!exists (false) && !instantiate ()) return false;
-	return SService<IPropertySrv> (LG)->Set (object.number,
-		property.iface->Describe ()->szName, nullptr, value) == S_OK;
+	if (!object.exists ())
+		throw MissingResource (object);
+	if (!property.iface)
+		throw MissingResource (MissingResource::PROPERTY, "(null)",
+			Object::NONE);
+	if (!exists (false))
+		instantiate ();
+	if (SService<IPropertySrv> (LG)->Set (object.number,
+	    property.iface->Describe ()->szName, nullptr, value) != S_OK)
+		throw std::runtime_error ("could not set property");
 }
 
 void
 ObjectProperty::_get_field (const char* field, LGMultiBase& value) const
 {
-	if (!object.exists () || !property.iface)
-		value.clear ();
-	else
-		SService<IPropertySrv> (LG)->Get (value, object.number,
-			property.iface->Describe ()->szName, field);
+	if (!object.exists ())
+		throw MissingResource (object);
+	if (!property.iface)
+		throw MissingResource (MissingResource::PROPERTY, "(null)",
+			Object::NONE);
+	SService<IPropertySrv> (LG)->Get (value, object.number,
+		property.iface->Describe ()->szName, field);
+	if (value.empty ())
+		throw MissingResource (MissingResource::PROPERTY,
+			property.get_name () + '.' + (field ? field : ""),
+			object);
 }
 
-bool
+void
 ObjectProperty::_set_field (const char* field, const LGMultiBase& value,
-	bool instantiate_if_missing) //TODO The MULTI_SET_ARG wrapper for this doesn't throw or return false on error.
+	bool instantiate_if_missing)
 {
-	if (!object.exists () || !property.iface) return false;
-	if (!exists (false) && (!instantiate_if_missing || !instantiate ()))
-		return false;
-	return SService<IPropertySrv> (LG)->Set (object.number,
-		property.iface->Describe ()->szName, field, value) == S_OK;
+	if (!object.exists ())
+		throw MissingResource (object);
+	if (!property.iface)
+		throw MissingResource (MissingResource::PROPERTY, "(null)",
+			Object::NONE);
+	if (!exists (false))
+	{
+		if (instantiate_if_missing)
+			instantiate ();
+		else
+			throw MissingResource (MissingResource::PROPERTY,
+				property.get_name (), object);
+	}
+	if (SService<IPropertySrv> (LG)->Set (object.number,
+	    property.iface->Describe ()->szName, field, value) != S_OK)
+		throw std::runtime_error ("could not set property field");
 }
 
 const void*
@@ -223,12 +284,18 @@ ObjectProperty::get_raw (bool inherited) const
 	return success ? raw : nullptr;
 }
 
-bool
+void
 ObjectProperty::set_raw (const void* raw)
 {
-	if (!object.exists () || !property.iface) return false;
-	if (!exists (false) && !instantiate ()) return false;
-	return property.iface->Set (object.number, const_cast<void*> (raw));
+	if (!object.exists ())
+		throw MissingResource (object);
+	if (!property.iface)
+		throw MissingResource (MissingResource::PROPERTY, "(null)",
+			Object::NONE);
+	if (!exists (false))
+		instantiate ();
+	if (!property.iface->Set (object.number, const_cast<void*> (raw)))
+		throw std::runtime_error ("could not set property");
 }
 
 
@@ -253,16 +320,16 @@ PropFieldBase::set (Object& object, const char* property, const char* field,
 	const LGMultiBase& value)
 {
 	ObjectProperty objprop (property, object);
-	if (field ? !objprop._set_field (field, value, true)
-	          : !objprop._set (value))
-		throw std::runtime_error ("could not set property field");
+	if (field)
+		objprop._set_field (field, value, true);
+	else
+		objprop._set (value);
 }
 
 void
 PropFieldBase::set_raw (Object& object, const char* property, const void* raw)
 {
-	if (!ObjectProperty (property, object).set_raw (raw))
-		throw std::runtime_error ("could not set property field");
+	ObjectProperty (property, object).set_raw (raw);
 }
 
 
@@ -280,12 +347,9 @@ PropFieldBase::set_raw (Object& object, const char* property, const void* raw)
 
 
 
-/* The following properties and property fields: are not instantiated in the
- * stock T2 dark.gam, have no documented use, work only in SS2, were never
- * implemented at all, are better accessed through methods in script services,
- * and/or are just clearly unsuited for direct use by scripts. No PropField
- * proxies have been created for them, but they may be accessed with the generic
- * Property wrapper.
+/* The following properties and property fields do not have PropField proxies in
+ * any Object subclasses (see Property.hh for reasons). They may be accessed
+ * with the generic ObjectProperty wrapper.
  *
  * AI: AI Core\Free sense knowledge = AI_FreeKnow
  * AI: AI Core\Handed-off proxy = AI_IsProxy

@@ -64,7 +64,7 @@ struct Flavor
 	//! Returns whether this flavor is the same as the given one.
 	bool operator == (const Flavor&) const;
 
-	//! Returns whether this flavor is different from as the given one.
+	//! Returns whether this flavor is different from the given one.
 	bool operator != (const Flavor&) const;
 
 	/*! Returns whether this flavor should sort before the given one.
@@ -81,12 +81,12 @@ struct Flavor
 	Flavor get_reverse () const;
 
 	/*! Constructs a reference to the named flavor.
-	 * \throw std::runtime_error if no flavor exists with the given \a name. */
+	 * \throw MissingResource if no flavor exists with the given \a name. */
 	Flavor (const String& name);
 
 	/*! Constructs a reference to the named flavor.
 	 * If \a name is a null pointer, refers to #ANY.
-	 * \throw std::runtime_error if no flavor exists with the given \a name. */
+	 * \throw MissingResource if no flavor exists with the given \a name. */
 	Flavor (const char* name);
 
 	//! Returns the name of the flavor.
@@ -287,14 +287,16 @@ public:
 	 * monitor links for, or Object::ANY to monitor all links of the given
 	 * flavor. \param host The object to notify of changes. If Object::SELF,
 	 * the source object of the links will be notified. (Object::SELF is not
-	 * valid if \a source is Object::ANY). */
-	static bool subscribe (Flavor flavor, const Object& source,
+	 * valid if \a source is Object::ANY). \throw std::runtime_error if the
+	 * subscription could not be created. */
+	static void subscribe (Flavor flavor, const Object& source,
 		const Object& host = Object::SELF);
 
 	/*! Unsubscribes from changes on links of the given flavor from the
 	 * given object. The \a flavor and \a source object must match the
 	 * original subscribe() call. Only messages to scripts on the given
-	 * \a host object will stop. */
+	 * \a host object will stop. \return Whether a matching subscription
+	 * had existed. */
 	static bool unsubscribe (Flavor flavor, const Object& source,
 		const Object& host = Object::SELF);
 

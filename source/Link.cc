@@ -267,11 +267,11 @@ Link::dump_links (Flavor flavor, const Object& source, const Object& dest,
 	mono << std::flush << std::internal;
 }
 
-bool
+void
 Link::subscribe (Flavor flavor, const Object& source, const Object& host)
 {
-	return SService<IOSLService> (LG)->subscribe_links
-		(flavor, source, host);
+	if (!SService<IOSLService> (LG)->subscribe_links (flavor, source, host))
+		throw std::runtime_error ("could not subscribe to links");
 }
 
 bool

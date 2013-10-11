@@ -417,7 +417,6 @@ public: \
 #define THIEF_LGMULTI_SPECIALIZE(Type, Default) \
 THIEF_LGMULTI_SPECIALIZE_ (Type, LGMultiBase, Default)
 
-//TODO Document this. Move to Base.hh? Elsewhere? For that matter, document LGMulti overall somewhere (without exposing it directly).
 class LGMultiTypeError : public std::exception
 {
 public:
@@ -488,46 +487,6 @@ class LGMulti<Empty> : public LGMultiBase
 public:
 	LGMulti (const Empty& = nullptr);
 };
-
-
-
-// Convenience macros for get/set methods using LGMulti
-
-#define MULTI_GET_ARG(Method, ArgType, ArgName) \
-template <typename T> \
-inline T \
-Method (const ArgType& ArgName) const \
-{ \
-	LGMulti<T> multi; \
-	_##Method (ArgName, multi); \
-	return multi; \
-}
-
-#define MULTI_GET(Method) \
-template <typename T> \
-inline T \
-Method () const \
-{ \
-	LGMulti<T> multi; \
-	_##Method (multi); \
-	return multi; \
-}
-
-#define MULTI_SET_ARG(Method, ArgType, ArgName) \
-template <typename T> \
-inline void \
-Method (const ArgType& ArgName, const T& value) \
-{ \
-	_##Method (ArgName, LGMulti<T> (value)); \
-}
-
-#define MULTI_SET(Method) \
-template <typename T> \
-inline void \
-Method (const T& value) \
-{ \
-	_##Method (LGMulti<T> (value)); \
-}
 
 
 

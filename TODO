@@ -1,7 +1,7 @@
 Current
-	* Eliminate the MULTI_* macros.
 	* Replace Parameter<Object> with Parameter<Object::Ref>, resolvable dynamically to an Object.
 	* Fix possible dangling pointer in posted or scheduled synthetic QuestMessage and ObjectiveMessage instances.
+	* Promote LGMultiTypeError to something public, documenting it and the general LGMulti system (without actually exposing LGMulti).
 
 Novel messages/wrappers
 	* HierarchyMessage: ITraitManager::Listen (per DH2)
@@ -16,10 +16,10 @@ TNH/NV/TW features
 	* TrapTrigger: NVScript-style features (on, off, count, capacitor, falloff, failchance, dest)
 
 Other
-	* Document all yet-undocumented units.
+	* Document undocumented units: AI, ActReact, Combat, Physics, Player, Rendering, Security, Sound, Tweq, Types.
+	* Document the template and various accessory files, such as version.rc and module.mk.
 	* Add more general documentation including examples.
 	* Recheck NewDark modders' notes for any missed fields.
-	* Use MissingResource and other custom exceptions more consistently.
 	* AI, Types: split each into two or more units.
 	* EnumCoding: support encoding and decoding of bitmasks.
 	* Objective: add VictoryCheck(er)-equivalent functionality per <lg/convict.h>.

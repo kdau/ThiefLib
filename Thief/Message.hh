@@ -342,11 +342,11 @@ public:
 
 
 /*! A message about a change to a Link.
- * A link-related message is sent whenver a link between game objects is created,
- * changed, or destroyed. It is sent only to scripts hosted by objects that have
- * subscribed to a link's flavor, either for its source object or for all
- * objects. This is a message created by ThiefLib, but it is available to all
- * scripts. \warning LinkMessage instances cannot be post()ed or schedule()d
+ * A link-related message is sent whenever a link between game objects is
+ * created, changed, or destroyed. It is sent only to scripts hosted by objects
+ * that have subscribed to a link's flavor, either for its source object or for
+ * all objects. This is a message created by ThiefLib, but it is available to
+ * all scripts. \warning LinkMessage instances cannot be post()ed or schedule()d
  * (including broadcast() with a delay time).
  * \note %Message names: \c LinkCreate, \c LinkChange, \c LinkDestroy */
 class LinkMessage : public Message

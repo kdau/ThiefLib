@@ -404,7 +404,7 @@ public:
 
 	/*! Returns the current value of the persistent variable.
 	 * If the variable is not set, returns the default value.
-	 * \throw std::runtime_error if the variable is not set and there is no.
+	 * \throw std::runtime_error if the variable is not set and there is no
 	 * default value. \throw LGMultiTypeError if the variable is of the
 	 * wrong type. */
 	operator const T& () const;

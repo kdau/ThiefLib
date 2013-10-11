@@ -358,6 +358,11 @@ MissingResource::MissingResource (Type _type, const String& name,
 	explanation = _explanation.str ();
 }
 
+MissingResource::MissingResource (const Object& object) noexcept
+	: explanation ((boost::format ("The requested object number \"%||\" "
+		"does not exist.") % object.number).str ())
+{}
+
 
 
 // LGMultiBase

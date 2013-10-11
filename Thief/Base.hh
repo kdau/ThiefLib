@@ -514,6 +514,10 @@ public:
 	MissingResource (Type type, const String& name,
 		const Object& object) noexcept;
 
+	/*! Constructs a new missing resource exception for a missing object.
+	 * \param object The object that is missing. */
+	MissingResource (const Object& object) noexcept;
+
 	//! Destroys a missing resource exception.
 	virtual ~MissingResource () noexcept {}
 

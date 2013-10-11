@@ -128,8 +128,10 @@ public:
 	 * to finish_create(). YMMV. */
 	static Object start_create (const Object& archetype);
 
-	//! Finishes creating an object that was started by start_create().
-	bool finish_create ();
+	/*! Finishes creating an object that was started by start_create().
+	 * \throw std::runtime_error if the object could not finish being
+	 * created or was not created with start_create(). */
+	void finish_create ();
 
 	/*! Creates a fnord object with a limited lifespan.
 	 * The object will inherit directly from the \c Marker archetype. It
@@ -296,12 +298,12 @@ public:
 	 * If \a single is \c true, the \a metaprop will not be added again
 	 * if it is already directly held by the referenced object; if \c false,
 	 * the \a metaprop will be added regardless.
-	 * \return whether the metaproperty was successfully added.
+	 * \return Whether the metaproperty needed to be added.
 	 */
 	bool add_metaprop (const Object& metaprop, bool single = true);
 
 	/*! Removes the given metaproperty to the referenced object.
-	 * \return whether the metaproperty was successfully removed.
+	 * \return Whether the metaproperty needed to be removed.
 	 */
 	bool remove_metaprop (const Object& metaprop);
 

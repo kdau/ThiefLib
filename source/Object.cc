@@ -68,10 +68,11 @@ Object::start_create (const Object& archetype)
 	return created;
 }
 
-bool
+void
 Object::finish_create ()
 {
-	return SService<IObjectSrv> (LG)->EndCreate (number) == S_OK;
+	if (SService<IObjectSrv> (LG)->EndCreate (number) != S_OK)
+		throw std::runtime_error ("could not finish creating object");
 }
 
 Object

@@ -222,11 +222,11 @@ HUDBitmap::draw (Frame frame, CanvasPoint position, CanvasRect clip) const
 
 // HUDElementBase
 
-bool
+void
 HUDElementBase::initialize (ZIndex priority)
 {
-	return SService<IOSLService> (LG)->register_hud_element
-		(*this, priority);
+	if (!SService<IOSLService> (LG)->register_hud_element (*this, priority))
+		throw std::runtime_error ("could not register HUD element");
 }
 
 bool
@@ -268,8 +268,8 @@ HUDElement::initialize (ZIndex priority)
 		return false;
 	else // Register the element with the handler.
 	{
-		initialized = HUDElementBase::initialize (priority);
-		return initialized;
+		HUDElementBase::initialize (priority);
+		return initialized = true;
 	}
 }
 

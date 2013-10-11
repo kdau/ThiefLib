@@ -1,7 +1,6 @@
-/******************************************************************************
- *  Property.inl
- *
- *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
+//! \file Property.inl
+
+/*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
  *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
@@ -18,8 +17,7 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- *****************************************************************************/
+ */
 
 #ifndef THIEF_PROPERTY_HH
 #error "This file should only be included from <Thief/Property.hh>."
@@ -65,6 +63,15 @@ ObjectProperty::operator < (const ObjectProperty& rhs) const
 
 template <typename T>
 inline T
+ObjectProperty::get () const
+{
+	LGMulti<T> value;
+	_get (value);
+	return value;
+}
+
+template <typename T>
+inline T
 ObjectProperty::get (const T& default_value) const
 {
 	if (exists ())
@@ -75,6 +82,22 @@ ObjectProperty::get (const T& default_value) const
 	}
 	else
 		return default_value;
+}
+
+template <typename T>
+inline void
+ObjectProperty::set (const T& value)
+{
+	_set (LGMulti<T> (value));
+}
+
+template <typename T>
+inline T
+ObjectProperty::get_field (const String& field) const
+{
+	LGMulti<T> value;
+	_get_field (field.empty () ? nullptr : field.data (), value);
+	return value;
 }
 
 template <typename T>
@@ -91,18 +114,12 @@ ObjectProperty::get_field (const String& field, const T& default_value) const
 		return default_value;
 }
 
+template <typename T>
 inline void
-ObjectProperty::_get_field (const String& field, LGMultiBase& value) const
+ObjectProperty::set_field (const String& field, const T& value)
 {
-	_get_field (field.empty () ? nullptr : field.data (), value);
-}
-
-inline bool
-ObjectProperty::_set_field (const String& field, const LGMultiBase& value,
-	bool instantiate_if_missing)
-{
-	return _set_field (field.empty () ? nullptr : field.data (), value,
-		instantiate_if_missing);
+	_set_field (field.empty () ? nullptr : field.data (),
+		LGMulti<T> (value), false);
 }
 
 

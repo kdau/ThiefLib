@@ -326,7 +326,9 @@ public:
 	const Action action; //TESTME
 	const Result result; //TESTME
 	const Object target; //TESTME
-	MULTI_GET (get_result_data);
+
+	template <typename T>
+	T get_result_data () const;
 
 private:
 	void _get_result_data (LGMultiBase& value) const;
