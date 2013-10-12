@@ -316,18 +316,23 @@ OSL::on_link_event (sRelationListenMsg* _message, void*)
 
 	LinkMessage message (event, Flavor (_message->flavor), _message->lLink,
 		Object (_message->source), Object (_message->dest));
+	Object::Set recipients;
 
-	// Send message to object-specific subscribers.
+	// Include object-specific subscribers.
 	auto range = self->link_subscriptions.equal_range
 		({ message.flavor, message.source });
 	for (auto iter = range.first; iter != range.second; ++iter)
-		message.send (Object::NONE, iter->second);
+		recipients.insert (iter->second);
 
-	// Send message to generic subscribers.
+	// Include generic subscribers.
 	range = self->link_subscriptions.equal_range
 		({ message.flavor, Object::ANY });
 	for (auto iter = range.first; iter != range.second; ++iter)
-		message.send (Object::NONE, iter->second);
+		recipients.insert (iter->second);
+
+	// Distribute the message.
+	for (auto recipient : recipients)
+		message.send (Object::NONE, recipient);
 }
 
 
@@ -348,8 +353,8 @@ OSL::subscribe_property (const Property& property, const Object& object,
 
 	if (listened_properties.find (property) == listened_properties.end ())
 	{
-		auto handle = property.iface->Listen (kPropertyFull,
-			on_property_event, nullptr);
+		auto handle = property.iface->Listen
+			(63, on_property_event, nullptr);
 		listened_properties.insert (std::make_pair (property, handle));
 	}
 
@@ -395,38 +400,51 @@ OSL::unsubscribe_property (const Property& property, const Object& object,
 void __stdcall
 OSL::on_property_event (sPropertyListenMsg* _message, PropListenerData)
 {
-	if (!self || !_message || (_message->event & 8) != 0 ||
-	    (_message->event & 48) == kPropertyInherited)
+	if (!self || !_message) return;
+
+	// Exclude unwanted events with an unknown flag.
+	if (_message->event & 0x8) return;
+
+	// Exclude inherited events that are not relevant.
+	bool inherited = _message->event & kPropertyInherited;
+	if (inherited && !(_message->event & kPropertyInheritedIsRelevant))
 		return;
 
 	// Translate the event type.
 	PropertyMessage::Event event;
 	switch (_message->event & 0x7)
 	{
-	case 0:
+	case 0: // For inherited changes.
 	case kPropertyChange:
 		event = PropertyMessage::CHANGE; break;
 	case kPropertyAdd:
 	case kPropertyAdd | kPropertyChange:
 		event = PropertyMessage::INSTANTIATE; break;
-	default:
+	case kPropertyDelete:
 		event = PropertyMessage::REMOVE; break;
+	default:
+		return;
 	}
 
-	PropertyMessage message (event, _message->event & kPropertyInherited,
+	PropertyMessage message (event, inherited,
 		Property (_message->iPropId), Object (_message->iObjId));
+	Object::Set recipients;
 
-	// Send message to object-specific subscribers.
+	// Include object-specific subscribers.
 	auto range = self->property_subscriptions.equal_range
 		({ message.property, message.object });
 	for (auto iter = range.first; iter != range.second; ++iter)
-		message.send (Object::NONE, iter->second);
+		recipients.insert (iter->second);
 
-	// Send message to generic subscribers.
+	// Include generic subscribers.
 	range = self->property_subscriptions.equal_range
 		({ message.property, Object::ANY });
 	for (auto iter = range.first; iter != range.second; ++iter)
-		message.send (Object::NONE, iter->second);
+		recipients.insert (iter->second);
+
+	// Distribute the message.
+	for (auto recipient : recipients)
+		message.send (Object::NONE, recipient);
 }
 
 
@@ -474,17 +492,22 @@ OSL::on_conversation_end (Object::Number conversation)
 	if (!self) return;
 
 	ConversationMessage message { Object (conversation) };
+	Object::Set recipients;
 
-	// Send message to object-specific subscribers.
+	// Include object-specific subscribers.
 	auto range = self->conversation_subscriptions.equal_range
 		(Object (conversation));
 	for (auto iter = range.first; iter != range.second; ++iter)
-		message.send (Object::NONE, iter->second);
+		recipients.insert (iter->second);
 
-	// Send message to generic subscribers.
+	// Include generic subscribers.
 	range = self->conversation_subscriptions.equal_range (Object::ANY);
 	for (auto iter = range.first; iter != range.second; ++iter)
-		message.send (Object::NONE, iter->second);
+		recipients.insert (iter->second);
+
+	// Distribute the message.
+	for (auto recipient : recipients)
+		message.send (Object::NONE, recipient);
 }
 
 

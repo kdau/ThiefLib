@@ -141,7 +141,20 @@ Script::Script (const String& _name, const Object& _host, Log _min_level)
 {}
 
 Script::~Script ()
-{}
+{
+	if (initialized)
+		try
+		{
+			deinitialize ();
+			initialized = false;
+		}
+		catch (std::exception& e)
+		{
+			try { log (Log::ERROR, e.what ()); }
+			catch (...) {}
+		}
+		catch (...) {}
+}
 
 void
 Script::initialize ()
@@ -173,6 +186,10 @@ Script::initialize ()
 		default: break;
 		}
 }
+
+void
+Script::deinitialize ()
+{}
 
 IScript*
 Script::get_interface ()
@@ -239,11 +256,6 @@ Script::dispatch (sScrMsg& message, sMultiParm* reply, unsigned trace)
 	if (trace == kBreak)
 		asm ("int $0x3");
 
-	// The EndScript message can potentially be sent to scripts immediately
-	// *after* a load from a saved game, immediately followed by BeginScript.
-	// Since certain initialization tasks would fail in that environment,
-	// and others might be immediately undone by EndScript message handlers,
-	// EndScript cannot be used as an initialization trigger.
 	if (!initialized && _stricmp (message.message, "EndScript") != 0)
 	{
 		initialize ();
@@ -284,6 +296,12 @@ Script::dispatch (sScrMsg& message, sMultiParm* reply, unsigned trace)
 		result &= dispatch_cycle (timer_handlers, (const char*)
 			static_cast<sScrTimerMsg*> (&message)->name,
 			message, reply);
+
+	if (initialized && _stricmp (message.message, "EndScript") == 0)
+	{
+		deinitialize ();
+		initialized = false;
+	}
 
 	return result;
 }

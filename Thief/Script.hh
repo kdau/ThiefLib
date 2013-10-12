@@ -200,11 +200,21 @@ protected:
 	/*! Prepares the script to handle messages.
 	 * This method is called before the first message received by the script
 	 * is handled. Since a script instance may be replaced during a single
-	 * game mode session, it may be called multiple times even without an
-	 * intervening reload. Scripts may extend this method to perform
-	 * preparation that requires access to elements of a loaded mission,
-	 * such as objects, links, or persistent variables. */
+	 * game mode session, this method may be called multiple times even
+	 * without an intervening reload. Scripts may extend this method to
+	 * perform preparation that requires access to elements of a loaded
+	 * mission, such as objects, links, or persistent variables. */
 	virtual void initialize ();
+
+	/*! Releases resources used by the script.
+	 * This method is called if the script receives an \c EndScript message
+	 * or is destroyed, but only if it has been initialized previously.
+	 * Since a script instance may be replaced during a single game mode
+	 * session, this method may be called multiple times even without an
+	 * intervening reload. Scripts may extend this method to unsubscribe
+	 * from subscribed messages, deregister HUD elements, and release any
+	 * other resources that are not managed automatically. */
+	virtual void deinitialize ();
 
 	/*! Outputs an appropriate prefix to the monolog and returns it.
 	 * This method is used to output monolog messages with a traditional
@@ -243,22 +253,21 @@ protected:
 	Time get_sim_time () const { return sim_time; }
 
 	/*! Listens for messages of the given name to be handled by the given
-	 * method. This method is usually called in a script's constructor, but
-	 * may be called later to listen for any future messages of the given
-	 * name. This method does not guarantee that messages of the given name
-	 * will be received by the object; see the various "subscribe" methods
-	 * throughout ThiefLib. \param message The name of the message to listen
-	 * for. \param handler A pointer to a member function of the script
-	 * class. */
+	 * method. This method is usually called in a script's constructor,
+	 * since listeners are not persistent. Calling this method does not
+	 * guarantee that messages of the given name will be received by the
+	 * object; see the various "subscribe" methods throughout ThiefLib.
+	 * \param message The name of the message to listen for.
+	 * \param handler A pointer to a member function of the script class. */
 	template <typename _Script, typename _Message>
 	void listen_message (const CIString& message,
 		Message::Result (_Script::*handler) (_Message&));
 
 	/*! Listens for \c %Timer messages with the given timer name.
 	 * Use this overload for handler methods expecting a generic Message.
-	 * This method is usually called in a script's constructor, but may be
-	 * called later to listen for any future \c %Timer messages with the
-	 * given timer name. \param timer The name of the timer to listen for.
+	 * This method is usually called in a script's constructor, since
+	 * listeners are not persistent.
+	 * \param timer The name of the timer to listen for.
 	 * \param handler A pointer to a member function of the script class. */
 	template <typename _Script>
 	void listen_timer (const CIString& timer,
@@ -266,9 +275,9 @@ protected:
 
 	/*! Listens for \c %Timer messages with the given timer name.
 	 * Use this overload for handler methods expecting a TimerMessage.
-	 * This method is usually called in a script's constructor, but may be
-	 * called later to listen for any future \c %Timer messages with the
-	 * given timer name. \param timer The name of the timer to listen for.
+	 * This method is usually called in a script's constructor, since
+	 * listeners are not persistent.
+	 * \param timer The name of the timer to listen for.
 	 * \param handler A pointer to a member function of the script class. */
 	template <typename _Script>
 	void listen_timer (const CIString& timer,

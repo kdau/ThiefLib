@@ -128,11 +128,15 @@ public:
 	THIEF_MESSAGE_WRAP (PropertyMessage);
 
 	//! The event that occurred on the affected property instance.
-	const Event event; //FIXME TESTME
+	const Event event;
 
 	/*! Whether the event affected an instance on an ancestor of the object
-	 * instead of on the object itself. */
-	const bool inherited; //FIXME TESTME
+	 * instead of on the object itself. \note Due to technical limitations,
+	 * every message about a change to an instance on the object itself is
+	 * preceded by a message about a change on an ancestor, even if no
+	 * ancestor has actually changed. Treat messages having \a inherited ==
+	 * \c true with caution. */
+	const bool inherited;
 
 	//! The property whose instance on the #object was affected.
 	const Property property;

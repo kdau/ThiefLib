@@ -74,6 +74,9 @@ public:
 	//! A list of references to game objects.
 	typedef std::vector<Object> List;
 
+	//! A set of references to game objects.
+	typedef std::set<Object> Set;
+
 	/*! %Object numbers uniquely identify objects, both concrete (positive)
 	 * and abstract (negative), within the mission and gamesys. */
 	typedef int Number;
