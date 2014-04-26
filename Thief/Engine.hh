@@ -109,7 +109,8 @@ struct CanvasSize
 
 
 
-//! A version number of the Dark %Engine or a supporting module.
+/*! A version number of the Dark %Engine, a script module, or another supporting
+ * file. */
 struct Version
 {
 	//! Constructs a new version number as specified.
@@ -266,8 +267,9 @@ public:
 	 * \a include_mesh is \c false, mesh objects (which include AIs and
 	 * ropes) will not be considered in the raycast.
 	 *
-	 * Ray casting is an expensive operation, less so for the #TERRAIN mode
-	 * but especially for the #NEAREST mode. Use it in moderation. */
+	 * Ray casting is an expensive operation, less so for
+	 * RaycastMode::TERRAIN but especially for RaycastMode::NEAREST.
+	 * Use it in moderation. */
 	static RaycastHit raycast (RaycastMode mode, const Vector& from,
 		const Vector& to, bool include_mesh = true);
 

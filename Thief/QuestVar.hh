@@ -254,7 +254,7 @@ public:
 	 * non-final objectives have been completed. */
 	THIEF_QUEST_FIELD (bool, final);
 
-	/*! Whether the referenced objective cannot return to state #INCOMPLETE.
+	/*! Whether the referenced objective cannot return to State::INCOMPLETE.
 	 * Irreversible objectives will remain complete even if their conditions
 	 * are no longer met. */
 	THIEF_QUEST_FIELD (bool, irreversible);
@@ -291,7 +291,7 @@ public:
 	{
 		NONE, /*!< The objective will not be automatically completed
 		       * in any conditions. A script must instead set the
-		       * objective's state to #COMPLETE when appropriate. */
+		       * objective's state to State::COMPLETE when appropriate. */
 		TAKE, /*!< The player must put the #target object in inventory.
 		       * The conditions will no longer be met if the object is
 		       * dropped. */
@@ -311,28 +311,28 @@ public:
 	THIEF_QUEST_FIELD (Type, type);
 
 	/*! The object relevant to the referenced objective's conditions.
-	 * See the #TAKE, #SLAY, and #GOTO types. */
+	 * See Type::TAKE, Type::SLAY, and Type::GOTO. */
 	THIEF_QUEST_FIELD (Object, target);
 
 	/*! The amount of gold that the player must steal.
-	 * This field only applies to #LOOT objectives. */
+	 * This field only applies to Type::LOOT objectives. */
 	THIEF_QUEST_FIELD (int, loot_gold);
 
 	/*! The amount of gems that the player must steal.
-	 * This field only applies to #LOOT objectives. */
+	 * This field only applies to Type::LOOT objectives. */
 	THIEF_QUEST_FIELD (int, loot_gems);
 
 	/*! The amount of goods that the player must steal.
-	 * This field only applies to #LOOT objectives. */
+	 * This field only applies to Type::LOOT objectives. */
 	THIEF_QUEST_FIELD (int, loot_goods);
 
 	/*! The total loot amount that the player must steal.
 	 * This is independent of any gold, gems, or goods requirement. This
-	 * field only applies to #LOOT objectives. */
+	 * field only applies to Type::LOOT objectives. */
 	THIEF_QUEST_FIELD (int, loot_total);
 
 	/*! A selection of special loot items.
-	 * An object with a loot value cannot be targeted with a #TAKE-type
+	 * An object with a loot value cannot be targeted with a Type::TAKE
 	 * objective. Instead, it must carry one (or more) of eight special loot
 	 * item flags. This bitset defines which special item or items apply to
 	 * an objective. */
@@ -340,7 +340,7 @@ public:
 
 	/*! The special loot item or items that the player must steal.
 	 * This is independent of any numeric loot requirement. This field only
-	 * applies to #LOOT objectives. */
+	 * applies to Type::LOOT objectives. */
 	SpecialsQuestField loot_specials;
 
 	/*! Returns the number of objectives that are currently defined.

@@ -192,28 +192,28 @@ struct Precipitation
 	float brightness;
 
 	/*! How far the drops should randomly drift as they fall, in feet (DU).
-	 * \pre This variable only applies to #SNOW precipitation. */
+	 * \pre This variable only applies to Type::SNOW precipitation. */
 	float snow_jitter;
 
 	/*! The vertical length of each drops in feet (DU).
-	 * \pre This variable only applies to #RAIN precipitation. */
+	 * \pre This variable only applies to Type::RAIN precipitation. */
 	float rain_length;
 
 	/*! How often a drop-on-ground collision should produce a splash.
 	 * The frequency ranges from \c 0.0 (never) to \c 1.0 (always).
-	 * \pre This variable only applies to #RAIN precipitation. */
+	 * \pre This variable only applies to Type::RAIN precipitation. */
 	float splash_frequency;
 
 	/*! The horizontal radius of any splashes produced, in feet (DU).
-	 * \pre This variable only applies to #RAIN precipitation. */
+	 * \pre This variable only applies to Type::RAIN precipitation. */
 	float splash_radius;
 
 	/*! The vertical length of any splashes produced, in feet (DU).
-	 * \pre This variable only applies to #RAIN precipitation. */
+	 * \pre This variable only applies to Type::RAIN precipitation. */
 	float splash_height;
 
 	/*! How long any splashes produced should remain visible.
-	 * \pre This variable only applies to #RAIN precipitation. */
+	 * \pre This variable only applies to Type::RAIN precipitation. */
 	float splash_duration;
 
 	/*! The name of the bitmap image file to use as a drop texture.
