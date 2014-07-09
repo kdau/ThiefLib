@@ -1,7 +1,7 @@
 //! \file Thief.hh Main header file which includes all others.
 
 /*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -61,13 +61,13 @@
  * \section requirements Requirements
  *
  * The library itself requires the following to be compiled:
- *   - a recent (GCC 4.6 or later) MinGW build environment
+ *   - a recent (GCC 4.8 or later) MinGW build environment
  *   - the <a href="http://www.boost.org/">Boost</a> libraries (currently Format
  *     and Preprocessor, but possibly more later)
  *   - <a href="https://github.com/kdau/lg">my modified version</a> of
  *     Telliamed's lg library
  *
- * Script modules based on this library require only MinGW (GCC 4.6+) and Boost
+ * Script modules based on this library require only MinGW (GCC 4.8+) and Boost
  * to be compiled. To run, they require:
  *   - either Windows (XP or later) or Linux (with a recent version of Wine)
  *   - TMA and/or TG/TDP, depending on build options
@@ -75,7 +75,7 @@
  *
  * \section credits Credits and legal information
  *
- * Copyright (C) 2012-2013 Kevin Daughtridge &lt;kevin AT kdau DOT com&gt;.
+ * Copyright (C) 2012-2014 Kevin Daughtridge &lt;kevin AT kdau DOT com&gt;.
  *
  * ThiefLib contains or is adapted in part from the following works:
  *   - the <a href="https://github.com/whoopdedo/lg">lg library</a>, by

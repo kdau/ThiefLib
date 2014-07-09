@@ -1,5 +1,5 @@
 #******************************************************************************
-#   module.mk: includable elements for script module Makfiles
+#   module.mk: includable elements for script module Makefiles
 #
 #   This file is part of ThiefLib, a library for Thief 1/2 script modules.
 #   Copyright (C) 2012-2013 Kevin Daughtridge <kevin@kdau.com>
