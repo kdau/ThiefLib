@@ -245,10 +245,21 @@ OSL_OBJECTS = \
 	$(bindir_osl)/OSL_version.o \
 	$(bindir_osl)/OSL_exports.o
 
-OSL_DEFINES = -DIS_OSL
+OSL_CXXFLAGS = $(CXXFLAGS)
+OSL_DEFINES = $(DEFINES) -DIS_OSL
+OSL_LDFLAGS = $(LDFLAGS)
+
+ifdef DEBUG_OSL
+OSL_CXXFLAGS := $(OSL_CXXFLAGS) $(CXXFLAGSD)
+OSL_DEFINES := $(OSL_DEFINES) $(DEFINESD)
+OSL_LDFLAGS := $(OSL_LDFLAGS) -g
+else
+OSL_CXXFLAGS := $(OSL_CXXFLAGS) $(CXXFLAGSN)
+OSL_DEFINES := $(OSL_DEFINES) $(DEFINESN)
+endif
 
 $(bindir_osl)/%.o: $(srcdir)/%.cc ./Thief/%.hh $(srcdir)/Private.hh
-	$(CXX) $(CXXFLAGS) $(CXXFLAGSN) $(DEFINES) $(OSL_DEFINES) $(INCLUDES) -o $@ -c $<
+	$(CXX) $(OSL_CXXFLAGS) $(OSL_DEFINES) $(INCLUDES) -o $@ -c $<
 
 ./Thief/ParameterCache.hh:
 $(bindir_osl)/ParameterCache.o: $(srcdir)/ParameterCache.hh

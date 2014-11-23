@@ -10,3 +10,5 @@ bin/t2-d/*.o
 libthief2-d.a
 bin/osl/*.o
 ThiefLib.osl
+template/bin-t1
+template/bin-t2
