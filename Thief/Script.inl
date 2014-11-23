@@ -1,7 +1,7 @@
 //! \file Script.inl
 
 /*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *  Adapted in part from TWScript
@@ -40,10 +40,20 @@ struct ScriptMessageHandler : public MessageHandler,
 {
 	typedef Message::Result (_Script::*Method) (_Message&);
 
-	ScriptMessageHandler (Method method);
+	static Ptr create (Method method);
 
 	virtual Message::Result handle (Script&, sScrMsg*, sMultiParm*);
+
+private:
+	ScriptMessageHandler (Method method);
 };
+
+template <typename _Script, typename _Message>
+MessageHandler::Ptr
+ScriptMessageHandler<_Script, _Message>::create (Method method)
+{
+	return Ptr (new ScriptMessageHandler (method));
+}
 
 template <typename _Script, typename _Message>
 ScriptMessageHandler<_Script, _Message>::ScriptMessageHandler (Method method)
@@ -112,8 +122,8 @@ inline void
 Script::listen_message (const CIString& message,
 	Message::Result (_Script::*handler) (_Message&))
 {
-	message_handlers.insert (std::make_pair (message,
-		new ScriptMessageHandler<_Script, _Message> (handler)));
+	message_handlers.emplace (message,
+		ScriptMessageHandler<_Script, _Message>::create (handler));
 }
 
 template <typename _Script>
@@ -121,8 +131,8 @@ inline void
 Script::listen_timer (const CIString& timer,
 	Message::Result (_Script::*handler) (Message&))
 {
-	timer_handlers.insert (std::make_pair (timer,
-		new ScriptMessageHandler<_Script, Message> (handler)));
+	timer_handlers.emplace (timer,
+		ScriptMessageHandler<_Script, Message>::create (handler));
 }
 
 template <typename _Script>
@@ -130,8 +140,8 @@ inline void
 Script::listen_timer (const CIString& timer,
 	Message::Result (_Script::*handler) (TimerMessage&))
 {
-	timer_handlers.insert (std::make_pair (timer,
-		new ScriptMessageHandler<_Script, TimerMessage> (handler)));
+	timer_handlers.emplace (timer,
+		ScriptMessageHandler<_Script, TimerMessage>::create (handler));
 }
 
 inline Timer

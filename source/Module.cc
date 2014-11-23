@@ -130,6 +130,11 @@ ScriptModuleInit (const char* name, IScriptMan* manager, MPrintfProc mprintf,
 {
 	if (!manager || !allocator) return false;
 
+#ifdef DEBUG
+	if (mprintf)
+		mprintf ("%s module loading...\n", Thief::module.get_name ());
+#endif
+
 	// Confirm that this is NewDark by checking for the new IEngineSrv.
 	try
 	{
@@ -170,6 +175,10 @@ ScriptModuleInit (const char* name, IScriptMan* manager, MPrintfProc mprintf,
 	Thief::module.set_name (name);
 	Thief::module.QueryInterface (IID_IScriptModule,
 		reinterpret_cast<void**> (module_ptr));
+
+#ifdef DEBUG
+	if (mprintf) mprintf ("%s module loaded.\n", Thief::module.get_name ());
+#endif
 
 	return true;
 }

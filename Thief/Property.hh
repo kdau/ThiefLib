@@ -40,7 +40,7 @@ namespace Thief {
  * Each property type has an internal number, an internal name (such as
  * \c "PhysType"), and a DromEd name as part of the organized hierarchy (such as
  * <i>Physics&rarr;Model&rarr;Type</i>). The numbers are not stable between
- * engine versions and the DromEd names are not easily accessibly to scripts, so
+ * engine versions and the DromEd names are not easily accessible to scripts, so
  * internal names should generally be used. */
 class Property
 {

@@ -2,7 +2,7 @@
  *  OSL.cc
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Dark Hook 2
  *  Copyright (C) 2005-2011 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -190,7 +190,7 @@ OSL::register_hud_element (HUDElementBase& element,
 			is_hud_handler = true;
 		}
 		catch (...) { return false; }
-	hud_elements.insert (HUDElementInfo (element, priority));
+	hud_elements.emplace (element, priority);
 	return true;
 }
 
@@ -227,7 +227,7 @@ OSL::load_hud_bitmap (const String& path, bool animation)
 	{
 		// The bitmap hasn't been loaded yet, so load it now.
 		bitmap = HUDBitmap::Ptr (new HUDBitmap (path, animation));
-		hud_bitmaps.insert (std::make_pair (path, bitmap));
+		hud_bitmaps.emplace (path, bitmap);
 	}
 	catch (std::exception& e)
 	{
@@ -271,7 +271,7 @@ OSL::subscribe_links (const Flavor& flavor, const Object& source,
 	}
 
 	LinkContext context = { flavor, source };
-	link_subscriptions.insert (std::make_pair (context, host));
+	link_subscriptions.emplace (context, host);
 	return true;
 }
 
@@ -355,11 +355,11 @@ OSL::subscribe_property (const Property& property, const Object& object,
 	{
 		auto handle = property.iface->Listen
 			(63, on_property_event, nullptr);
-		listened_properties.insert (std::make_pair (property, handle));
+		listened_properties.emplace (property, handle);
 	}
 
 	ObjectProperty context (property, object);
-	property_subscriptions.insert (std::make_pair (context, host));
+	property_subscriptions.emplace (context, host);
 	return true;
 }
 
@@ -466,7 +466,7 @@ OSL::subscribe_conversation (const Object& conversation, const Object& _host)
 		listened_conversations = true;
 	}
 
-	conversation_subscriptions.insert (std::make_pair (conversation, host));
+	conversation_subscriptions.emplace (conversation, host);
 	return true;
 }
 
@@ -525,6 +525,10 @@ ThiefLibOSLInit (IScriptMan* manager, MPrintfProc mprintf, IMalloc* allocator)
 	if (Thief::OSL::self)
 		return true; // A copy of the OSL service already exists.
 
+#ifdef DEBUG_OSL
+	if (mprintf) mprintf ("ThiefLib support library loading...\n");
+#endif
+
 	// Attach various ThiefLib components to the engine.
 	if (!manager || !allocator) return false;
 	Thief::LG = manager;
@@ -552,6 +556,10 @@ ThiefLibOSLInit (IScriptMan* manager, MPrintfProc mprintf, IMalloc* allocator)
 				"library.\n");
 		return false;
 	}
+
+#ifdef DEBUG_OSL
+	if (mprintf) mprintf ("ThiefLib support library loaded.\n");
+#endif
 
 	return true;
 }

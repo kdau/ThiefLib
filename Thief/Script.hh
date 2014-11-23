@@ -1,7 +1,7 @@
 //! \file Script.hh Base classes and utilities for custom scripts.
 
 /*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *  Adapted in part from TWScript
@@ -56,7 +56,7 @@ struct MessageHandler
 {
 	/*! A pointer to a message handler structure.
 	 * These structures are created internally and destroyed automatically. */
-	typedef std::unique_ptr<MessageHandler> Ptr;
+	typedef std::shared_ptr<MessageHandler> Ptr;
 
 	/*! Handles a message by wrapping it and passing it to the given script.
 	 * Derived classes must implement this method and use a message wrapper
@@ -505,9 +505,9 @@ protected:
 	virtual void initialize ();
 
 	/*! Sends a trigger message along \a ControlDevice links.
-	 * This method replicates the behavior of most standard trigger scripts.
-	 * Each object that is the destination of a \a ControlDevice link from
-	 * the script's host object will receive the message.
+	 * This method replicates the basic behavior of most standard trigger
+	 * scripts. Each object that is the destination of a \a ControlDevice
+	 * link from the script's host object will receive the message.
 	 * \param on Whether to send \c "TurnOn" (\c true) or \c "TurnOff"
 	 * (\c false). \param conditional Whether to \a not send the message if
 	 * the host object is locked. If \a conditional is \c true and the
@@ -525,7 +525,7 @@ protected:
 	 * implement a trap response. The base version does nothing.
 	 * \param on Whether the processed message is \c TurnOn or \c TurnOff.
 	 * \param message The underlying message that resulted in this trap
-	 * activation. Its name and type are not guaranteed. */
+	 * activation. Its name and detailed type are not guaranteed. */
 	virtual Message::Result on_trap (bool on, Message& message);
 
 private:
@@ -576,7 +576,7 @@ public:
 	 * Any previous cycle will be aborted. */
 	void start ();
 
-	/*! Returns whether the transition is not currently in progress.
+	/*! Returns whether the transition is \a not currently in progress.
 	 * This could be during the last step (progress is \c 1.0) or outside
 	 * the transition cycle. */
 	bool is_finished () const;

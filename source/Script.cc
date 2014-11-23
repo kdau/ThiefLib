@@ -2,7 +2,7 @@
  *  Script.cc
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *  Adapted in part from TWScript
@@ -506,11 +506,11 @@ Transition::~Transition ()
 {
 	try
 	{
+		// Remove self as a timer handler from the host.
 		for (auto iter = host.timer_handlers.begin ();
 		     iter != host.timer_handlers.end (); ++iter)
 			if (iter->second.get () == this)
 			{
-				iter->second.release ();
 				host.timer_handlers.erase (iter);
 				break;
 			}
@@ -518,14 +518,19 @@ Transition::~Transition ()
 	catch (...) {}
 }
 
+static void
+Transition_noop_delete (Transition*)
+{}
+
 void
 Transition::initialize ()
 {
-	/* Creating a unique_ptr to this is horrible. It only works because
-	 * Transition's destructor removes and releases the pointer before
-	 * Script's destructor can get to it. The alternative is a unique_ptr
-	 * wrapper with conditional deletion, which seems excessive. */
-	host.timer_handlers.insert (std::make_pair ("TransitionStep", this));
+	// Add self as a timer handler on the host. The no-op deleter allows
+	// Transition, which is usually created as a member of script classes,
+	// to be referred to by a shared_ptr without risk of early or double
+	// destruction.
+	host.timer_handlers.emplace ("TransitionStep",
+		MessageHandler::Ptr (this, Transition_noop_delete));
 }
 
 void
