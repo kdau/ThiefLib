@@ -1,7 +1,7 @@
 //! \file Property.inl
 
 /*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -131,9 +131,9 @@ inline
 THIEF_FIELD_PROXY_CLASS (PropField)::PropField (Object& _object, size_t _index)
 	: object (_object), index (_index)
 {
-	if (index >= config.count)
+	if (index >= config->count)
 		throw std::out_of_range ("bad field index");
-	if (!config.items [index].major)
+	if (!config->items [index].major)
 		throw std::runtime_error ("no property specified");
 }
 
@@ -141,21 +141,21 @@ THIEF_FIELD_PROXY_TEMPLATE
 inline bool
 THIEF_FIELD_PROXY_CLASS (PropField)::exists () const
 {
-	return ObjectProperty (config.items [index].major, object).exists ();
+	return ObjectProperty (config->items [index].major, object).exists ();
 }
 
 THIEF_FIELD_PROXY_TEMPLATE
 inline bool
 THIEF_FIELD_PROXY_CLASS (PropField)::instantiate ()
 {
-	return ObjectProperty (config.items [index].major, object).instantiate ();
+	return ObjectProperty (config->items [index].major, object).instantiate ();
 }
 
 THIEF_FIELD_PROXY_TEMPLATE
 inline bool
 THIEF_FIELD_PROXY_CLASS (PropField)::remove ()
 {
-	return ObjectProperty (config.items [index].major, object).remove ();
+	return ObjectProperty (config->items [index].major, object).remove ();
 }
 
 THIEF_FIELD_PROXY_TEMPLATE
@@ -164,9 +164,9 @@ THIEF_FIELD_PROXY_CLASS (PropField)::operator Type () const
 {
 	LGMulti<sMultiParm> raw;
 	if (exists ())
-		get (object, config.items [index].major,
-			config.items [index].minor, raw);
-	return config.getter (config.items [index], raw);
+		get (object, config->items [index].major,
+			config->items [index].minor, raw);
+	return config->getter (config->items [index], raw);
 }
 
 THIEF_FIELD_PROXY_TEMPLATE
@@ -175,10 +175,10 @@ THIEF_FIELD_PROXY_CLASS (PropField)::operator = (const Type& value)
 {
 	LGMulti<sMultiParm> raw;
 	if (exists ())
-		get (object, config.items [index].major,
-			config.items [index].minor, raw);
-	config.setter (config.items [index], raw, value);
-	set (object, config.items [index].major, config.items [index].minor,
+		get (object, config->items [index].major,
+			config->items [index].minor, raw);
+	config->setter (config->items [index], raw, value);
+	set (object, config->items [index].major, config->items [index].minor,
 		raw);
 	return *this;
 }

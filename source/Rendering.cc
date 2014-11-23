@@ -2,7 +2,7 @@
  *  Rendering.cc
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -225,8 +225,8 @@ Bitmapped::is_bitmapped () const
 // property that causes it to ignore the green and blue channels when set
 // through an LGMulti of type INT.
 template<>
-PropField<Color, Bitmapped::F_bitmap_color>&
-PropField<Color, Bitmapped::F_bitmap_color>::operator = (const Color& value)
+PropField<Color, &Bitmapped::F_bitmap_color>&
+PropField<Color, &Bitmapped::F_bitmap_color>::operator = (const Color& value)
 {
 	set_raw (object, "BitmapColor", reinterpret_cast<void*> (long (value)));
 	return *this;

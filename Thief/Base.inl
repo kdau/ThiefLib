@@ -1,7 +1,7 @@
 //! \file Base.inl
 
 /*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -556,24 +556,24 @@ FieldProxyConfig<Type>::default_setter (const Item&, LGMultiBase& multi,
 #define THIEF_FIELD_PROXY(ProxyType, Type, Specifiers, Name) \
 static const FieldProxyConfig<Type>::Item I_##Name; \
 static const FieldProxyConfig<Type> F_##Name; \
-Specifiers ProxyType<Type, F_##Name> Name;
+Specifiers ProxyType<Type, &F_##Name> Name;
 
 #define THIEF_FIELD_PROXY_ARRAY(ProxyType, Type, Count, Specifiers, Name) \
 static const FieldProxyConfig<Type>::Item I_##Name [Count]; \
 static const FieldProxyConfig<Type> F_##Name; \
-Specifiers ProxyType<Type, F_##Name> Name [Count];
+Specifiers ProxyType<Type, &F_##Name> Name [Count];
 
 #define THIEF_FIELD_PROXY_TEMPLATE \
-template <typename Type, const FieldProxyConfig<Type>& config>
+template <typename Type, const FieldProxyConfig<Type>* config>
 
 #define THIEF_FIELD_PROXY_CLASS(Name) Name<Type, config>
 
 #define THIEF_SPECIALIZE_FIELD_PROXY_GET(ProxyType, Type, Class, Member) \
-template<> ProxyType<Type, Class::F_##Member>::operator Type () const;
+template<> ProxyType<Type, &Class::F_##Member>::operator Type () const;
 
 #define THIEF_SPECIALIZE_FIELD_PROXY_SET(ProxyType, Type, Class, Member) \
-template<> ProxyType<Type, Class::F_##Member>& \
-ProxyType<Type, Class::F_##Member>::operator = (const Type&);
+template<> ProxyType<Type, &Class::F_##Member>& \
+ProxyType<Type, &Class::F_##Member>::operator = (const Type&);
 
 
 

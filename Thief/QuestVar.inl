@@ -1,7 +1,7 @@
 //! \file QuestVar.inl.
 
 /*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -102,7 +102,7 @@ THIEF_FIELD_PROXY_CLASS (QuestField)::operator Type () const
 {
 	QuestVar _qvar (qvar ());
 	return _qvar.exists () ? Type (_qvar.get ())
-		: config.items [index].default_value;
+		: config->items [index].default_value;
 }
 
 THIEF_FIELD_PROXY_TEMPLATE
@@ -131,9 +131,9 @@ THIEF_FIELD_PROXY_TEMPLATE
 inline QuestVar
 THIEF_FIELD_PROXY_CLASS (QuestField)::qvar (bool major) const
 {
-	return QuestVar ((boost::format (major ? config.items [index].major
-		: config.items [index].minor) % numbered.number).str (),
-		QuestVar::Scope (config.items [index].detail));
+	return QuestVar ((boost::format (major ? config->items [index].major
+		: config->items [index].minor) % numbered.number).str (),
+		QuestVar::Scope (config->items [index].detail));
 }
 
 
@@ -205,7 +205,7 @@ THIEF_FIELD_PROXY_CLASS (DoubleQuestField)::unsubscribe (const Object& host)
 extern const FieldProxyConfig<Difficulty> F_objective_difficulty;
 
 class DifficultyQuestField
-	: public DoubleQuestField<Difficulty, F_objective_difficulty>
+	: public DoubleQuestField<Difficulty, &F_objective_difficulty>
 {
 public:
 	DifficultyQuestField (Numbered&, size_t index = 0u);
@@ -216,7 +216,8 @@ public:
 
 inline
 DifficultyQuestField::DifficultyQuestField (Numbered& _numbered, size_t _index)
-	: DoubleQuestField<Difficulty, F_objective_difficulty> (_numbered, _index)
+	: DoubleQuestField<Difficulty, &F_objective_difficulty> (_numbered,
+		_index)
 {}
 
 #endif // !IS_DOXYGEN
@@ -232,7 +233,7 @@ DifficultyQuestField::DifficultyQuestField (Numbered& _numbered, size_t _index)
 extern const FieldProxyConfig<std::bitset<8>> F_objective_specials;
 
 class SpecialsQuestField
-	: public DoubleQuestField<std::bitset<8>, F_objective_specials>
+	: public DoubleQuestField<std::bitset<8>, &F_objective_specials>
 {
 public:
 	SpecialsQuestField (Numbered&, size_t index = 0u);
@@ -243,7 +244,7 @@ public:
 
 inline
 SpecialsQuestField::SpecialsQuestField (Numbered& _numbered, size_t _index)
-	: DoubleQuestField<std::bitset<8>, F_objective_specials> (_numbered,
+	: DoubleQuestField<std::bitset<8>, &F_objective_specials> (_numbered,
 		_index)
 {}
 

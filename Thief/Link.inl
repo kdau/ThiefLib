@@ -1,7 +1,7 @@
 //! \file Link.inl
 
 /*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -132,7 +132,7 @@ inline
 THIEF_FIELD_PROXY_CLASS (LinkField)::LinkField (Link& _link, size_t _index)
 	: link (_link), index (_index)
 {
-	if (index >= config.count)
+	if (index >= config->count)
 		throw std::out_of_range ("bad field index");
 }
 
@@ -141,8 +141,8 @@ inline
 THIEF_FIELD_PROXY_CLASS (LinkField)::operator Type () const
 {
 	LGMulti<sMultiParm> raw;
-	link._get_data_field (config.items [index].major, raw);
-	return config.getter (config.items [index], raw);
+	link._get_data_field (config->items [index].major, raw);
+	return config->getter (config->items [index], raw);
 }
 
 THIEF_FIELD_PROXY_TEMPLATE
@@ -150,9 +150,9 @@ inline THIEF_FIELD_PROXY_CLASS (LinkField)&
 THIEF_FIELD_PROXY_CLASS (LinkField)::operator = (const Type& value)
 {
 	LGMulti<sMultiParm> raw;
-	link._get_data_field (config.items [index].major, raw);
-	config.setter (config.items [index], raw, value);
-	link._set_data_field (config.items [index].major, raw);
+	link._get_data_field (config->items [index].major, raw);
+	config->setter (config->items [index], raw, value);
+	link._set_data_field (config->items [index].major, raw);
 	return *this;
 }
 
