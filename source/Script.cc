@@ -247,11 +247,8 @@ Script::dispatch (sScrMsg& message, sMultiParm* reply, unsigned trace)
 		return true; // Silently ignore these to avoid extra work.
 
 	mono ((trace != kNoAction) ? Log::NORMAL : Log::VERBOSE)
-		<< "Got message \"" << message.message << '\"'
-#ifdef DEBUG
-		<< " of type " << message.Persistent_GetName ()
-#endif
-		<< (trace == kBreak ? ". Breaking." : ".") << std::endl;
+		<< "Got message \"" << message.message << "\"."
+		<< (trace == kBreak ? " Breaking." : "") << std::endl;
 
 	if (trace == kBreak)
 		asm ("int $0x3");

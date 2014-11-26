@@ -2,7 +2,7 @@
  *  Property.cc
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -95,8 +95,7 @@ Property::get_number () const
 
 // PropertyMessage
 
-MESSAGE_WRAPPER_IMPL_ (PropertyMessage,
-	MESSAGE_TYPENAME_TEST ("PropertyMessageImpl")),
+MESSAGE_WRAPPER_IMPL (PropertyMessage, "PropertyChange"),
 	event (MESSAGE_AS (PropertyMessageImpl)->event),
 	inherited (MESSAGE_AS (PropertyMessageImpl)->inherited),
 	property (MESSAGE_AS (PropertyMessageImpl)->property),

@@ -197,12 +197,6 @@ Message::_set_data (Slot slot, const LGMultiBase& value)
 	}
 }
 
-const char*
-Message::get_lg_typename () const
-{
-	return message->Persistent_GetName ();
-}
-
 bool
 Message::is_postable () const
 {
@@ -215,10 +209,9 @@ Message::is_postable () const
 
 MessageWrapError::MessageWrapError (const sScrMsg* message,
 	const char* wrap_type, const char* problem) noexcept
-	: explanation ((boost::format ("Can't wrap a \"%||\" message of engine "
-		"type %|| as a %||: %||.")
+	: explanation ((boost::format
+		("Can't wrap a \"%||\" message as a %||: %||.")
 		% ((message && message->message) ? message->message : "")
-		% (message ? message->Persistent_GetName () : "null")
 		% (wrap_type ? wrap_type : "Message")
 		% (problem ? problem : "an unknown error occurred")).str ())
 {}
@@ -249,7 +242,7 @@ GenericMessage::GenericMessage (const char* name)
 
 // TimerMessage
 
-MESSAGE_WRAPPER_IMPL (TimerMessage, sScrTimerMsg),
+MESSAGE_WRAPPER_IMPL (TimerMessage, "Timer"),
 	timer_name (MESSAGE_AS (sScrTimerMsg)->name)
 {}
 
@@ -264,7 +257,10 @@ TimerMessage::TimerMessage (const String& _timer_name)
 
 // LinkMessage
 
-MESSAGE_WRAPPER_IMPL_ (LinkMessage, MESSAGE_TYPENAME_TEST ("LinkMessageImpl")),
+MESSAGE_WRAPPER_IMPL_ (LinkMessage,
+		MESSAGE_NAME_TEST ("LinkCreate") ||
+		MESSAGE_NAME_TEST ("LinkChange") ||
+		MESSAGE_NAME_TEST ("LinkDestroy")),
 	event (MESSAGE_AS (LinkMessageImpl)->event),
 	flavor (MESSAGE_AS (LinkMessageImpl)->flavor),
 	link (MESSAGE_AS (LinkMessageImpl)->link),

@@ -2,7 +2,7 @@
  *  Mission.cc
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -44,8 +44,7 @@ THIEF_ENUM_CODING (Difficulty, BOTH, VALUE,
 
 // DifficultyMessage
 
-// "Difficulty" reports as "sScrMsg", so it can't be tested by type.
-MESSAGE_WRAPPER_IMPL_ (DifficultyMessage, MESSAGE_NAME_TEST ("Difficulty")),
+MESSAGE_WRAPPER_IMPL (DifficultyMessage, "Difficulty"),
 	difficulty (Difficulty (MESSAGE_AS (sDiffScrMsg)->difficulty))
 {}
 

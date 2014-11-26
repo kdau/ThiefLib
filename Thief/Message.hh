@@ -224,8 +224,6 @@ protected:
 
 	sScrMsg* const message;
 
-	const char* get_lg_typename () const;
-
 	virtual bool is_postable () const;
 
 	template <typename, typename> friend struct ScriptMessageHandler;

@@ -2,7 +2,7 @@
  *  Engine.cc
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -465,9 +465,7 @@ Engine::write_to_game_log (const String& message)
 
 // GameModeMessage
 
-// "DarkGameModeChange" reports as "sScrMsg", so it can't be tested by type.
-MESSAGE_WRAPPER_IMPL_ (GameModeMessage,
-	MESSAGE_NAME_TEST ("DarkGameModeChange")),
+MESSAGE_WRAPPER_IMPL (GameModeMessage, "DarkGameModeChange"),
 	event (MESSAGE_AS (sDarkGameModeScrMsg)->fResuming ? RESUME : SUSPEND)
 {}
 
@@ -483,7 +481,7 @@ GameModeMessage::GameModeMessage (Event _event)
 
 // SimMessage
 
-MESSAGE_WRAPPER_IMPL (SimMessage, sSimMsg),
+MESSAGE_WRAPPER_IMPL (SimMessage, "Sim"),
 	event (MESSAGE_AS (sSimMsg)->fStarting ? START : FINISH)
 {}
 

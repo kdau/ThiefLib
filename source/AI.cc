@@ -2,7 +2,7 @@
  *  AI.cc
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -605,7 +605,7 @@ DetailAttachementLink::create (const Object& source, const Object& dest,
 
 // AIActionResultMessage
 
-MESSAGE_WRAPPER_IMPL (AIActionResultMessage, sAIObjActResultMsg),
+MESSAGE_WRAPPER_IMPL (AIActionResultMessage, "ObjActResult"),
 	action (Action (MESSAGE_AS (sAIObjActResultMsg)->action)),
 	result (Result (MESSAGE_AS (sAIObjActResultMsg)->result)),
 	target (MESSAGE_AS (sAIObjActResultMsg)->target)
@@ -634,8 +634,7 @@ AIActionResultMessage::_get_result_data (LGMultiBase& value) const
 // AIAlertnessMessage
 
 MESSAGE_WRAPPER_IMPL_ (AIAlertnessMessage,
-	MESSAGE_TYPENAME_TEST ("sAIAlertnessMsg") ||
-	MESSAGE_TYPENAME_TEST ("sAIHighAlertMsg")),
+	MESSAGE_NAME_TEST ("Alertness") || MESSAGE_NAME_TEST ("HighAlert")),
 	high_alert (MESSAGE_NAME_TEST ("HighAlert")),
 	new_level (AI::Alert (MESSAGE_AS (sAIAlertnessMsg)->level)),
 	old_level (AI::Alert (MESSAGE_AS (sAIAlertnessMsg)->oldLevel))
@@ -665,7 +664,7 @@ AIAlertnessMessage::AIAlertnessMessage (AI::Alert _new_level,
 
 // AIModeMessage
 
-MESSAGE_WRAPPER_IMPL (AIModeMessage, sAIModeChangeMsg),
+MESSAGE_WRAPPER_IMPL (AIModeMessage, "AIModeChange"),
 	new_mode (AI::Mode (MESSAGE_AS (sAIModeChangeMsg)->mode)),
 	old_mode (AI::Mode (MESSAGE_AS (sAIModeChangeMsg)->previous_mode))
 {}
@@ -683,7 +682,10 @@ AIModeMessage::AIModeMessage (AI::Mode _new_mode, AI::Mode _old_mode)
 
 // AIMotionMessage
 
-MESSAGE_WRAPPER_IMPL (AIMotionMessage, sBodyMsg),
+MESSAGE_WRAPPER_IMPL_ (AIMotionMessage,
+		MESSAGE_NAME_TEST ("MotionStart") ||
+		MESSAGE_NAME_TEST ("MotionFlagReached") ||
+		MESSAGE_NAME_TEST ("MotionEnd")),
 	event (Event (MESSAGE_AS (sBodyMsg)->ActionType)),
 	motion (MESSAGE_AS (sBodyMsg)->MotionName),
 	motion_flag (MESSAGE_AS (sBodyMsg)->FlagValue)
@@ -710,7 +712,7 @@ AIMotionMessage::AIMotionMessage (Event _event, const String& _motion,
 
 // AIPatrolPointMessage
 
-MESSAGE_WRAPPER_IMPL (AIPatrolPointMessage, sAIPatrolPointMsg),
+MESSAGE_WRAPPER_IMPL (AIPatrolPointMessage, "PatrolPoint"),
 	patrol_point (MESSAGE_AS (sAIPatrolPointMsg)->patrolObj)
 {}
 
@@ -725,7 +727,7 @@ AIPatrolPointMessage::AIPatrolPointMessage (const Object& _patrol_point)
 
 // AISignalMessage
 
-MESSAGE_WRAPPER_IMPL (AISignalMessage, sAISignalMsg),
+MESSAGE_WRAPPER_IMPL (AISignalMessage, "SignalAI"),
 	signal (MESSAGE_AS (sAISignalMsg)->signal)
 {}
 
@@ -740,7 +742,7 @@ AISignalMessage::AISignalMessage (const String& _signal)
 
 // ConversationMessage
 
-MESSAGE_WRAPPER_IMPL (ConversationMessage, ConversationMessageImpl),
+MESSAGE_WRAPPER_IMPL (ConversationMessage, "ConversationEnd"),
 	conversation (MESSAGE_AS (ConversationMessageImpl)->conversation)
 {}
 

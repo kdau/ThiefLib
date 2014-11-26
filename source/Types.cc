@@ -2,7 +2,7 @@
  *  Types.cc
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -53,8 +53,7 @@ Combinable::adjust_stack_count (int by, bool destroy_if_zero)
 
 // CombineMessage
 
-// "Combine" reports as "sScrMsg", so it can't be tested by type.
-MESSAGE_WRAPPER_IMPL_ (CombineMessage, MESSAGE_NAME_TEST ("Combine")),
+MESSAGE_WRAPPER_IMPL (CombineMessage, "Combine"),
 	stack (MESSAGE_AS (sCombineScrMsg)->combiner)
 {}
 
@@ -106,7 +105,7 @@ Damageable::resurrect (const Object& culprit)
 
 // DamageMessage
 
-MESSAGE_WRAPPER_IMPL (DamageMessage, sDamageScrMsg),
+MESSAGE_WRAPPER_IMPL (DamageMessage, "Damage"),
 	culprit (MESSAGE_AS (sDamageScrMsg)->culprit),
 	stimulus (MESSAGE_AS (sDamageScrMsg)->kind),
 	hit_points (MESSAGE_AS (sDamageScrMsg)->damage)
@@ -129,7 +128,7 @@ DamageMessage::DamageMessage (const Object& _culprit, const Object& _stimulus,
 
 // SlayMessage
 
-MESSAGE_WRAPPER_IMPL (SlayMessage, sSlayMsg),
+MESSAGE_WRAPPER_IMPL (SlayMessage, "Slain"),
 	culprit (MESSAGE_AS (sSlayMsg)->culprit),
 	stimulus (MESSAGE_AS (sSlayMsg)->kind)
 {}
@@ -252,7 +251,13 @@ FrobMessage::parse (const char* _name)
 		return Event (-1);
 }
 
-MESSAGE_WRAPPER_IMPL (FrobMessage, sFrobMsg),
+MESSAGE_WRAPPER_IMPL_ (FrobMessage,
+		MESSAGE_NAME_TEST ("FrobInvBegin") ||
+		MESSAGE_NAME_TEST ("FrobToolBegin") ||
+		MESSAGE_NAME_TEST ("FrobWorldBegin") ||
+		MESSAGE_NAME_TEST ("FrobInvEnd") ||
+		MESSAGE_NAME_TEST ("FrobToolEnd") ||
+		MESSAGE_NAME_TEST ("FrobWorldEnd")),
 	event (parse (message->message)),
 	frobber (MESSAGE_AS (sFrobMsg)->Frobber),
 	tool (MESSAGE_AS (sFrobMsg)->SrcObjId),
@@ -401,8 +406,6 @@ ContainsLink::create (const Object& source, const Object& dest,
 
 // ContainmentMessage
 
-// "Contained" and "Container" both report as "sScrMsg", so neither can be
-// tested by type.
 MESSAGE_WRAPPER_IMPL_ (ContainmentMessage,
 	MESSAGE_NAME_TEST ("Container") || MESSAGE_NAME_TEST ("Contained")),
 	subject (MESSAGE_NAME_TEST ("Container") ? CONTAINER : CONTENT),
@@ -551,7 +554,14 @@ Room::is_room () const
 
 // RoomMessage
 
-MESSAGE_WRAPPER_IMPL (RoomMessage, sRoomMsg),
+MESSAGE_WRAPPER_IMPL_ (RoomMessage,
+		MESSAGE_NAME_TEST ("PlayerRoomEnter") ||
+		MESSAGE_NAME_TEST ("CreatureRoomEnter") ||
+		MESSAGE_NAME_TEST ("ObjectRoomEnter") ||
+		MESSAGE_NAME_TEST ("PlayerRoomExit") ||
+		MESSAGE_NAME_TEST ("CreatureRoomExit") ||
+		MESSAGE_NAME_TEST ("ObjectRoomExit") ||
+		MESSAGE_NAME_TEST ("ObjRoomTransit")),
 	event (Event (MESSAGE_AS (sRoomMsg)->TransitionType)),
 	object_type (ObjectType (MESSAGE_AS (sRoomMsg)->ObjType)),
 	object (MESSAGE_AS (sRoomMsg)->MoveObjId),

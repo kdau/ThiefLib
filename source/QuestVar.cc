@@ -2,7 +2,7 @@
  *  QuestVar.cc
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -78,7 +78,7 @@ QuestVar::unsubscribe (const String& name, const Object& host)
 
 // QuestMessage
 
-MESSAGE_WRAPPER_IMPL (QuestMessage, sQuestMsg),
+MESSAGE_WRAPPER_IMPL (QuestMessage, "QuestChange"),
 	quest_var (MESSAGE_AS (sQuestMsg)->m_pName
 		? MESSAGE_AS (sQuestMsg)->m_pName : ""),
 	new_value (MESSAGE_AS (sQuestMsg)->m_newValue),
@@ -400,7 +400,8 @@ THIEF_ENUM_CODING (ObjectiveMessage::Field, CODE, CODE,
 )
 
 MESSAGE_WRAPPER_IMPL_ (ObjectiveMessage,
-	MESSAGE_TYPENAME_TEST ("sQuestMsg") &&
+	MESSAGE_NAME_TEST ("QuestChange") &&
+		static_cast<sQuestMsg*> (_message)->m_pName &&
 		parse (static_cast<sQuestMsg*> (_message)->m_pName).first
 			!= Objective::NONE),
 	objective (parse (MESSAGE_AS (sQuestMsg)->m_pName).first),

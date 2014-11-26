@@ -2,7 +2,7 @@
  *  Security.cc
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -213,7 +213,12 @@ translate_door_action (sDoorMsg::eDoorAction action)
 	}
 }
 
-MESSAGE_WRAPPER_IMPL (DoorMessage, sDoorMsg),
+MESSAGE_WRAPPER_IMPL_ (DoorMessage,
+		MESSAGE_NAME_TEST ("DoorClose") ||
+		MESSAGE_NAME_TEST ("DoorOpen") ||
+		MESSAGE_NAME_TEST ("DoorClosing") ||
+		MESSAGE_NAME_TEST ("DoorOpening") ||
+		MESSAGE_NAME_TEST ("DoorHalt")),
 	new_state (translate_door_action (MESSAGE_AS (sDoorMsg)->ActionType)),
 	old_state (translate_door_action (MESSAGE_AS (sDoorMsg)->PrevActionType))
 {
@@ -423,8 +428,7 @@ OBJECT_TYPE_IMPL_ (AdvPickable, Rendered (), Interactive (), Lockable (),
 
 // PickStateMessage
 
-// "PickStateChange" reports as "sScrMsg", so it can't be tested by type.
-MESSAGE_WRAPPER_IMPL_ (PickMessage, MESSAGE_NAME_TEST ("PickStateChange")),
+MESSAGE_WRAPPER_IMPL (PickMessage, "PickStateChange"),
 	new_stage (AdvPickable::Stage (MESSAGE_AS (sPickStateScrMsg)->NewState)),
 	old_stage (AdvPickable::Stage (MESSAGE_AS (sPickStateScrMsg)->PrevState))
 {}

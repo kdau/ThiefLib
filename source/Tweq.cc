@@ -2,7 +2,7 @@
  *  Tweq.cc
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -78,7 +78,7 @@ PROXY_BIT_CONFIG (Type, reversed, StateProp, "AnimS", 2u, false);
 
 // TweqMessage
 
-MESSAGE_WRAPPER_IMPL (TweqMessage, sTweqMsg),
+MESSAGE_WRAPPER_IMPL (TweqMessage, "TweqComplete"),
 	event (Event (MESSAGE_AS (sTweqMsg)->Op)),
 	tweq_type (Tweq::Type (MESSAGE_AS (sTweqMsg)->Type)),
 	direction (Tweq::Direction (MESSAGE_AS (sTweqMsg)->Dir))

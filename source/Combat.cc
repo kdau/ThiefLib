@@ -2,7 +2,7 @@
  *  Combat.cc
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -99,7 +99,10 @@ AIAttackMessage::parse (const char* _name)
 	return Event (-1);
 }
 
-MESSAGE_WRAPPER_IMPL (AIAttackMessage, sAttackMsg),
+MESSAGE_WRAPPER_IMPL_ (AIAttackMessage,
+		MESSAGE_NAME_TEST ("StartWindup") ||
+		MESSAGE_NAME_TEST ("StartAttack") ||
+		MESSAGE_NAME_TEST ("EndAttack")),
 	event (parse (message->message)),
 	weapon (MESSAGE_AS (sAttackMsg)->weapon)
 {
