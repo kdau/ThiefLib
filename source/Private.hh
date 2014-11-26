@@ -2,7 +2,7 @@
  *  Private.hh
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -132,7 +132,9 @@ class LGVector : public mxs_vector
 {
 public:
 	LGVector ()
-		{ x = y = z = 0.0f; }
+	{
+		x = y = z = 0.0f;
+	}
 
 	LGVector (const mxs_vector* copy)
 	{
@@ -142,12 +144,65 @@ public:
 	}
 
 	LGVector (const Vector& copy)
-		{ x = copy.x; y = copy.y; z = copy.z; }
+	{
+		x = copy.x;
+		y = copy.y;
+		z = copy.z;
+	}
 
 	operator Vector () const
 	{
 		return Vector (x, y, z);
 	}
+};
+
+
+
+// LinkMessageImpl
+
+struct LinkMessageImpl : public sScrMsg
+{
+	typedef LinkMessage::Event Event;
+
+	Event event;
+	Flavor flavor;
+	Link::Number link;
+	Object source, dest;
+
+	LinkMessageImpl ();
+	virtual ~LinkMessageImpl ();
+	virtual const char* __thiscall GetName () const;
+};
+
+
+
+// PropertyMessageImpl
+
+struct PropertyMessageImpl : public sScrMsg
+{
+	typedef PropertyMessage::Event Event;
+
+	Event event;
+	bool inherited;
+	Property property;
+	Object object;
+
+	PropertyMessageImpl ();
+	virtual ~PropertyMessageImpl ();
+	virtual const char* __thiscall GetName () const;
+};
+
+
+
+// ConversationMessageImpl
+
+struct ConversationMessageImpl : public sScrMsg
+{
+	Object conversation;
+
+	ConversationMessageImpl ();
+	virtual ~ConversationMessageImpl ();
+	virtual const char* __thiscall GetName () const;
 };
 
 

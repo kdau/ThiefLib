@@ -518,10 +518,6 @@ Transition::~Transition ()
 	catch (...) {}
 }
 
-static void
-Transition_noop_delete (Transition*)
-{}
-
 void
 Transition::initialize ()
 {
@@ -530,7 +526,7 @@ Transition::initialize ()
 	// to be referred to by a shared_ptr without risk of early or double
 	// destruction.
 	host.timer_handlers.emplace ("TransitionStep",
-		MessageHandler::Ptr (this, Transition_noop_delete));
+		MessageHandler::Ptr (this, [] (Transition*) {}));
 }
 
 void

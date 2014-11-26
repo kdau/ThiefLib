@@ -337,7 +337,8 @@ private:
  * directly inherits. (This does not appear to be used anywhere.)
  * \param Class The name of the class implementing the script. */
 #define THIEF_SCRIPT(Name, Parent, Class) \
-{ ScriptModule::real_name, Name, Parent, \
+{ \
+	ScriptModule::real_name, Name, Parent, \
 	[] (const char* name, int host) __cdecl \
 	{ \
 		if (_stricmp (name, Name) == 0) \

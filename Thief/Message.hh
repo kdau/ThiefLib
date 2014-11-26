@@ -1,7 +1,7 @@
 //! \file Message.hh Event notifications sent to and between scripts.
 
 /*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *  Adapted in part from TWScript
@@ -271,11 +271,10 @@ public:
 		const char* problem) noexcept;
 
 	//! Destroys a message-wrapping exception.
-	virtual ~MessageWrapError () noexcept {}
+	virtual ~MessageWrapError () noexcept;
 
 	//! Returns a string describing the exception.
-	virtual const char* what () const noexcept
-		{ return explanation.data (); }
+	virtual const char* what () const noexcept;
 
 private:
 	String explanation;

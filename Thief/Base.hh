@@ -2,7 +2,7 @@
  * throughout ThiefLib.
  */
 /*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -519,11 +519,10 @@ public:
 	MissingResource (const Object& object) noexcept;
 
 	//! Destroys a missing resource exception.
-	virtual ~MissingResource () noexcept {}
+	virtual ~MissingResource () noexcept;
 
 	//! Returns a string describing the exception.
-	virtual const char* what () const noexcept
-		{ return explanation.data (); }
+	virtual const char* what () const noexcept;
 
 private:
 	String explanation;

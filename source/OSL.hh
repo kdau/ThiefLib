@@ -2,7 +2,7 @@
  *  OSL.hh
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Dark Hook 2
  *  Copyright (C) 2005-2011 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -72,79 +72,6 @@ interface IOSLService : IScriptServiceBase
 extern "C" const GUID IID_IOSLService;
 #define THIEF_IOSLService_GUID { 0x709a2033, 0x3d7e, 0x4424, \
 		{ 0x97, 0x1d, 0xed, 0xf5, 0x55, 0x45, 0x2b, 0x01 } }
-
-
-
-// LinkMessageImpl
-
-struct LinkMessageImpl : public sScrMsg
-{
-	typedef LinkMessage::Event Event;
-
-	Event event;
-	Flavor flavor;
-	Link::Number link;
-	Object source, dest;
-
-	LinkMessageImpl ()
-		: sScrMsg (),
-		  event (Event::CHANGE),
-		  flavor (Flavor::ANY), link (Link::NONE.number),
-		  source (), dest ()
-	{}
-
-	virtual ~LinkMessageImpl ()
-	{}
-
-	virtual const char* __thiscall GetName () const
-		{ return "LinkMessageImpl"; }
-};
-
-
-
-// PropertyMessageImpl
-
-struct PropertyMessageImpl : public sScrMsg
-{
-	typedef PropertyMessage::Event Event;
-
-	Event event;
-	bool inherited;
-	Property property;
-	Object object;
-
-	PropertyMessageImpl ()
-		: sScrMsg (),
-		  event (Event::CHANGE), inherited (false),
-		  property (Property::NONE), object ()
-	{}
-
-	virtual ~PropertyMessageImpl ()
-	{}
-
-	virtual const char* __thiscall GetName () const
-		{ return "PropertyMessageImpl"; }
-};
-
-
-
-// ConversationMessageImpl
-
-struct ConversationMessageImpl : public sScrMsg
-{
-	Object conversation;
-
-	ConversationMessageImpl ()
-		: sScrMsg (),
-		  conversation ()
-	{}
-
-	virtual ~ConversationMessageImpl ()
-	{}
-
-	virtual const char* __thiscall GetName () const
-		{ return "ConversationMessageImpl"; }
-};
 
 
 

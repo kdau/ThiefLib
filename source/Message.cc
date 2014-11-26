@@ -2,7 +2,7 @@
  *  Message.cc
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *  Adapted in part from TWScript
@@ -222,6 +222,15 @@ MessageWrapError::MessageWrapError (const sScrMsg* message,
 		% (wrap_type ? wrap_type : "Message")
 		% (problem ? problem : "an unknown error occurred")).str ())
 {}
+
+MessageWrapError::~MessageWrapError () noexcept
+{}
+
+const char*
+MessageWrapError::what () const noexcept
+{
+	return explanation.data ();
+}
 
 
 

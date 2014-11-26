@@ -2,7 +2,7 @@
  *  Private.cc
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -106,10 +106,10 @@ Allocator::Allocator()
 
 Allocator::~Allocator()
 {
-	// module_name leaked intentionally
 	if (malloc) malloc->Release ();
 #ifdef DEBUG
 	if (dbmalloc) dbmalloc->Release ();
+	// module_name leaked intentionally
 #endif
 }
 
@@ -121,18 +121,21 @@ Allocator::attach (IMalloc* allocator, const char* _module_name)
 
 	allocator->QueryInterface (IID_IMalloc,
 		reinterpret_cast<void**>(&malloc));
+
 #ifdef DEBUG
 	allocator->QueryInterface (IID_IDebugMalloc,
 		reinterpret_cast<void**>(&dbmalloc));
 
-	size_t namelen = strlen (_module_name) + sizeof ("ThiefLib allocator []");
+	size_t namelen = (_module_name ? strlen (_module_name) : 3) +
+		sizeof ("ThiefLib allocator []");
 	module_name = static_cast<char*> (allocator->Alloc (namelen));
 	strcpy (module_name, "ThiefLib allocator [");
-	strcat (module_name, _module_name);
+	strcat (module_name, _module_name ? _module_name : "???");
 	strcat (module_name, "]");
 #else
 	(void) _module_name;
 #endif
+
 	assert (malloc != nullptr);
 }
 
@@ -265,6 +268,67 @@ XYZColor::XYZColor (const LabColor& lab)
 	X = std::max (0.0, std::min (1.0, D65_WHITE.X * Lab_invf (_X)));
 	Y = std::max (0.0, std::min (1.0, D65_WHITE.Y * Lab_invf (_Y)));
 	Z = std::max (0.0, std::min (1.0, D65_WHITE.Z * Lab_invf (_Z)));
+}
+
+
+
+// LinkMessageImpl
+
+LinkMessageImpl::LinkMessageImpl ()
+	: sScrMsg (),
+	  event (Event::CHANGE),
+	  flavor (Flavor::ANY),
+	  link (Link::NONE.number),
+	  source (),
+	  dest ()
+{}
+
+LinkMessageImpl::~LinkMessageImpl ()
+{}
+
+const char* __thiscall
+LinkMessageImpl::GetName () const
+{
+	return "LinkMessageImpl";
+}
+
+
+
+// PropertyMessageImpl
+
+PropertyMessageImpl::PropertyMessageImpl ()
+	: sScrMsg (),
+	  event (Event::CHANGE),
+	  inherited (false),
+	  property (Property::NONE),
+	  object ()
+{}
+
+PropertyMessageImpl::~PropertyMessageImpl ()
+{}
+
+const char* __thiscall
+PropertyMessageImpl::GetName () const
+{
+	return "PropertyMessageImpl";
+}
+
+
+
+// ConversationMessageImpl
+
+ConversationMessageImpl::ConversationMessageImpl ()
+	: sScrMsg (),
+	  conversation ()
+{}
+
+ConversationMessageImpl::~ConversationMessageImpl ()
+{}
+
+const char* __thiscall
+ConversationMessageImpl::GetName () const
+{
+	return "ConversationMessageImpl";
 }
 
 
