@@ -1,7 +1,7 @@
 //! \file Mission.hh Global aspects of a mission and its interface
 
 /*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -349,7 +349,8 @@ public:
 	 * \param texture A path a bitmap image file, relative to the game or FM
 	 * main  directory. The file should not be used as a terrain or object
 	 * texture in the same mission. An empty string clears the texture for
-	 * the given zone. */
+	 * the given zone. \pre This method is only functional with NewDark
+	 * version 1.20 or later. On earlier versions, it raises an exception. */
 	static void set_envmap_texture (unsigned zone, const String& texture);
 
 	//! Returns the current Fog settings for the given zone.
@@ -410,6 +411,18 @@ public:
 	 * executable as well as DromEd. */
 	static void show_book (const String& book, const String& art,
 		bool reload = false);
+
+	/*! Returns whether book decals in the specified group are visible.
+	 * \param group The group ID to check. \pre This method is only
+	 * functional with NewDark version 1.22 or later. On earlier versions,
+	 * it raises an exception. */
+	static bool get_book_decals_visible (unsigned group);
+
+	/*! Sets whether book decals in the specified group are visible.
+	 * \param group The group ID to check. \pre This method is only
+	 * functional with NewDark version 1.22 or later. On earlier versions,
+	 * it raises an exception. */
+	static void set_book_decals_visible (unsigned group, bool visible);
 
 	//@}
 	//! \name Other metagame screens

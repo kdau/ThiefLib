@@ -368,6 +368,30 @@ Mission::show_book (const String& book, const String& art, bool reload)
 		SService<IDarkUISrv> (LG)->ReadBook (book.data (), art.data ());
 }
 
+bool
+Mission::get_book_decals_visible (unsigned group)
+{
+	if (Engine::get_version () < Version (1, 22))
+		throw std::runtime_error ("Mission::get_book_decals_visible is "
+			"not implemented before engine version 1.22.");
+
+	int series = group / 32, bit = 1 << (group % 32);
+	QuestVar qvar ((boost::format ("BOOK_DECALS_HIDDEN%||") % series).str ());
+	return !(qvar & bit);
+}
+
+void
+Mission::set_book_decals_visible (unsigned group, bool visible)
+{
+	if (Engine::get_version () < Version (1, 22))
+		throw std::runtime_error ("Mission::set_book_decals_visible is "
+			"not implemented before engine version 1.22.");
+
+	int series = group / 32, bit = 1 << (group % 32);
+	QuestVar qvar ((boost::format ("BOOK_DECALS_HIDDEN%||") % series).str ());
+	qvar = visible ? qvar & ~bit : qvar | bit;
+}
+
 
 
 // Mission: other information screens
