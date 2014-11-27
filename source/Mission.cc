@@ -240,8 +240,8 @@ void
 Mission::set_envmap_texture (unsigned zone, const String& texture)
 {
 	if (Engine::get_version () < Version (1, 20))
-		throw std::runtime_error ("Mission::set_envmap_texture is not "
-			"implemented before engine version 1.20.");
+		throw std::runtime_error ("Mission::set_envmap_texture"
+			" is not implemented before engine version 1.20.");
 
 	if (zone >= 64u)
 		throw std::out_of_range ("bad environment map zone");
@@ -372,8 +372,8 @@ bool
 Mission::get_book_decals_visible (unsigned group)
 {
 	if (Engine::get_version () < Version (1, 22))
-		throw std::runtime_error ("Mission::get_book_decals_visible is "
-			"not implemented before engine version 1.22.");
+		throw std::runtime_error ("Mission::get_book_decals_visible"
+			" is not implemented before engine version 1.22.");
 
 	int series = group / 32, bit = 1 << (group % 32);
 	QuestVar qvar ((boost::format ("BOOK_DECALS_HIDDEN%||") % series).str ());
@@ -384,8 +384,8 @@ void
 Mission::set_book_decals_visible (unsigned group, bool visible)
 {
 	if (Engine::get_version () < Version (1, 22))
-		throw std::runtime_error ("Mission::set_book_decals_visible is "
-			"not implemented before engine version 1.22.");
+		throw std::runtime_error ("Mission::set_book_decals_visible"
+			" is not implemented before engine version 1.22.");
 
 	int series = group / 32, bit = 1 << (group % 32);
 	QuestVar qvar ((boost::format ("BOOK_DECALS_HIDDEN%||") % series).str ());

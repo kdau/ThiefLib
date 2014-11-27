@@ -23,6 +23,8 @@
 
 #include "Private.hh"
 
+#undef OPTIONAL // ugh, Windows...
+
 namespace Thief {
 
 

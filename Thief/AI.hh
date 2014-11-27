@@ -2,7 +2,7 @@
  *  AI.hh
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -129,7 +129,7 @@ public:
 	// Alertness and awareness
 
 	THIEF_PROP_FIELD (bool, notices_bodies); //TESTME
-	THIEF_PROP_FIELD (bool, notices_cameras); //TESTME
+	THIEF_PROP_FIELD (bool, notices_watchers); //TESTME
 	THIEF_PROP_FIELD (bool, notices_damage); //TESTME
 	THIEF_PROP_FIELD (bool, notices_other_ai); //TESTME
 	THIEF_PROP_FIELD (bool, notices_projectiles); //TESTME

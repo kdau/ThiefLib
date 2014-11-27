@@ -2,7 +2,7 @@
  *  Player.hh
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -29,6 +29,8 @@
 #include <Thief/Types.hh>
 
 namespace Thief {
+
+
 
 class Player : public Being
 {
@@ -105,14 +107,34 @@ public:
 
 	// Miscellaneous
 
-	void attach_camera (const Object& camera, bool freelook);
-	bool detach_camera (const Object& camera = Object::ANY);
-
 	bool drop_dead ();
 
 	void enable_world_focus ();
 	void disable_world_focus ();
 };
+
+
+
+struct Camera
+{
+	// Implemented in NewDark 1.22 or later only.
+	static Object get ();
+
+	// Implemented in NewDark 1.22 or later only.
+	static bool is_remote ();
+
+	static void attach (const Object& to, bool freelook);
+
+	static bool detach (const Object& from = Object::ANY);
+
+	// Implemented in NewDark 1.22 or later only.
+	static Vector get_location ();
+
+	// Implemented in NewDark 1.22 or later only.
+	static Vector get_rotation ();
+};
+
+
 
 } // namespace Thief
 

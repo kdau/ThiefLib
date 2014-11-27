@@ -2,7 +2,7 @@
  *  Player.cc
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -26,6 +26,8 @@
 namespace Thief {
 
 
+
+// Player
 
 static bool
 Player_arm_visible_getter (const FieldProxyConfig<bool>::Item& item,
@@ -66,7 +68,7 @@ Player::Player ()
 
 
 
-// Inventory
+// Player: inventory
 
 bool
 Player::is_in_inventory (const Object& object) const
@@ -186,7 +188,7 @@ Player::has_touched (const Object& object) const
 
 
 
-// Combat
+// Player: combat
 
 Weapon
 Player::get_selected_weapon () const
@@ -251,7 +253,7 @@ Player::abort_attack ()
 
 
 
-// Physics and movement
+// Player: physics and movement
 
 #ifdef IS_THIEF2
 
@@ -293,7 +295,7 @@ Player::remove_speed_control (const String& name)
 
 
 
-// Limb model (player arm)
+// Player: limb model (player arm)
 
 bool
 Player::show_arm ()
@@ -325,30 +327,7 @@ Player::hide_arm ()
 
 
 
-// Miscellaneous
-
-#ifndef IS_OSL
-
-void
-Player::attach_camera (const Object& camera, bool freelook)
-{
-	if (freelook)
-		SService<ICameraSrv> (LG)->DynamicAttach (camera.number);
-	else
-		SService<ICameraSrv> (LG)->StaticAttach (camera.number);
-}
-
-bool
-Player::detach_camera (const Object& camera)
-{
-	if (camera == Object::ANY)
-		return SService<ICameraSrv> (LG)->ForceCameraReturn () == S_OK;
-	else
-		return SService<ICameraSrv> (LG)->CameraReturn
-			(camera.number) == S_OK;
-}
-
-#endif // !IS_OSL
+// Player: miscellaneous
 
 bool
 Player::drop_dead ()
@@ -370,6 +349,82 @@ Player::disable_world_focus ()
 	SService<IDarkInvSrv> (LG)->CapabilityControl
 		(kDrkInvCapWorldFocus, kDrkInvControlOff);
 }
+
+
+
+// Camera
+
+#ifndef IS_OSL
+
+Object
+Camera::get ()
+{
+	if (Engine::get_version () < Version (1, 22))
+		throw std::runtime_error ("Camera::get"
+			" is not implemented before engine version 1.22.");
+	LGObject camera;
+	SService<ICameraSrv> (LG)->GetCameraParent (camera);
+	return camera;
+}
+
+bool
+Camera::is_remote ()
+{
+	if (Engine::get_version () < Version (1, 22))
+		throw std::runtime_error ("Camera::is_remote"
+			" is not implemented before engine version 1.22.");
+
+	LGBool remote;
+	SService<ICameraSrv> (LG)->IsRemote (remote);
+	return remote;
+}
+
+void
+Camera::attach (const Object& to, bool freelook)
+{
+	if (freelook)
+		SService<ICameraSrv> (LG)->DynamicAttach (to.number);
+	else
+		SService<ICameraSrv> (LG)->StaticAttach (to.number);
+}
+
+bool
+Camera::detach (const Object& from)
+{
+	if (from == Object::ANY)
+		return SService<ICameraSrv> (LG)->ForceCameraReturn () == S_OK;
+	else
+		return SService<ICameraSrv> (LG)->CameraReturn
+			(from.number) == S_OK;
+}
+
+Vector
+Camera::get_location ()
+{
+	if (Engine::get_version () < Version (1, 22))
+		throw std::runtime_error ("Camera::get_location"
+			" is not implemented before engine version 1.22.");
+	LGVector location;
+	SService<ICameraSrv> (LG)->GetPosition (location);
+	return location;
+}
+
+Vector
+Camera::get_rotation ()
+{
+	if (Engine::get_version () < Version (1, 22))
+		throw std::runtime_error ("Camera::get_rotation"
+			" is not implemented before engine version 1.22.");
+	LGVector rotation;
+	SService<ICameraSrv> (LG)->GetFacing (rotation);
+	return rotation;
+}
+
+#endif // !IS_OSL
+
+
+
+//TODO wrap property (on what?): Renderer\Camera Overlay = CameraOverlay
 
 
 

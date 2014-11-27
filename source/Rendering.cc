@@ -260,6 +260,14 @@ PropField<Color, &Bitmapped::F_bitmap_color>::operator = (const Color& value)
 
 
 
+//TODO Create Corona and wrap property: Renderer\Corona = Corona
+
+
+
+//TODO Create Distortion and wrap property: SFX\Heat Disks = HeatDisks (including NewDark-added "Z-compare" field)
+
+
+
 // Flash
 //TODO wrap rest of property: SFX\FlashBombInfo = RenderFlash
 
@@ -366,14 +374,6 @@ TextureSwapper::swap_textures (const Vector& _center, float radius,
 		nullptr, old_texture.data (), nullptr, new_texture.data ())
 			== S_OK;
 }
-
-
-
-/*TODO wrap the following properties, perhaps creating {Camera,Corona,Distortion}:
- * Renderer\Camera Overlay = CameraOverlay
- * Renderer\Corona = Corona
- * SFX\Heat Disks = HeatDisks
- */
 
 
 

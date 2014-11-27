@@ -54,7 +54,7 @@ PROXY_CONFIG (AI, patrols, "AI_Patrol", nullptr, bool, false);
 PROXY_CONFIG (AI, patrols_randomly, "AI_PtrlRnd", nullptr, bool, false);
 PROXY_CONFIG (AI, traverses_water, "AI_UseWater", nullptr, bool, false);
 PROXY_CONFIG (AI, notices_bodies, "AI_NtcBody", nullptr, bool, true);
-PROXY_NEG_CONFIG (AI, notices_cameras, "AI_IgCam", nullptr, bool, true);
+PROXY_NEG_CONFIG (AI, notices_watchers, "AI_IgCam", nullptr, bool, true);
 PROXY_CONFIG (AI, notices_damage, "AI_NoticeDmg", nullptr, bool, true);
 PROXY_NEG_CONFIG (AI, notices_other_ai, "AI_OnlyPlayer", nullptr, bool, true);
 PROXY_CONFIG (AI, notices_projectiles, "AI_SeesPrj", nullptr, bool, true);
@@ -103,7 +103,7 @@ OBJECT_TYPE_IMPL_ (AI, Rendered (), Interactive (), Physical (),
 	PROXY_INIT (patrols_randomly),
 	PROXY_INIT (traverses_water),
 	PROXY_INIT (notices_bodies),
-	PROXY_INIT (notices_cameras),
+	PROXY_INIT (notices_watchers),
 	PROXY_INIT (notices_damage),
 	PROXY_INIT (notices_other_ai),
 	PROXY_INIT (notices_projectiles),
@@ -763,7 +763,7 @@ ConversationMessage::is_postable () const
 
 //TODO Create Device : AI and wrap property: AI: Ability Settings\Device: parameters = AI_Device
 
-//TODO Create Camera : Device and wrap property: AI: Ability Settings\Camera: parameters = AI_Camera
+//TODO Create Watcher : Device and wrap property: AI: Ability Settings\Camera: parameters = AI_Camera
 
 /*TODO Create Turret : Device and wrap these properties:
  * AI: Ability Settings\Turret: parameters = AI_Turret

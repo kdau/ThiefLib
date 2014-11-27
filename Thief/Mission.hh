@@ -349,7 +349,7 @@ public:
 	 * \param texture A path a bitmap image file, relative to the game or FM
 	 * main  directory. The file should not be used as a terrain or object
 	 * texture in the same mission. An empty string clears the texture for
-	 * the given zone. \pre This method is only functional with NewDark
+	 * the given zone. \pre This method is only implemented by NewDark
 	 * version 1.20 or later. On earlier versions, it raises an exception. */
 	static void set_envmap_texture (unsigned zone, const String& texture);
 
@@ -414,13 +414,13 @@ public:
 
 	/*! Returns whether book decals in the specified group are visible.
 	 * \param group The group ID to check. \pre This method is only
-	 * functional with NewDark version 1.22 or later. On earlier versions,
+	 * implemented by NewDark version 1.22 or later. On earlier versions,
 	 * it raises an exception. */
 	static bool get_book_decals_visible (unsigned group);
 
 	/*! Sets whether book decals in the specified group are visible.
 	 * \param group The group ID to check. \pre This method is only
-	 * functional with NewDark version 1.22 or later. On earlier versions,
+	 * implemented by NewDark version 1.22 or later. On earlier versions,
 	 * it raises an exception. */
 	static void set_book_decals_visible (unsigned group, bool visible);
 
