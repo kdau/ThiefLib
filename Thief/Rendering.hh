@@ -2,7 +2,7 @@
  *  Rendering.hh
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -117,8 +117,8 @@ public:
 	THIEF_PROP_FIELD_CONST (bool, soft_shadows); //TESTME
 
 	enum class State { FALLING, RISING };
-	THIEF_PROP_FIELD_CONST (State, current_state); //TESTME -const?
-	THIEF_PROP_FIELD_CONST (Time, current_countdown); //TESTME -const?
+	THIEF_PROP_FIELD_CONST (State, current_state); //TESTME; non-const?
+	THIEF_PROP_FIELD_CONST (Time, current_countdown); //TESTME; non-const?
 
 	void subscribe_light (); //TESTME
 	void unsubscribe_light (); //TESTME
@@ -135,6 +135,26 @@ public:
 	bool is_dynamic_light () const;
 
 	THIEF_PROP_FIELD (int, brightness);
+
+	// Implemented in NewDark 1.22 or later only.
+	THIEF_PROP_FIELD (float, radius);
+};
+
+
+
+// StaticLight
+
+class StaticLight : public Light
+{
+public:
+	THIEF_OBJECT_TYPE (StaticLight)
+	bool is_static_light () const; //TESTME
+
+	THIEF_PROP_FIELD_CONST (int, brightness); //TESTME
+	THIEF_PROP_FIELD_CONST (float, outer_radius); //TESTME
+	THIEF_PROP_FIELD_CONST (float, inner_radius); //TESTME
+	THIEF_PROP_FIELD_CONST (Vector, light_offset); //TESTME
+	THIEF_PROP_FIELD_CONST (bool, soft_shadows); //TESTME
 };
 
 

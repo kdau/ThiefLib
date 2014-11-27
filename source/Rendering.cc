@@ -158,9 +158,11 @@ AnimLight::unsubscribe_light ()
 // DynamicLight
 
 PROXY_CONFIG (DynamicLight, brightness, "SelfLit", nullptr, int, 0);
+PROXY_CONFIG (DynamicLight, radius, "SelfLitRad", nullptr, float, 10.0);
 
 OBJECT_TYPE_IMPL_ (DynamicLight, Light (),
-	PROXY_INIT (brightness)
+	PROXY_INIT (brightness),
+	PROXY_INIT (radius)
 )
 
 bool
@@ -171,7 +173,31 @@ DynamicLight::is_dynamic_light () const
 
 
 
-//TODO Create StaticLight : Light and wrap property: Renderer\Light = Light
+// StaticLight
+
+PROXY_CONV_CONFIG (StaticLight, brightness, "Light", "brightness",
+	int, 0, float);
+PROXY_CONFIG (StaticLight, outer_radius, "Light", "radius (0 for infinite)",
+	float, 0.0f);
+PROXY_CONFIG (StaticLight, inner_radius, "Light", "inner radius (0 for none)",
+	float, 0.0f);
+PROXY_CONFIG (StaticLight, light_offset, "Light", "offset from object",
+	Vector, Vector ());
+PROXY_CONFIG (StaticLight, soft_shadows, "Light", "quad lit", bool, false);
+
+OBJECT_TYPE_IMPL_ (StaticLight, Light (),
+	PROXY_INIT (brightness),
+	PROXY_INIT (outer_radius),
+	PROXY_INIT (inner_radius),
+	PROXY_INIT (light_offset),
+	PROXY_INIT (soft_shadows)
+)
+
+bool
+StaticLight::is_static_light () const
+{
+	return brightness.exists ();
+}
 
 
 
