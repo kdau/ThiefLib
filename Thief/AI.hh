@@ -279,10 +279,14 @@ class CreatureAttachmentLink : public Link
 public:
 	THIEF_LINK_FLAVOR (CreatureAttachment)
 
+	enum class JointRotation { DEFAULT, ALWAYS, NEVER };
+
 	static CreatureAttachmentLink create (const Object& source,
-		const Object& dest, AI::Joint = AI::Joint::NONE);
+		const Object& dest, AI::Joint = AI::Joint::NONE,
+		JointRotation = JointRotation::DEFAULT);
 
 	THIEF_LINK_FIELD (AI::Joint, joint);
+	THIEF_LINK_FIELD (JointRotation, joint_rotation); //TESTME
 };
 
 

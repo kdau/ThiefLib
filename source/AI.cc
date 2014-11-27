@@ -528,18 +528,24 @@ AIAwarenessLink::update (Time time, bool updated_los)
 
 PROXY_CONFIG (CreatureAttachmentLink, joint, "Joint", nullptr,
 	AI::Joint, AI::Joint::NONE);
+PROXY_CONFIG (CreatureAttachmentLink, joint_rotation, "Rot Mode", nullptr,
+	CreatureAttachmentLink::JointRotation, JointRotation::DEFAULT);
 
 LINK_FLAVOR_IMPL (CreatureAttachment,
-	PROXY_INIT (joint)
+	PROXY_INIT (joint),
+	PROXY_INIT (joint_rotation)
 )
 
 CreatureAttachmentLink
 CreatureAttachmentLink::create (const Object& source, const Object& dest,
-	AI::Joint joint)
+	AI::Joint joint, JointRotation joint_rotation)
 {
 	CreatureAttachmentLink link = Link::create (flavor (), source, dest);
 	if (link != Link::NONE)
+	{
 		link.joint = joint;
+		link.joint_rotation = joint_rotation;
+	}
 	return link;
 }
 

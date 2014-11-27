@@ -204,8 +204,6 @@ PROXY_BIT_CONFIG (ModelsTweq, anchor_bottom, "StTweqModels", "MiscC",
 	1u, false);
 PROXY_BIT_CONFIG (ModelsTweq, anchor_vhot, "StTweqModels", "MiscC",
 	1024u, false);
-PROXY_BIT_CONFIG (ModelsTweq, use_creature_scale, "StTweqModels", "MiscC",
-	4096u, false);
 PROXY_BIT_CONFIG (ModelsTweq, use_model_5, "StTweqModels", "MiscC",
 	8192u, false);
 PROXY_CONFIG (ModelsTweq, current_time, "StTweqModels", "Cur Time", Time, 0ul);
@@ -216,7 +214,6 @@ OBJECT_TYPE_IMPL_ (ModelsTweq, Tweq (), TWEQ_COMMON_INIT,
 	PROXY_ARRAY_INIT (model, 6),
 	PROXY_INIT (anchor_bottom),
 	PROXY_INIT (anchor_vhot),
-	PROXY_INIT (use_creature_scale),
 	PROXY_INIT (use_model_5),
 	PROXY_INIT (current_time),
 	PROXY_INIT (current_frame)
@@ -233,6 +230,10 @@ ModelsTweq::has_models_tweq () const
 /*TODO Create RotateTweq and wrap the following properties:
  * Tweq\Rotate = CfgTweqRotate
  * Tweq\RotateState = StTweqRotate
+	THIEF_PROP_FIELD (bool, link_relative); //TESTME
+PROXY_BIT_CONFIG (RotateTweq, link_relative, "StTweqRotate", "MiscC",
+	16384u, false);
+	PROXY_INIT (link_relative),
  */
 
 
@@ -240,6 +241,10 @@ ModelsTweq::has_models_tweq () const
 /*TODO Create ScaleTweq and wrap the following properties:
  * Tweq\Scale = CfgTweqScale
  * Tweq\ScaleState = StTweqScale
+	THIEF_PROP_FIELD (bool, affect_creature_scale); //TESTME
+PROXY_BIT_CONFIG (ScaleTweq, affect_creature_scale, "StTweqScale", "MiscC",
+	4096u, false);
+	PROXY_INIT (affect_creature_scale),
  */
 
 

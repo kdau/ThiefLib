@@ -2,7 +2,7 @@
  *  Tweq.hh
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -149,7 +149,6 @@ public:
 	THIEF_PROP_FIELD_ARRAY (String, model, 6u); //TESTME
 	THIEF_PROP_FIELD (bool, anchor_bottom); //TESTME
 	THIEF_PROP_FIELD (bool, anchor_vhot); //TESTME
-	THIEF_PROP_FIELD (bool, use_creature_scale); //TESTME
 	THIEF_PROP_FIELD (bool, use_model_5); //TESTME
 
 	THIEF_PROP_FIELD (Time, current_time); //TESTME
