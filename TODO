@@ -1,12 +1,17 @@
-Current
-	* Replace Parameter<Object> with Parameter<Object::Ref>, resolvable dynamically to an Object.
-	* Fix possible dangling pointer in posted or scheduled synthetic QuestMessage and ObjectiveMessage instances.
-	* Promote LGMultiTypeError to something public, documenting it and the general LGMulti system (without actually exposing LGMulti).
+ThiefLib
+========
 
-Novel messages/wrappers
-	* HierarchyMessage: ITraitManager::Listen (per DH2)
-	* ObjectMessage: IObjectSystem::Listen (per DH2)
-	* ParameterMessage: from ParameterCache activity
+Current
+	* Ensure compliance with string allocation and filename access rules in NewDark 1.22's script_notes.txt.
+	* Reevaluate HUD overlays after fix for "filtering...even pixel scaled UI in DX9" in NewDark 1.22.
+	* Fix possible dangling pointer in posted or scheduled synthetic QuestMessage and ObjectiveMessage instances.
+
+New features
+	* EnumCoding: support encoding and decoding of bitmasks
+	* Victory: new, per VictoryCheck(er) and  <lg/convict.h>
+	* HierarchyMessage: new, from ITraitManager::Listen (per DH2)
+	* ObjectMessage: new, from IObjectSystem::Listen (per DH2)
+	* ParameterMessage: new, from ParameterCache activity
 
 TNH/NV/TW features
 	* ParameterCache: NVScript-style syntax (script name prefix, object targetting)
@@ -15,14 +20,14 @@ TNH/NV/TW features
 	* TrapTrigger: requirement counting per cRequirement
 	* TrapTrigger: NVScript-style features (on, off, count, capacitor, falloff, failchance, dest)
 
-Other
+Refactoring
+	* Replace Parameter<Object> with Parameter<Object::Ref>, resolvable dynamically to an Object.
+	* Promote LGMultiTypeError to something public, documenting it and the general LGMulti system (without actually exposing LGMulti).
+	* Use boost::bimap (now that 1.55 supports initializer lists).
+	* AI, Types: split each into two or more units.
+
+Documentation
 	* Document undocumented units: AI, ActReact, Combat, Physics, Player, Rendering, Security, Sound, Tweq, Types.
 	* Document the template and various accessory files, such as version.rc and module.mk.
 	* Add more general documentation including examples.
-	* Recheck NewDark modders' notes for any missed fields.
-	* AI, Types: split each into two or more units.
-	* EnumCoding: support encoding and decoding of bitmasks.
-	* Objective: add VictoryCheck(er)-equivalent functionality per <lg/convict.h>.
-	* Use C++11 features added in G++ 4.8, including {map,multimap,set}::emplace.
-	* Use boost::bimap (now that 1.55 supports initializer lists).
 

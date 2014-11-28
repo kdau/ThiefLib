@@ -227,8 +227,8 @@ struct Precipitation
 
 
 
-/*! Control of an overall mission, its interface, and global aspects of the game
- * world. The Mission class is not instantiable; all members are static.
+/*! Control of a mission overall and global aspects of the game world.
+ * The Mission class is not instantiable; all members are static.
  *
  * Fan-mission-related methods only return meaningful values if the player is
  * using a fan mission loader such as FMSel that implements NewDark's FM
@@ -366,7 +366,41 @@ public:
 	static void set_precipitation (const Precipitation&);
 
 	//@}
-	//! \name Text messages and books
+};
+
+
+
+/*! Control of the game interface and its screens and elements.
+ * The Interface class is not instantiable; all members are static.
+ *
+ * \nosubgrouping */
+class Interface
+{
+public:
+	//! \name In-game elements
+	//@{
+
+	enum Element
+	{
+		LIGHT_GEM = 1u,
+		HEALTH_BAR = 2u,
+		BREATH_METER = 4u,
+		WEAPONS = 8u,
+		INVENTORY = 16u,
+		ALL_INFORMATIONAL = 7u,
+		ALL_INTERACTIVE = 24u,
+		ALL_STANDARD = 31u,
+		HUD_NONOVERLAY = 65536u,
+		HUD_OVERLAY = 131072u,
+		ALL_HUD = 196608u,
+		ALL = 196639u
+	};
+
+	static bool get_element_visible (Element);
+	static void set_element_visible (Element, bool visible);
+
+	//@}
+	//! \name Text messages
 	//@{
 
 	/*! Returns a translated string from a resource file.
@@ -397,6 +431,10 @@ public:
 	static void show_text (const String& text, Time duration = 0ul,
 		const Color& color = Color ());
 
+	//@}
+	//! \name Books
+	//@{
+
 	/*! Returns the translated text of one page of a book file.
 	 * \param book The name of the book file, without the \c ".str"
 	 * extension. \param page The page to retrieve. */
@@ -425,7 +463,7 @@ public:
 	static void set_book_decals_visible (unsigned group, bool visible);
 
 	//@}
-	//! \name Other metagame screens
+	//! \name Maps
 	//@{
 
 	//! Suspends game mode and displays the map interface.
@@ -449,6 +487,10 @@ public:
 	static void visit_automap_location (int page, int location);
 
 #endif // IS_THIEF2
+
+	//@}
+	//! \name Other metagame screens
+	//@{
 
 	//! Suspends game mode and displays the objectives screen.
 	static void show_objectives ();

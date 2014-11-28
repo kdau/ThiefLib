@@ -478,7 +478,7 @@ OBJECT_TYPE_IMPL_ (Readable, Rendered (), Interactive (),
 String
 Readable::get_book_text (int page)
 {
-	return Mission::get_book_text (book_name, page);
+	return Interface::get_book_text (book_name, page);
 }
 
 bool
@@ -488,12 +488,12 @@ Readable::show_book (bool use_art, Time duration, bool reload)
 	if (book.empty ()) return false;
 
 	if (use_art && !art.empty ())
-		Mission::show_book (book, art, reload);
+		Interface::show_book (book, art, reload);
 	else
 	{
-		String text = Mission::get_book_text (book);
+		String text = Interface::get_book_text (book);
 		if (text.empty ()) return false;
-		Mission::show_text (text, duration);
+		Interface::show_text (text, duration);
 	}
 
 	return true;

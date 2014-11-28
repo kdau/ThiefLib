@@ -312,10 +312,27 @@ Mission::set_precipitation (const Precipitation& precip)
 
 
 
-// Mission: text messages and books
+// Interface: in-game elements
+
+bool
+Interface::get_element_visible (Element element)
+{
+	return !(QuestVar ("HIDE_UI_ELEMENTS") & element);
+}
+
+void
+Interface::set_element_visible (Element element, bool visible)
+{
+	QuestVar qvar ("HIDE_UI_ELEMENTS");
+	qvar = visible ? qvar & ~element : qvar | element;
+}
+
+
+
+// Interface: text messages
 
 String
-Mission::get_text (const String& directory, const String& file,
+Interface::get_text (const String& directory, const String& file,
 	const String& name)
 {
 	LGString result;
@@ -325,7 +342,7 @@ Mission::get_text (const String& directory, const String& file,
 }
 
 Time
-Mission::calc_text_duration (const String& text, Time word_duration)
+Interface::calc_text_duration (const String& text, Time word_duration)
 {
 	if (text.empty ()) return 0ul;
 
@@ -346,21 +363,25 @@ Mission::calc_text_duration (const String& text, Time word_duration)
 }
 
 void
-Mission::show_text (const String& text, Time duration, const Color& color)
+Interface::show_text (const String& text, Time duration, const Color& color)
 {
 	if (duration == 0ul) duration = calc_text_duration (text);
 	SService<IDarkUISrv> (LG)->TextMessage (text.data (), color, duration);
 }
 
+
+
+// Interface: books
+
 String
-Mission::get_book_text (const String& book, int page)
+Interface::get_book_text (const String& book, int page)
 {
 	return get_text ("strings", "..\\books\\" + book,
 		"page_" + std::to_string (page));
 }
 
 void
-Mission::show_book (const String& book, const String& art, bool reload)
+Interface::show_book (const String& book, const String& art, bool reload)
 {
 	if (reload)
 		Engine::run_command ("test_book_ex", book + "," + art);
@@ -369,10 +390,10 @@ Mission::show_book (const String& book, const String& art, bool reload)
 }
 
 bool
-Mission::get_book_decals_visible (unsigned group)
+Interface::get_book_decals_visible (unsigned group)
 {
 	if (Engine::get_version () < Version (1, 22))
-		throw std::runtime_error ("Mission::get_book_decals_visible"
+		throw std::runtime_error ("Interface::get_book_decals_visible"
 			" is not implemented before engine version 1.22.");
 
 	int series = group / 32, bit = 1 << (group % 32);
@@ -381,10 +402,10 @@ Mission::get_book_decals_visible (unsigned group)
 }
 
 void
-Mission::set_book_decals_visible (unsigned group, bool visible)
+Interface::set_book_decals_visible (unsigned group, bool visible)
 {
 	if (Engine::get_version () < Version (1, 22))
-		throw std::runtime_error ("Mission::set_book_decals_visible"
+		throw std::runtime_error ("Interface::set_book_decals_visible"
 			" is not implemented before engine version 1.22.");
 
 	int series = group / 32, bit = 1 << (group % 32);
@@ -394,10 +415,10 @@ Mission::set_book_decals_visible (unsigned group, bool visible)
 
 
 
-// Mission: other information screens
+// Interface: maps
 
 void
-Mission::show_map ()
+Interface::show_map ()
 {
 	Engine::run_command ("automap");
 }
@@ -405,52 +426,56 @@ Mission::show_map ()
 #ifdef IS_THIEF2
 
 bool
-Mission::has_visited_automap_location (int page, int location)
+Interface::has_visited_automap_location (int page, int location)
 {
 	return SService<IDarkGameSrv> (LG)->GetAutomapLocationVisited
 		(page, location);
 }
 
 void
-Mission::visit_automap_location (int page, int location)
+Interface::visit_automap_location (int page, int location)
 {
 	SService<IDarkGameSrv> (LG)->SetAutomapLocationVisited (page, location);
 }
 
 #endif // IS_THIEF2
 
+
+
+// Interface: other metagame screens
+
 void
-Mission::show_objectives ()
+Interface::show_objectives ()
 {
 	Engine::run_command ("objectives");
 }
 
 void
-Mission::show_image (const String& image)
+Interface::show_image (const String& image)
 {
 	Engine::run_command ("show_image", image);
 }
 
 void
-Mission::show_video (const String& video)
+Interface::show_video (const String& video)
 {
 	Engine::run_command ("movie", video);
 }
 
 void
-Mission::show_menu ()
+Interface::show_menu ()
 {
 	Engine::run_command ("sim_menu");
 }
 
 void
-Mission::show_load_screen ()
+Interface::show_load_screen ()
 {
 	Engine::run_command ("load_game");
 }
 
 void
-Mission::show_save_screen ()
+Interface::show_save_screen ()
 {
 	Engine::run_command ("save_game");
 }
