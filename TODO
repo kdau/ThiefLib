@@ -1,14 +1,9 @@
 ThiefLib
 ========
 
-Current
-	* Ensure compliance with string allocation and filename access rules in NewDark 1.22's script_notes.txt.
-	* Reevaluate HUD overlays after fix for "filtering...even pixel scaled UI in DX9" in NewDark 1.22.
-	* Fix possible dangling pointer in posted or scheduled synthetic QuestMessage and ObjectiveMessage instances.
-
 New features
 	* EnumCoding: support encoding and decoding of bitmasks
-	* Victory: new, per VictoryCheck(er) and  <lg/convict.h>
+	* Victory: new, per VictoryCheck(er) and <lg/convict.h>
 	* HierarchyMessage: new, from ITraitManager::Listen (per DH2)
 	* ObjectMessage: new, from IObjectSystem::Listen (per DH2)
 	* ParameterMessage: new, from ParameterCache activity

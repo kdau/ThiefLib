@@ -421,9 +421,14 @@ ObjectiveMessage::ObjectiveMessage (const Objective& _objective, Field _field,
 	MESSAGE_AS (sQuestMsg)->m_newValue = new_raw_value;
 	MESSAGE_AS (sQuestMsg)->m_oldValue = old_raw_value;
 
+	// This baroque procedure intentionally leaks the quest variable name to
+	// deal with sQuestMsg's need for a const char* that we wouldn't know
+	// when to free later.
 	boost::format qvar_name ("goal_%||_%||");
 	qvar_name % EnumCoding::get<Field> ().encode (field) % objective.number;
-	MESSAGE_AS (sQuestMsg)->m_pName = qvar_name.str ().data (); //FIXME This data will be lost.
+	char *leak = new char [qvar_name.size () + 1];
+	std::strcpy (leak, qvar_name.str ().data ());
+	MESSAGE_AS (sQuestMsg)->m_pName = leak;
 }
 
 ObjectiveMessage::ParseResult
