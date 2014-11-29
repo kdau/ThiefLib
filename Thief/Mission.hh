@@ -457,7 +457,8 @@ public:
 	static bool get_book_decals_visible (unsigned group);
 
 	/*! Sets whether book decals in the specified group are visible.
-	 * \param group The group ID to check. \pre This method is only
+	 * \param group The group ID to set. \param visible Whether decals in
+	 * the given group should be visible or hidden. \pre This method is only
 	 * implemented by NewDark version 1.22 or later. On earlier versions,
 	 * it raises an exception. */
 	static void set_book_decals_visible (unsigned group, bool visible);

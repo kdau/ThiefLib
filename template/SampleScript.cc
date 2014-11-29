@@ -17,7 +17,7 @@ Message::Result
 SampleScript::on_sim (SimMessage& message)
 {
 	if (message.event == SimMessage::START)
-		Mission::show_text ("Hello world!");
+		Interface::show_text ("Hello world!");
 	else // event == FINISH
 		log (Log::INFO, "Goodbye world!");
 	return Message::HALT;
@@ -28,7 +28,7 @@ SampleScript::on_frob_world_end (FrobMessage& message)
 {
 	if (ticklish && message.frobber == Player ())
 	{
-		Mission::show_text ("Stop, that tickles!");
+		Interface::show_text ("Stop, that tickles!");
 #ifdef IS_THIEF1
 		SoundSchema ("m06vikgig").play (host ());
 #endif
