@@ -100,10 +100,10 @@ OBJECT_TYPE_IMPL_ (Light,
 
 PROXY_CONFIG (AnimLight, light_mode, "AnimLight", "Mode",
 	AnimLight::Mode, Mode::FLIP);
-PROXY_NEG_CONFIG (AnimLight, active, "AnimLight", "inactive", bool, true);
-PROXY_CONFIG (AnimLight, brighten_time, "AnimLight", "millisecs to brighten",
+PROXY_CONFIG (AnimLight, rise_interval, "AnimLight", "millisecs to brighten",
 	Time, 0ul);
-PROXY_CONFIG (AnimLight, dim_time, "AnimLight", "millisecs to dim", Time, 0ul);
+PROXY_CONFIG (AnimLight, fall_interval, "AnimLight", "millisecs to dim",
+	Time, 0ul);
 PROXY_CONV_CONFIG (AnimLight, min_brightness, "AnimLight", "min brightness",
 	int, 0, float);
 PROXY_CONV_CONFIG (AnimLight, max_brightness, "AnimLight", "max brightness",
@@ -115,24 +115,25 @@ PROXY_CONFIG (AnimLight, inner_radius, "AnimLight", "inner radius (0 for none)",
 PROXY_CONFIG (AnimLight, light_offset, "AnimLight", "offset from object",
 	Vector, Vector ());
 PROXY_CONFIG (AnimLight, soft_shadows, "AnimLight", "quad lit", bool, false);
-PROXY_CONV_CONFIG (AnimLight, current_state, "AnimLight", "currently rising?",
+PROXY_NEG_CONFIG (AnimLight, active, "AnimLight", "inactive", bool, true);
+PROXY_CONV_CONFIG (AnimLight, state, "AnimLight", "currently rising?",
 	AnimLight::State, State::FALLING, bool);
-PROXY_CONFIG (AnimLight, current_countdown, "AnimLight", "current countdown",
+PROXY_CONFIG (AnimLight, elapsed_time, "AnimLight", "current countdown",
 	Time, 0ul);
 
 OBJECT_TYPE_IMPL_ (AnimLight, Light (),
 	PROXY_INIT (light_mode),
-	PROXY_INIT (active),
-	PROXY_INIT (brighten_time),
-	PROXY_INIT (dim_time),
+	PROXY_INIT (rise_interval),
+	PROXY_INIT (fall_interval),
 	PROXY_INIT (min_brightness),
 	PROXY_INIT (max_brightness),
 	PROXY_INIT (outer_radius),
 	PROXY_INIT (inner_radius),
 	PROXY_INIT (light_offset),
 	PROXY_INIT (soft_shadows),
-	PROXY_INIT (current_state),
-	PROXY_INIT (current_countdown)
+	PROXY_INIT (active),
+	PROXY_INIT (state),
+	PROXY_INIT (elapsed_time)
 )
 
 bool
@@ -268,18 +269,18 @@ PropField<Color, &Bitmapped::F_bitmap_color>::operator = (const Color& value)
 
 
 
-// Flash
-//TODO wrap rest of property: SFX\FlashBombInfo = RenderFlash
+// FlashConfig
 
-PROXY_CONFIG (Flash, world_duration, "RenderFlash", "world flash duration",
-	Time, 0ul);
-PROXY_CONFIG (Flash, screen_duration, "RenderFlash", "max screen duration (ms)",
-	Time, 0ul);
-PROXY_CONFIG (Flash, effect_duration, "RenderFlash", "after-effec duration (ms)",
-	Time, 0ul);
-PROXY_CONFIG (Flash, range, "RenderFlash", "range", float, 0.0f);
+//TODO wrap "flash color r", "flash color b", "flash color g" (how?)
+PROXY_CONFIG (FlashConfig, world_duration, "RenderFlash",
+	"world flash duration", Time, 0ul);
+PROXY_CONFIG (FlashConfig, screen_duration, "RenderFlash",
+	"max screen duration (ms)", Time, 0ul);
+PROXY_CONFIG (FlashConfig, effect_duration, "RenderFlash",
+	"after-effect duration (ms)", Time, 0ul);
+PROXY_CONFIG (FlashConfig, range, "RenderFlash", "range", float, 0.0f);
 
-OBJECT_TYPE_IMPL_ (Flash,
+OBJECT_TYPE_IMPL_ (FlashConfig,
 	PROXY_INIT (world_duration),
 	PROXY_INIT (screen_duration),
 	PROXY_INIT (effect_duration),
@@ -287,14 +288,28 @@ OBJECT_TYPE_IMPL_ (Flash,
 )
 
 bool
-Flash::is_flash () const
+FlashConfig::is_flash_config () const
 {
-	return range.exists ();
+	return get_type () == Type::ARCHETYPE && range.exists ();
+}
+
+
+
+// FlashPoint
+
+OBJECT_TYPE_IMPL (FlashPoint)
+
+bool
+FlashPoint::is_flash_point () const
+{
+	return get_type () == Type::CONCRETE && Link::get_any ("RenderFlash",
+		get_archetype (), ANY, Link::Inheritance::SOURCE).exists ();
 }
 
 void
-Flash::flash_world ()
+FlashPoint::flash ()
 {
+	if (!is_flash_point ()) throw std::runtime_error ("not a flash point");
 	SService<IDarkPowerupsSrv> (LG)->TriggerWorldFlash (number);
 }
 

@@ -22,7 +22,7 @@ Refactoring
 	* AI, Types: split each into two or more units.
 
 Documentation
-	* Document undocumented units: AI, ActReact, Combat, Physics, Player, Rendering, Security, Sound, Tweq, Types.
+	* Document undocumented units: AI, ActReact, Combat, Physics, Player, Security, Sound, Tweq, Types.
 	* Document the template and various accessory files, such as version.rc and module.mk.
 	* Add more general documentation including examples.
 

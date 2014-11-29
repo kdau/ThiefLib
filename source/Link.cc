@@ -196,7 +196,8 @@ Link::get_any (Flavor flavor, const Object& source, const Object& dest,
 	Inheritance inheritance)
 {
 	auto links = get_all (flavor, source, dest, inheritance);
-	return links.at (Engine::random_int (0, links.size () - 1));
+	return links.empty () ? NONE
+		: links.at (Engine::random_int (0, links.size () - 1));
 }
 
 Link::List
