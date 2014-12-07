@@ -352,8 +352,17 @@ ScriptParamsLink::get_all_by_data (const Object& source,
 		inheritance);
 	List links;
 	for (ScriptParamsLink link : _links)
-		if (data == link.data)
-			links.push_back (link);
+	{
+		try
+		{
+			if (!(data == link.data)) continue;
+		}
+		catch (...) // type mismatch, skip anyway
+		{
+			continue;
+		}
+		links.push_back (link);
+	}
 	return links;
 }
 

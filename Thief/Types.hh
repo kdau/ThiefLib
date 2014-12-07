@@ -320,6 +320,10 @@ public:
 	THIEF_PROP_FIELD (int, gravity); //TESTME
 
 	THIEF_PROP_FIELD_CONST (bool, see_through); //TESTME, not const?
+
+	// These two fields are not implemented in the engine.
+	THIEF_PROP_FIELD (String, ambient_schema);
+	THIEF_PROP_FIELD (int, ambient_volume);
 };
 
 class RoomMessage : public Message

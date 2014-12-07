@@ -138,8 +138,9 @@ public:
 
 	/*! Creates a fnord object with a limited lifespan.
 	 * The object will inherit directly from the \c Marker archetype. It
-	 * will not be persisted in saved games. It will be destroyed after the
-	 * given \a lifespan has passed, implemented by a delete tweq. */
+	 * will not be persisted in saved games. If \a lifespan is non-zero,
+	 * the object will be destroyed after that amount of time has passed
+	 * (implemented by a delete tweq). */
 	static Object create_temp_fnord (Time lifespan = 1ul);
 
 	/*! Creates an archetype.

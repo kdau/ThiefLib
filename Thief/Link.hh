@@ -427,7 +427,7 @@ public:
 		Inheritance inheritance = Inheritance::NONE,
 		bool reverse = false);
 
-	/*! Returns the only link matching the given criteria, including the.
+	/*! Returns the only link matching the given criteria, including the
 	 * data string. This method is used with ScriptParams links that are
 	 * singleton: only one ScriptParams link with the given data should
 	 * exist on an object at any time. No matching link may exist, in which

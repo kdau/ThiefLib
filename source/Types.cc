@@ -502,8 +502,7 @@ Readable::show_book (bool use_art, Time duration, bool reload)
 
 
 // Room
-//TODO wrap property (if useful): Room\Acoustics = Acoustics
-//TODO wrap property (if useful): Room\Ambient = Ambient
+//TODO wrap property (now that it is implemented by NewDark): Room\Acoustics = Acoustics
 //TODO wrap property (if useful): Room\Loud Room = LoudRoom
 
 static Fog::Zone
@@ -532,6 +531,8 @@ PROXY_CONFIG_ (Room, fog_zone, "Weather", "fog", Fog::Zone, Fog::Zone::DISABLED,
 PROXY_CONFIG (Room, precipitation, "Weather", "precipitation", bool, false);
 PROXY_CONFIG (Room, gravity, "RoomGrav", nullptr, int, 100);
 PROXY_BIT_CONFIG (Room, see_through, "RoomRend", "Flags", 1u, false);
+PROXY_CONFIG (Room, ambient_schema, "Ambient", "Schema Name", String, "");
+PROXY_CONFIG (Room, ambient_volume, "Ambient", "Volume", int, 0);
 
 OBJECT_TYPE_IMPL_ (Room,
 	PROXY_INIT (automap_page),
@@ -541,13 +542,20 @@ OBJECT_TYPE_IMPL_ (Room,
 	PROXY_INIT (fog_zone),
 	PROXY_INIT (precipitation),
 	PROXY_INIT (gravity),
-	PROXY_INIT (see_through)
+	PROXY_INIT (see_through),
+	PROXY_INIT (ambient_schema),
+	PROXY_INIT (ambient_volume)
 )
 
 bool
 Room::is_room () const
 {
-	return inherits_from (Object ("Base Room")); // hopefully not renamed
+	// There is no systematic indication in the object system whether a
+	// particular object belongs to the room hierarchy, nor is there any
+	// property that all rooms and only rooms share. The only available test
+	// is inheritance from the standard root archetype for rooms; this would
+	// break on any gamesys where it had been renamed.
+	return inherits_from (Object ("Base Room"));
 }
 
 
