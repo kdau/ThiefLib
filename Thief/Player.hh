@@ -117,6 +117,7 @@ public:
 
 class Camera
 {
+public:
 	// Implemented in NewDark 1.22 or later only.
 	static Object get ();
 

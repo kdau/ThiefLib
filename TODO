@@ -4,6 +4,8 @@ ThiefLib
 New features
 	* EnumCoding: support encoding and decoding of bitmasks
 	* Victory: new, per VictoryCheck(er) and <lg/convict.h>
+
+New messages
 	* HierarchyMessage: new, from ITraitManager::Listen (per DH2)
 	* ObjectMessage: new, from IObjectSystem::Listen (per DH2)
 	* ParameterMessage: new, from ParameterCache activity

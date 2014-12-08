@@ -395,7 +395,9 @@ PersistentBase::set (const LGMultiBase& value)
 
 TrapTrigger::TrapTrigger (const String& _name, const Object& _host, Log _level,
 		bool _delayed_revert)
-	: Script (_name, _host, _level), delayed_revert (_delayed_revert)
+	: Script (_name, _host, _level),
+	  delayed_revert (_delayed_revert),
+	  THIEF_PERSISTENT (revert_timer)
 {
 	listen_message ("TurnOn", &TrapTrigger::on_turn_on);
 	listen_timer ("TurnOn", &TrapTrigger::on_turn_on);
@@ -460,12 +462,19 @@ TrapTrigger::on_turn_on (Message& message)
 	if (!host ().trap_on) return Message::HALT;
 	if (host ().is_locked ()) return Message::HALT;
 
+	if (revert_timer.exists ())
+	{
+		revert_timer->cancel ();
+		revert_timer.remove ();
+	}
+
 	bool on = host ().trap_invert ? false : true;
 	Message::Result result = on_trap (on, message);
 
 	if (delayed_revert && result == Message::CONTINUE &&
 	    host ().script_timing != 0ul)
-		start_timer ("Revert", host ().script_timing, false, !on);
+		revert_timer = start_timer ("Revert",
+			host ().script_timing, false, !on);
 
 	if (result != Message::ERROR && host ().trap_once)
 		host ().set_locked (true);
@@ -478,6 +487,12 @@ TrapTrigger::on_turn_off (Message& message)
 {
 	if (!host ().trap_off) return Message::HALT;
 	if (host ().is_locked ()) return Message::HALT;
+
+	if (revert_timer.exists ())
+	{
+		revert_timer->cancel ();
+		revert_timer.remove ();
+	}
 
 	bool on = host ().trap_invert ? true : false;
 	Message::Result result = on_trap (on, message);

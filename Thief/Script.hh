@@ -535,6 +535,7 @@ private:
 
 	Message::Result on_revert (TimerMessage&);
 	bool delayed_revert;
+	Persistent<Timer> revert_timer;
 };
 
 

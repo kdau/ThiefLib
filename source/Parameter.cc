@@ -149,7 +149,14 @@ Parameter<bool>::decode (const String& raw) const
 		break;
 	default:
 		// Kept like this to conform to ScriptLib's DN syntax.
-		value = std::stol (raw, nullptr, 0);
+		try
+		{
+			value = std::stol (raw, nullptr, 0);
+		}
+		catch (...) // not numeric
+		{
+			value = false;
+		}
 		break;
 	}
 
