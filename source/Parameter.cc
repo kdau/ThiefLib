@@ -110,6 +110,15 @@ ParameterBase::reparse () const
 }
 
 void
+ParameterBase::dump_cache ()
+{
+	ParameterCache* cache = SService<IOSLService> (LG)->get_param_cache ();
+	if (!cache)
+		throw std::runtime_error ("could not access parameter cache");
+	cache->dump (mono);
+}
+
+void
 ParameterBase::initialize () const
 {
 	if (!cache)

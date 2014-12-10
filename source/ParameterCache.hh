@@ -50,6 +50,8 @@ public:
 		const ParameterBase&) = 0;
 	virtual void unwatch_object (const Object&,
 		const ParameterBase&) = 0;
+
+	virtual void dump (Monolog& log) = 0;
 };
 
 
@@ -123,6 +125,8 @@ public:
 
 	virtual void watch_object (const Object&, const ParameterBase&);
 	virtual void unwatch_object (const Object&, const ParameterBase&);
+
+	virtual void dump (Monolog& log);
 
 private:
 	friend class OSL;

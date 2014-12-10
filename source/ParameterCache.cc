@@ -332,6 +332,34 @@ ParameterCacheImpl::unwatch_object (const Object& object,
 }
 
 void
+ParameterCacheImpl::dump (Monolog& log)
+{
+	log << "Dumping parameter cache (C = cached; E = object exists; R = DesignNote on object)...\n";
+	for (auto& datum : data)
+	{
+		String name = datum.first.exists ()
+			? datum.first.get_name () : "NONEXISTENT";
+		if (name.empty ())
+		{
+			name = "[" + datum.first.get_archetype ().get_name ()
+				+ "]";
+		}
+		log << boost::format ("  %|6| %|-24| [state: %||%||%||; "
+			"watchers: %|| direct, %|| indirect]\n")
+			% datum.first.number % name
+			% ((datum.second.state & DesignNote::CACHED) ? "C" : "-")
+			% ((datum.second.state & DesignNote::EXISTENT) ? "E" : "-")
+			% ((datum.second.state & DesignNote::RELEVANT) ? "R" : "-")
+			% datum.second.direct_watchers.size ()
+			% datum.second.indirect_watchers;
+		for (auto& raw_value : datum.second.raw_values)
+			log << boost::format ("           %|-22| %||\n")
+				% raw_value.first % raw_value.second;
+	}
+	log << std::flush;
+}
+
+void
 ParameterCacheImpl::reset ()
 {
 	data.clear ();
@@ -346,19 +374,20 @@ ParameterCacheImpl::on_dn_change (sPropertyListenMsg* message,
 
 	Object object = Object (message->iObjId);
 	auto self = reinterpret_cast<ParameterCacheImpl*> (_self);
-	if (object == self->current) return;
 
 	auto dn_iter = self->data.find (object);
-	if (dn_iter != self->data.end ())
+	if (dn_iter == self->data.end ()) return;
+	DesignNote& dn = dn_iter->second;
+
+	if (object != self->current)
 	{
-		DesignNote& dn = dn_iter->second;
 		dn.state &= ~DesignNote::CACHED;
 		self->update_object (object);
-
-		// Notify any directly watching parameters.
-		for (auto& watcher : dn.direct_watchers)
-			watcher->reparse ();
 	}
+
+	// Notify any directly watching parameters.
+	for (auto& watcher : dn.direct_watchers)
+		watcher->reparse ();
 }
 
 STDMETHODIMP_ (void)

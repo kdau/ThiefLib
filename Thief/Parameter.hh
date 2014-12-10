@@ -99,6 +99,13 @@ public:
 	 * reinterpretation when the relevant context may have changed. */
 	virtual void reparse () const;
 
+	/*! Outputs cached parameters and technical details to the monolog.
+	 * ThiefLib caches the raw values of parameters on objects that scripts
+	 * are currently interested in. This method prints to the monolog a list
+	 * of those objects, the state of and parameters in their DesignNotes,
+	 * and the values of those parameters. */
+	static void dump_cache ();
+
 protected:
 	//! \cond HIDDEN_SYMBOLS
 

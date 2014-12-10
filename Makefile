@@ -268,13 +268,13 @@ $(bindir_osl)/ParameterCache.o: $(srcdir)/ParameterCache.hh
 $(bindir_osl)/OSL.o: $(srcdir)/OSL.hh
 
 $(bindir_osl)/OSL_version.o: $(srcdir)/OSL.rc
-	$(RC) $(DEFINES) $(OSL_DEFINES) $(INCLUDES) -o $@ -i $<
+	$(RC) $(OSL_DEFINES) $(INCLUDES) -o $@ -i $<
 
 $(bindir_osl)/OSL_exports.o: $(srcdir)/OSL.def
 	$(DLLTOOL) --output-exp $@ --input-def $<
 
 $(OSL_NAME): $(OSL_OBJECTS) $(LIBSN)
-	$(LD) $(LDFLAGS) -Wl,--image-base=0x14200000 -o $@ $^ -luuid
+	$(LD) $(OSL_LDFLAGS) -Wl,--image-base=0x14200000 -o $@ $^ -luuid
 
 
 
