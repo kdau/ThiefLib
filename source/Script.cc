@@ -394,10 +394,10 @@ PersistentBase::set (const LGMultiBase& value)
 // TrapTrigger
 
 TrapTrigger::TrapTrigger (const String& _name, const Object& _host, Log _level,
-		bool _delayed_revert)
+		Timing _timing_behavior)
 	: Script (_name, _host, _level),
-	  delayed_revert (_delayed_revert),
-	  THIEF_PERSISTENT (revert_timer)
+	  timing_behavior (_timing_behavior),
+	  THIEF_PERSISTENT (timer)
 {
 	listen_message ("TurnOn", &TrapTrigger::on_turn_on);
 	listen_timer ("TurnOn", &TrapTrigger::on_turn_on);
@@ -405,8 +405,8 @@ TrapTrigger::TrapTrigger (const String& _name, const Object& _host, Log _level,
 	listen_message ("TurnOff", &TrapTrigger::on_turn_off);
 	listen_timer ("TurnOff", &TrapTrigger::on_turn_off);
 
-	if (delayed_revert)
-		listen_timer ("Revert", &TrapTrigger::on_revert);
+	if (timing_behavior != Timing::NONE)
+		listen_timer ("TrapTiming", &TrapTrigger::on_timer);
 }
 
 TrapTrigger::~TrapTrigger ()
@@ -462,19 +462,27 @@ TrapTrigger::on_turn_on (Message& message)
 	if (!host ().trap_on) return Message::HALT;
 	if (host ().is_locked ()) return Message::HALT;
 
-	if (revert_timer.exists ())
+	if (timer.exists ())
 	{
-		revert_timer->cancel ();
-		revert_timer.remove ();
+		timer->cancel ();
+		timer.remove ();
 	}
 
 	bool on = host ().trap_invert ? false : true;
+
+	if (host ().script_timing != 0ul && timing_behavior == Timing::DELAY)
+	{
+		timer = start_timer ("TrapTiming", host ().script_timing,
+			false, on);
+		return Message::CONTINUE;
+	}
+
 	Message::Result result = on_trap (on, message);
 
-	if (delayed_revert && result == Message::CONTINUE &&
-	    host ().script_timing != 0ul)
-		revert_timer = start_timer ("Revert",
-			host ().script_timing, false, !on);
+	if (result == Message::CONTINUE && host ().script_timing != 0ul &&
+	    timing_behavior == Timing::REVERT)
+		timer = start_timer ("TrapTiming", host ().script_timing,
+			false, !on);
 
 	if (result != Message::ERROR && host ().trap_once)
 		host ().set_locked (true);
@@ -488,13 +496,21 @@ TrapTrigger::on_turn_off (Message& message)
 	if (!host ().trap_off) return Message::HALT;
 	if (host ().is_locked ()) return Message::HALT;
 
-	if (revert_timer.exists ())
+	if (timer.exists ())
 	{
-		revert_timer->cancel ();
-		revert_timer.remove ();
+		timer->cancel ();
+		timer.remove ();
 	}
 
 	bool on = host ().trap_invert ? true : false;
+
+	if (host ().script_timing != 0ul && timing_behavior == Timing::DELAY)
+	{
+		timer = start_timer ("TrapTiming", host ().script_timing,
+			false, on);
+		return Message::CONTINUE;
+	}
+
 	Message::Result result = on_trap (on, message);
 
 	if (result != Message::ERROR && host ().trap_once)
@@ -504,10 +520,15 @@ TrapTrigger::on_turn_off (Message& message)
 }
 
 Message::Result
-TrapTrigger::on_revert (TimerMessage& message)
+TrapTrigger::on_timer (TimerMessage& message)
 {
+	if (timing_behavior == Timing::NONE)
+		return Message::ERROR;;
 	bool on = message.get_data (Message::DATA1, false);
-	return on_trap (on, message);
+	Message::Result result = on_trap (on, message);
+	if (result != Message::ERROR && host ().trap_once)
+		host_as<Lockable> ().set_locked (true);
+	return result;
 }
 
 

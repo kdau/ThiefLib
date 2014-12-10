@@ -475,8 +475,9 @@ private:
  * Traps are scripts that perform actions in response to the \c TurnOn and/or
  * \c TurnOff messages. This class provides behaviors common to all standard
  * traps (among the stock scripts, those traps that inherit from \c StdTrap).
- * Specifically, it handles locking, filtering, inversion, and timed reversion
- * as specified by the trap control flags (see ScriptHost).
+ * Specifically, it handles locking, filtering, and inversion as specified by
+ * the trap control flags and timed delay or reversion as specified by the
+ * script timing (see ScriptHost).
  *
  * Trigger behavior is provided by the trigger() method; see it for more
  * information. */
@@ -486,16 +487,26 @@ public:
 	//! Destoys a trap/trigger script.
 	virtual ~TrapTrigger ();
 
+	//! A behavior related to the ScriptHost::script_timing field.
+	enum class Timing
+	{
+		NONE,	//!< The field is ignored.
+		DELAY,	/*!< \c TurnOn and \c TurnOff will not be processed
+			 * until the specified time has elapsed. */
+		REVERT	/*! Each time the trap is turned on, it will be turned
+			 * off again after the specified time has elapsed. (No
+			 * reversion will occur for \c TurnOff.) */
+	};
+
 protected:
 	/*! Constructs a trap/trigger script of the given name on the given host
-	 * object. If \a delayed_revert is \c true and the host object has a
-	 * ScriptHost::script_timing, each time the trap is turned on it will
-	 * be turned off again after the timing duration.
+	 * object. A trap will with ScriptHost::script_timing set will behave
+	 * according to the specified \c timing_behavior.
 	 *
 	 * See Script::Script() for more general information. */
 	TrapTrigger (const String& name, const Object& host,
 		Log min_level = THIEF_DEFAULT_LOG_LEVEL,
-		bool delayed_revert = false);
+		Timing timing_behavior = Timing::NONE);
 
 	/*! Prepares the script to handle messages.
 	 * In %Thief: The Dark Project and %Thief Gold (\c IS_THIEF1) only,
@@ -532,10 +543,10 @@ protected:
 private:
 	Message::Result on_turn_on (Message&);
 	Message::Result on_turn_off (Message&);
+	Message::Result on_timer (TimerMessage&);
 
-	Message::Result on_revert (TimerMessage&);
-	bool delayed_revert;
-	Persistent<Timer> revert_timer;
+	Timing timing_behavior;
+	Persistent<Timer> timer;
 };
 
 
