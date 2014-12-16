@@ -2,7 +2,7 @@
  *  ActReact.cc
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -29,6 +29,29 @@ namespace Thief {
 
 
 
+// Reaction
+
+const Reaction
+Reaction::NONE (0);
+
+Reaction::Reaction (const String& name)
+	: number (SService<IActReactSrv> (LG)->GetReactionNamed (name.data ()))
+{
+	if (*this == NONE)
+		throw MissingResource (MissingResource::REACTION, name,
+			Object::NONE);
+}
+
+String
+Reaction::get_name () const
+{
+	LGString name;
+	SService<IActReactSrv> (LG)->GetReactionName (name, number);
+	return name;
+}
+
+
+
 // Stimulus
 //TODO wrap property: Game: Dark\BloodMaxDamage = BloodMaxDmg
 
@@ -43,26 +66,54 @@ OBJECT_TYPE_IMPL_ (Stimulus,
 bool
 Stimulus::is_stimulus () const
 {
-	return inherits_from (Object ("Stimulus")); // hopefully not renamed
+	// There is no property that all stimuli and only stimuli share. The
+	// only available test is inheritance from the standard base archetype
+	// for stimuli; this would break on any gamesys where it had been
+	// renamed.
+	return inherits_from (Object ("Stimulus"));
 }
 
 
 
-// Reaction
+// Reagent
 
-//TODO Create, replacing reaction_kind.
-//TODO wrap method: IActReactSrv->GetReactionNamed
-//TODO wrap method: IActReactSrv->GetReactionName
+OBJECT_TYPE_IMPL (Reagent)
 
-
-
-// Reactor
-
-//TODO Create, after finding a better name.
 //TODO wrap method: IActReactSrv->React
-//TODO wrap method: IActReactSrv->Stimulate
-//TODO wrap method: IActReactSrv->SubscribeToStimulus
-//TODO wrap method: IActReactSrv->UnsubscribeToStimulus
+
+#ifndef IS_OSL
+
+void
+Reagent::stimulate (const Stimulus& stimulus, float intensity,
+	const Object& source)
+{
+#ifndef IS_THIEF2
+	(void) source;
+#endif
+	SService<IActReactSrv> (LG)->Stimulate
+		(number, stimulus.number, intensity
+#ifdef IS_THIEF2
+		, source.number
+#endif
+		);
+}
+
+#endif // !IS_OSL
+
+void
+Reagent::subscribe_stimulus (const Stimulus& stimulus)
+{
+	SService<IActReactSrv> (LG)->SubscribeToStimulus
+		(number, stimulus.number);
+}
+
+void
+Reagent::unsubscribe_stimulus (const Stimulus& stimulus)
+{
+	SService<IActReactSrv> (LG)->UnsubscribeToStimulus
+		(number, stimulus.number);
+}
+
 //TODO wrap method: IActReactSrv->BeginContact
 //TODO wrap method: IActReactSrv->EndContact
 //TODO wrap method: IActReactSrv->SetSingleSensorContact

@@ -1,7 +1,7 @@
 //! \file Object.hh Base class and macros for game object wrappers.
 
 /*  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -47,7 +47,7 @@ namespace Thief {
  * The game world is made up of concrete objects. Each concrete object inherits
  * from one direct, abstract ancestor, an archetype which identifies its type.
  * That archetype in turn inherits from other archetypes, up to one of several
- * root archetypes. In Thief, the root archetypes are \c Object, \c Stimulus,
+ * root archetypes. For %Thief, the root archetypes are \c Object, \c Stimulus,
  * <tt>Flow Group</tt>, \c MetaProperty, \link Room <tt>Base %Room</tt>\endlink,
  * and \c Texture.
  *
@@ -57,7 +57,7 @@ namespace Thief {
  * places across the main hierarchy of archetypes.
  *
  * All concrete objects have a specific position in the game world, consisting
- * of a location vector (X-Y-Z coordinates) and a rotation vector (heading
+ * of a location vector (X-Y-Z coordinates) and a rotation vector (heading-
  * pitch-bank directions in degrees).
  *
  * Concrete objects have positive object numbers and are stored in the mission

@@ -75,7 +75,7 @@ PROXY_CONFIG (Damageable, slay_result, "SlayResult", nullptr,
 	Damageable::SlayResult, SlayResult::NORMAL);
 PROXY_CONFIG (Damageable, death_stage, "DeathStage", nullptr, int, 0);
 
-OBJECT_TYPE_IMPL_ (Damageable,
+OBJECT_TYPE_IMPL_ (Damageable, Reagent (),
 	PROXY_INIT (hit_points),
 	PROXY_INIT (max_hit_points),
 	PROXY_INIT (slay_result),

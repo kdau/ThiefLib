@@ -501,7 +501,8 @@ public:
 		FLAVOR,    //!< A link Flavor.
 		LINK,      //!< A Link between objects.
 		PARAMETER, //!< A Parameter in an object's Design Note.
-		BITMAP     //!< A HUDBitmap image.
+		BITMAP,    //!< A HUDBitmap image.
+		REACTION   //!< A Reaction kind.
 	};
 
 	/*! Constructs a new missing resource exception.

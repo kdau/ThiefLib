@@ -2,7 +2,7 @@
  *  Types.hh
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -61,7 +61,7 @@ public:
 
 // Damageable
 
-class Damageable : public virtual Object
+class Damageable : public Reagent
 {
 public:
 	THIEF_OBJECT_TYPE (Damageable)
@@ -267,7 +267,7 @@ public:
 
 // Marker
 
-class Marker : public Object
+class Marker : public virtual Object
 {
 public:
 	THIEF_OBJECT_TYPE (Marker)

@@ -346,6 +346,7 @@ MissingResource::MissingResource (Type _type, const String& name,
 	case LINK: type = "link"; break;
 	case PARAMETER: type = "parameter"; break;
 	case BITMAP: type = "HUD bitmap"; break;
+	case REACTION: type = "reaction kind"; break;
 	}
 
 	boost::format _explanation

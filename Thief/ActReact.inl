@@ -1,8 +1,8 @@
 /******************************************************************************
- *  ActReact.hh
+ *  ActReact.inl
  *
  *  This file is part of ThiefLib, a library for Thief 1/2 script modules.
- *  Copyright (C) 2013-2014 Kevin Daughtridge <kevin@kdau.com>
+ *  Copyright (C) 2014 Kevin Daughtridge <kevin@kdau.com>
  *  Adapted in part from Public Scripts and the Object Script Library
  *  Copyright (C) 2005-2013 Tom N Harris <telliamed@whoopdedo.org>
  *
@@ -22,64 +22,47 @@
  *****************************************************************************/
 
 #ifndef THIEF_ACTREACT_HH
-#define THIEF_ACTREACT_HH
+#error "This file should only be included from <Thief/ActReact.hh>."
+#endif
 
-#include <Thief/Base.hh>
-#include <Thief/Object.hh>
+#ifndef THIEF_ACTREACT_INL
+#define THIEF_ACTREACT_INL
 
 namespace Thief {
 
 
 
-struct Reaction
+// Reaction
+
+inline Reaction::Reaction ()
+	: number (NONE.number)
+{}
+
+inline Reaction::Reaction (Number _number)
+	: number (_number)
+{}
+
+inline bool
+Reaction::operator == (const Reaction& rhs) const
 {
-	typedef long Number;
-	static const Reaction NONE;
-	Number number;
+	return number == rhs.number;
+}
 
-	Reaction ();
-	explicit Reaction (Number);
-	explicit Reaction (const String& name); //TESTME
-
-	bool operator == (const Reaction&) const;
-	bool operator != (const Reaction&) const;
-	bool operator < (const Reaction&) const;
-
-	String get_name () const; //TESTME
-};
-
-
-
-class Stimulus : public virtual Object
+inline bool
+Reaction::operator != (const Reaction& rhs) const
 {
-public:
-	THIEF_OBJECT_TYPE (Stimulus)
+	return number != rhs.number;
+}
 
-	bool is_stimulus () const;
-
-	THIEF_PROP_FIELD (bool, causes_blood); //TESTME
-	THIEF_PROP_FIELD (bool, causes_knockout); //TESTME
-};
-
-
-
-class Reagent : public virtual Object
+inline bool
+Reaction::operator < (const Reaction& rhs) const
 {
-public:
-	THIEF_OBJECT_TYPE (Reagent)
-
-	void stimulate (const Stimulus&, float intensity,
-		const Object& source = Object::NONE);
-
-	void subscribe_stimulus (const Stimulus&); //TESTME
-	void unsubscribe_stimulus (const Stimulus&); //TESTME
-};
+	return number < rhs.number;
+}
 
 
 
 } // namespace Thief
 
-#include <Thief/ActReact.inl>
-
-#endif // THIEF_ACTREACT_HH
+#endif // THIEF_ACTREACT_INL
 

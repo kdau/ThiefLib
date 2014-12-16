@@ -472,7 +472,7 @@ public:
  * This object type is used to replace one texture with another on all terrain
  * surfaces within a given radius of the object. A static method is supplied
  * here to automatically create a temporary object for this purpose. */
-class TextureSwapper : public Object
+class TextureSwapper : public virtual Object
 {
 public:
 	THIEF_OBJECT_TYPE (TextureSwapper)
