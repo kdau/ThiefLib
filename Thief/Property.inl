@@ -139,9 +139,10 @@ THIEF_FIELD_PROXY_CLASS (PropField)::PropField (Object& _object, size_t _index)
 
 THIEF_FIELD_PROXY_TEMPLATE
 inline bool
-THIEF_FIELD_PROXY_CLASS (PropField)::exists () const
+THIEF_FIELD_PROXY_CLASS (PropField)::exists (bool inherited) const
 {
-	return ObjectProperty (config->items [index].major, object).exists ();
+	return ObjectProperty (config->items [index].major, object)
+		.exists (inherited);
 }
 
 THIEF_FIELD_PROXY_TEMPLATE

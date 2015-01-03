@@ -336,8 +336,9 @@ public:
 	PropField (Object&, size_t index);
 
 	/*! Returns whether the underlying property is instantiated on the
-	 * object. */
-	bool exists () const;
+	 * object. \param inherited Whether to consider instances of the
+	 * underlying property on ancestors of the object. */
+	bool exists (bool inherited = true) const;
 
 	/*! Instantiates the underlying property on the object.
 	 * This method affects the entire underlying property, not just this
