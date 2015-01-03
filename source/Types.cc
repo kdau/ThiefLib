@@ -75,7 +75,7 @@ PROXY_CONFIG (Damageable, slay_result, "SlayResult", nullptr,
 	Damageable::SlayResult, SlayResult::NORMAL);
 PROXY_CONFIG (Damageable, death_stage, "DeathStage", nullptr, int, 0);
 
-OBJECT_TYPE_IMPL_ (Damageable, Reagent (),
+OBJECT_TYPE_IMPL_ (Damageable, SoundSource (), Reagent (),
 	PROXY_INIT (hit_points),
 	PROXY_INIT (max_hit_points),
 	PROXY_INIT (slay_result),
@@ -169,7 +169,8 @@ PROXY_CONFIG (Being, drowning_damage, "BreathConfig", "Drown Damage", int, 0);
 PROXY_CONFIG (Being, drowning_frequency, "BreathConfig", "Drown Freq (ms)",
 	Time, 0ul);
 
-OBJECT_TYPE_IMPL_ (Being, Physical (), SpherePhysical (), Damageable (),
+OBJECT_TYPE_IMPL_ (Being,
+	Physical (), SpherePhysical (), SoundSource (), Damageable (),
 	PROXY_INIT (team),
 	PROXY_INIT (culpable),
 	PROXY_INIT (blood_type),
@@ -214,7 +215,7 @@ PROXY_CONFIG (Interactive, loot_value_goods, "Loot", "Art", int, 0);
 PROXY_CONFIG (Interactive, loot_value_special, "Loot", "Specials", unsigned, 0u);
 PROXY_CONFIG (Interactive, store_price, "SalePrice", nullptr, int, 0);
 
-OBJECT_TYPE_IMPL_ (Interactive, Rendered (),
+OBJECT_TYPE_IMPL_ (Interactive, Rendered (), SoundSource (),
 	PROXY_INIT (frob_world_action),
 	PROXY_INIT (frob_inventory_action),
 	PROXY_INIT (frob_tool_action),
@@ -470,7 +471,8 @@ OBJECT_TYPE_IMPL_ (Marker,
 PROXY_CONFIG (Readable, book_name, "Book", nullptr, String, "");
 PROXY_CONFIG (Readable, book_art, "BookArt", nullptr, String, "");
 
-OBJECT_TYPE_IMPL_ (Readable, Rendered (), Interactive (),
+OBJECT_TYPE_IMPL_ (Readable,
+	Rendered (), SoundSource (), Interactive (),
 	PROXY_INIT (book_name),
 	PROXY_INIT (book_art)
 )

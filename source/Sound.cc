@@ -196,6 +196,18 @@ SoundSchema::play_by_tags (const String& tags, Tagged location,
 
 
 
+// SoundSource
+
+PROXY_CONFIG (SoundSource, class_tags, "Class Tags", nullptr, String, "");
+PROXY_CONFIG (SoundSource, material_tags, "Material Tags", nullptr, String, "");
+
+OBJECT_TYPE_IMPL_ (SoundSource,
+	PROXY_INIT (class_tags),
+	PROXY_INIT (material_tags)
+)
+
+
+
 // AmbientHacked
 
 PROXY_NEG_BIT_CONFIG (AmbientHacked, active, "AmbientHacked", "Flags",
@@ -235,13 +247,6 @@ AmbientHacked::is_ambient_hacked () const
 {
 	return active.exists ();
 }
-
-
-
-/*TODO wrap these properties, perhaps creating SoundSource : Object:
- * Schema\Class Tags = Class Tags
- * Schema\Material Tags = Material Tags
- */
 
 
 

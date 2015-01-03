@@ -79,7 +79,7 @@ PROXY_CONFIG (AI, last_speech_concept, "Speech", "concept", int, 0);
 PROXY_BIT_CONFIG (AI, is_innocent, "DarkStat", nullptr, 1u, false);
 PROXY_BIT_CONFIG (AI, is_robot, "DarkStat", nullptr, 16u, false);
 
-OBJECT_TYPE_IMPL_ (AI, Rendered (), Interactive (), Physical (),
+OBJECT_TYPE_IMPL_ (AI, Rendered (), SoundSource (), Interactive (), Physical (),
 		SpherePhysical (), Damageable (), Being (), Container (),
 	PROXY_INIT (mode),
 	PROXY_INIT (frozen_start),

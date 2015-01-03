@@ -113,6 +113,19 @@ public:
 
 
 
+// SoundSource
+
+class SoundSource : public virtual Object
+{
+public:
+	THIEF_OBJECT_TYPE (SoundSource)
+
+	THIEF_PROP_FIELD (String, class_tags);
+	THIEF_PROP_FIELD (String, material_tags); //TESTME
+};
+
+
+
 // AmbientHacked
 
 class AmbientHacked : public virtual Object

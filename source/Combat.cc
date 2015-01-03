@@ -31,7 +31,7 @@ namespace Thief {
 
 PROXY_CONFIG (Blood, is_blood, "Blood", nullptr, bool, false);
 
-OBJECT_TYPE_IMPL_ (Blood, Rendered (), Damageable (),
+OBJECT_TYPE_IMPL_ (Blood, Rendered (), SoundSource (), Damageable (),
 	PROXY_INIT (is_blood)
 )
 
@@ -52,7 +52,8 @@ PROXY_CONFIG (Weapon, exposure_swung, "SwingExpose", nullptr, int, 0);
 PROXY_CONFIG (Weapon, collides_with_terrain, "WpnTerrColl", nullptr,
 	bool, false);
 
-OBJECT_TYPE_IMPL_ (Weapon, Rendered (), Interactive (), Combinable (),
+OBJECT_TYPE_IMPL_ (Weapon,
+	Rendered (), SoundSource (), Interactive (), Combinable (),
 	PROXY_INIT (exposure_drawn),
 	PROXY_INIT (exposure_swung),
 	PROXY_INIT (collides_with_terrain)
@@ -136,7 +137,8 @@ AIAttackMessage::AIAttackMessage (Event _event, const Object& _weapon)
 PROXY_CONFIG (Combatant, non_hostile, "AI_NonHst", nullptr,
 	Combatant::NonHostile, NonHostile::NEVER);
 
-OBJECT_TYPE_IMPL_ (Combatant, Rendered (), Interactive (), Physical (),
+OBJECT_TYPE_IMPL_ (Combatant,
+	Rendered (), SoundSource (), Interactive (), Physical (),
 	SpherePhysical (), Damageable (), AI (),
 	PROXY_INIT (non_hostile)
 )
@@ -204,7 +206,8 @@ PROXY_CONFIG (RangedCombatant, decay_speed, "AIRCProp", "Decay Speed",
 PROXY_CONFIG (RangedCombatant, contain_projectile,
 	"AIRCProp", "Contain Projectile", bool, false);
 
-OBJECT_TYPE_IMPL_ (RangedCombatant, Rendered (), Interactive (), Physical (),
+OBJECT_TYPE_IMPL_ (RangedCombatant,
+	Rendered (), SoundSource (), Interactive (), Physical (),
 	SpherePhysical (), Damageable (), Combatant (),
 	PROXY_INIT (minimum_distance),
 	PROXY_INIT (ideal_distance),
@@ -303,7 +306,8 @@ AIProjectileLink::create (const Object& source, const Object& dest,
 PROXY_CONFIG (SuicideCombatant, detonate_range, "DAI_FrogExpl", nullptr,
 	float, 0.0f);
 
-OBJECT_TYPE_IMPL_ (SuicideCombatant, Rendered (), Interactive (), Physical (),
+OBJECT_TYPE_IMPL_ (SuicideCombatant,
+	Rendered (), SoundSource (), Interactive (), Physical (),
 	SpherePhysical (), Damageable (), Combatant (),
 	PROXY_INIT (detonate_range)
 )

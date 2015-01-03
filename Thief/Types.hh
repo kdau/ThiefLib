@@ -32,6 +32,7 @@
 #include <Thief/Physics.hh>
 #include <Thief/Property.hh>
 #include <Thief/Rendering.hh>
+#include <Thief/Sound.hh>
 
 namespace Thief {
 
@@ -61,7 +62,7 @@ public:
 
 // Damageable
 
-class Damageable : public Reagent
+class Damageable : public Reagent, public virtual SoundSource
 {
 public:
 	THIEF_OBJECT_TYPE (Damageable)
@@ -129,7 +130,7 @@ public:
 
 // Interactive
 
-class Interactive : public virtual Rendered
+class Interactive : public virtual Rendered, public virtual SoundSource
 {
 public:
 	THIEF_OBJECT_TYPE (Interactive)

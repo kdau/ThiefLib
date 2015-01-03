@@ -88,8 +88,9 @@ PROXY_CONFIG (Key, master_key, "KeySrc", "MasterBit", bool, false);
 PROXY_CONFIG (Key, region_mask, "KeySrc", "RegionMask", unsigned, 0u);
 PROXY_CONFIG (Key, lock_number, "KeySrc", "LockID", unsigned, 0u);
 
-OBJECT_TYPE_IMPL_ (Key, Physical (), SpherePhysical (), Rendered (),
-		Interactive (), Combinable (), Damageable (),
+OBJECT_TYPE_IMPL_ (Key,
+	Physical (), SpherePhysical (), Rendered (), SoundSource (),
+	Interactive (), Combinable (), Damageable (),
 	PROXY_INIT (master_key),
 	PROXY_INIT (region_mask),
 	PROXY_INIT (lock_number)
@@ -123,7 +124,8 @@ THIEF_ENUM_CODING (Door::State, CODE, CODE,
 PROXY_CONFIG (Door, static_light_position, "DoorStaticLight", nullptr,
 	bool, false);
 
-OBJECT_TYPE_IMPL_ (Door, Physical (), OBBPhysical (), Rendered (),
+OBJECT_TYPE_IMPL_ (Door,
+	Physical (), OBBPhysical (), Rendered (), SoundSource (),
 	Interactive (), Damageable (), Lockable (),
 	PROXY_INIT (static_light_position))
 
@@ -266,7 +268,8 @@ PROXY_ARRAY_CONFIG_ (RotatingDoor, room, 2u, Room, Door_room_getter, nullptr,
 	PROXY_ARRAY_ITEM ("RotDoor", "Room ID #2", Object::NONE)
 );
 
-OBJECT_TYPE_IMPL_ (RotatingDoor, Physical (), OBBPhysical (), Rendered (),
+OBJECT_TYPE_IMPL_ (RotatingDoor,
+	Physical (), OBBPhysical (), Rendered (), SoundSource (),
 	Interactive (), Damageable (), Lockable (), Door (),
 	PROXY_INIT (axis),
 	PROXY_INIT (initial_angle),
@@ -306,7 +309,8 @@ PROXY_ARRAY_CONFIG_ (TranslatingDoor, room, 2u, Room, Door_room_getter, nullptr,
 	PROXY_ARRAY_ITEM ("TransDoor", "Room ID #2", Object::NONE)
 );
 
-OBJECT_TYPE_IMPL_ (TranslatingDoor, Physical (), OBBPhysical (), Rendered (),
+OBJECT_TYPE_IMPL_ (TranslatingDoor,
+	Physical (), OBBPhysical (), Rendered (), SoundSource (),
 	Interactive (), Damageable (), Lockable (), Door (),
 	PROXY_INIT (axis),
 	PROXY_INIT (initial_position),
@@ -336,7 +340,8 @@ PROXY_CONFIG (Pickable, total_time, "PickState", "TotalTime", Time, 0ul);
 PROXY_CONFIG (Pickable, stage_time, "PickState", "StageTime", Time, 0ul);
 PROXY_CONFIG (Pickable, picker, "PickState", "Picker", Being, Object::NONE);
 
-OBJECT_TYPE_IMPL_ (Pickable, Rendered (), Interactive (), Lockable (),
+OBJECT_TYPE_IMPL_ (Pickable,
+	Rendered (), SoundSource (), Interactive (), Lockable (),
 	PROXY_INIT (current_stage),
 	PROXY_INIT (current_pin),
 	PROXY_INIT (picked),
@@ -378,8 +383,8 @@ PROXY_BIT_ARRAY_CONFIG (BasicPickable, randomize_time, 3u, bool,
 	PROXY_BIT_ARRAY_ITEM ("PickCfg", "Flags 2", false, 2u),
 	PROXY_BIT_ARRAY_ITEM ("PickCfg", "Flags 3", false, 2u));
 
-OBJECT_TYPE_IMPL_ (BasicPickable, Rendered (), Interactive (), Lockable (),
-	Pickable (),
+OBJECT_TYPE_IMPL_ (BasicPickable,
+	Rendered (), SoundSource (), Interactive (), Lockable (), Pickable (),
 	PROXY_ARRAY_INIT (pick_bits, 3),
 	PROXY_ARRAY_INIT (pin_count, 3),
 	PROXY_ARRAY_INIT (time_percent, 3),
@@ -417,8 +422,8 @@ PROXY_ARRAY_CONFIG (AdvPickable, stage_time, 9u, Time,
 	PROXY_ARRAY_ITEM ("AdvPickStateCfg", "Time 7", 0ul),
 	PROXY_ARRAY_ITEM ("AdvPickStateCfg", "Time 8", 0ul));
 
-OBJECT_TYPE_IMPL_ (AdvPickable, Rendered (), Interactive (), Lockable (),
-	Pickable (),
+OBJECT_TYPE_IMPL_ (AdvPickable,
+	Rendered (), SoundSource (), Interactive (), Lockable (), Pickable (),
 	PROXY_INIT (is_advanced_pickable),
 	PROXY_ARRAY_INIT (pick_bits, 3),
 	PROXY_ARRAY_INIT (stage_time, 9)
@@ -450,7 +455,7 @@ PickMessage::PickMessage (AdvPickable::Stage _new_stage,
 
 PROXY_CONFIG (Lockpick, pick_bits, "PickSrc", "PickBits", unsigned, 0u);
 
-OBJECT_TYPE_IMPL_ (Lockpick, Rendered (), Interactive (),
+OBJECT_TYPE_IMPL_ (Lockpick, Rendered (), SoundSource (), Interactive (),
 	PROXY_INIT (pick_bits)
 )
 
