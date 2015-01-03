@@ -565,15 +565,22 @@ Transition::initialize ()
 void
 Transition::start ()
 {
-	if (timer.exists ()) // Stop any previous cycle.
+	abort (); // Stop any previous cycle.
+	remaining = length;
+	TimerMessage::with_data ("TransitionStep", name)
+		.send (host.host (), host.host ());
+}
+
+void
+Transition::abort ()
+{
+	if (timer.exists ())
 	{
 		timer->cancel ();
 		timer.remove ();
 	}
-
-	remaining = length;
-	TimerMessage::with_data ("TransitionStep", name)
-		.send (host.host (), host.host ());
+	if (remaining.exists ())
+		remaining.remove ();
 }
 
 bool

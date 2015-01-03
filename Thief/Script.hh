@@ -556,7 +556,9 @@ private:
  * gradient values (such as color, opacity, or speed). It uses \c %Timer
  * messages to trigger a series of steps between the starting and finishing
  * states. A script using this class passes it a pointer to a member function
- * that updates the state at each step, using interpolate()d values. */
+ * that updates the state at each step, using interpolate()d values. That step
+ * function must return a bool; if it returns \c false, the transition will be
+ * aborted. */
 class Transition : public MessageHandler
 {
 public:
@@ -588,6 +590,12 @@ public:
 	/*! Starts the transition.
 	 * Any previous cycle will be aborted. */
 	void start ();
+
+	/*! Aborts the transition cycle in progress.
+	 * The step method will not be called again, so the transition effect
+	 * will be left in its current state, but this object will be reset.
+	 * If no cycle is in progress, this method will have no effect. */
+	void abort ();
 
 	/*! Returns whether the transition is \a not currently in progress.
 	 * This could be during the last step (progress is \c 1.0) or outside
